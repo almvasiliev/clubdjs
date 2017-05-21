@@ -1,0 +1,309 @@
+<?php
+       
+        require_once ("substrings.html");
+        require_once ("index_events_dates.html");
+        
+        $date_now = date('Y-m-d H:i:s');
+        $date_now = str_replace(' ', '-', $date_now);
+        $date_now = str_replace(':', '-', $date_now);
+        $date_now = explode("-", $date_now);
+        $date_year_now = intval($date_now[0]);
+        $date_month_now = intval($date_now[1]);
+        $date_day_now = intval($date_now[2]);
+        $date_hour_now = intval($date_now[3]);
+        $date_minute_now = intval($date_now[4]);
+        $date_second_now = intval($date_now[5]);
+        $dateunix_now = mktime ($date_hour_now, $date_minute_now, $date_second_now, $date_month_now, $date_day_now, $date_year_now);//Вычисляем метку времени UNIX для серверного времени на стыке сегодня/завтра
+        $dateunix_now = $dateunix_now + $diftime;   
+        $date_now = date("Y-m-d H:i:s", $dateunix_now);
+                        
+        //НАЧАЛО Подсчет предстоящих события на главную страницу.                
+        $result_events = mysql_query("
+        SELECT page.p_id, page.city_id, page.p_date_finish, city.city_id 
+        FROM page 
+        LEFT JOIN city ON city.city_id=page.city_id
+        WHERE page.pp_id='11' AND page.city_id='$city_id' AND page.p_show_index='1' AND '$date_now' <  page.p_date_finish 
+        ORDER BY page.p_date_start 
+        LIMIT 9
+        ");
+        
+		$array_events = array();
+            while($myrow_events = mysql_fetch_array($result_events))
+                {
+                    $array_events[] = $myrow_events['p_id'];
+                }
+		$carray_events = count($array_events);
+        	if ($carray_events == 0)
+                {
+                    $evt = '';
+                }
+            else
+                {
+                    $evt = "$carray_events";
+                }
+		//КОНЕЦ Подсчет предстоящих события на главную страницу.
+        
+        //НАЧАЛО Подсчет новых заведений.
+        
+        $result_places = mysql_query("
+        SELECT page.p_id 
+        FROM page 
+        WHERE page.city_id='$city_id' AND (page.pp_id='1' OR page.pp_id='2' OR page.pp_id='3' OR page.pp_id='4' OR page.pp_id='5' OR page.pp_id='6') 
+        ORDER BY page.p_date 
+        LIMIT 4
+        ");
+		$array_places = array();
+            while($myrow_places = mysql_fetch_array($result_places))
+                {
+                    $array_places[] = $myrow_places['p_id'];
+                }
+		$carray_places = count($array_places);
+        	if ($carray_places == 0)
+                {
+                    $plc = '';
+                }
+            else
+                {
+                    $plc = "$carray_places";
+                }
+		//КОНЕЦ Подсчет новых заведений.
+        
+        echo ("
+		<td width='510' valign='top'>
+            <table cellpadding='0' cellspacing='0' width='510' height='65' bgcolor='#ffffff'>
+            	<tr><td width='510' height='65'><div style='float:left'><h1>Развлечения в $city_name_dative</h1></div></td>
+                </tr>
+				<tr><td height='1'>");require_once('menu_2.html');echo("</td>
+            	</tr>
+            </table>
+        
+        	<table border='0' cellpadding='0' cellspacing='0' width='510' height='300' bgcolor='#ffffff'>
+				<tr><td width='3'>
+        				<table border='0' cellpadding='0' cellspacing='0' width='3' height='100%'>
+                    		<tr><td background='".define_host()."source/imgs/gradient_left_up_line.gif' height='170' width='3'></td>
+                        	</tr>
+		            		<tr><td width='3'></td>
+                        	</tr>
+                        	<tr><td background='".define_host()."source/imgs/gradient_left_down_line.gif' height='170' width='3'></td>
+                            </tr>
+            			</table>
+            		</td>
+            		<td width='504' bgcolor='#fcfcfc'>
+            			<table border=0 cellpadding='0' cellspacing='0' height='100%' width='100%' valign='top'>
+							<tr><td height='1' width='100%' class='ternary_menu' colspan='3'>");require_once('menu_3.html');echo("</td>
+                            </tr>                            
+                            ");
+                            
+                            if ($carray_events != 0)
+                            	{
+                                	echo("
+                                    <tr><td width='100%' height='10' class='list_news' align='left' colspan='3'><h2 class='list_news'>Главные события в $city_name_dative.</h2><p>Мероприятия и события, которые совсем скоро будут проходить в $city_name_dative. Рекомендуем Вам обратить особое внимание на эти предстоящие мероприятия.</p></td></tr>
+                                    ");
+                                    
+                                	for ($j = 0; $j <= $carray_events - 1; $j++)
+										{
+                                        	$event_id_evt = $array_events[$j];
+                                            
+                                            $result_page = mysql_query("
+                                            SELECT page.p_id, page.pp_id, page.p_url, page.p_name_priority, page.city_id, page.p_date_start, page.p_date_finish, page.p_place_id, page.p_act, city.city_name, city.country_id, city.diftime, country.country_name, page_h1.ph1_text, page_logo.pl_mid, page_parent.pp_name 
+                                            FROM page
+                                            LEFT JOIN city ON city.city_id=page.city_id 
+                                            LEFT JOIN country ON country.country_id=city.country_id 
+                                            LEFT JOIN page_h1 ON page_h1.p_id=page.p_id AND page_h1.pt_page='9' 
+                                            LEFT JOIN page_logo ON page_logo.p_id=page.p_id 
+                                            LEFT JOIN page_parent ON page_parent.pp_id=page.pp_id 
+                                            WHERE page.p_id='$event_id_evt'
+                                            ");
+                                            
+                                            $myrow_page = mysql_fetch_array($result_page);
+                                                    
+                                            $result_place = mysql_query("
+                                            SELECT page.p_id, page.pp_id, page.p_url, page.p_name_priority, page_parent.pp_name_short 
+                                            FROM page
+                                            LEFT JOIN page_parent ON page_parent.pp_id=page.pp_id 
+                                            WHERE page.p_id='$myrow_page[p_place_id]'
+                                            ");
+                                            
+                                            $myrow_place = mysql_fetch_array($result_place);
+                                            
+                                            $n = $j + 1;
+                                            
+                                            if ($n % 2 != 0)
+                                            	{
+                                                	echo("
+                                                    <tr><td width='250' height='118'>
+                                                            <table border=0 cellpadding='0' cellspacing='0' height='118' width='250' valign='top'>
+                                                                <tr><td width='118' height='118' class='list_news' align='left'>
+                                                                    <div class='logo_user'><a href='".define_host()."$myrow_page[p_url]/index.html'><img src='".define_host()."$myrow_page[pl_mid]' alt='$myrow_page[ph1_text]'></a></div>
+                                                                    </td>
+                                                                    <td width='132' height='118' class='list_text_black' align='left' style='background: #fcfcfc url(".define_host()."source/imgs/bgte.gif) no-repeat'>
+                                                                    <h3 class='list_news'><a href='".define_host()."$myrow_page[p_url]/index.html' class='list_news'>".substrings($myrow_page['p_name_priority'],40)."</a></h3>");
+                                                                    index_events_dates($myrow_page['p_date_start'],$myrow_page['p_date_finish'],$myrow_page['diftime']);
+                                                                    echo("<br clear=all>");if (!empty($myrow_page['p_act'])) {echo("".substrings($myrow_page['p_act'],40)."<br>");}
+                                                                    $place_name = "$myrow_place[pp_name_short] $myrow_place[p_name_priority]";
+                                                                    echo("<a href='".define_host()."$myrow_place[p_url]/index.html' class='link'>".substrings($place_name,40)."</a><br><br>
+                                                                    <a href='".define_host()."$myrow_page[p_url]/index.html' class='link'>Читать дальше</a>
+                                                                    </td>
+                                                            </table>
+                                                        </td>
+                                                        <td width='4' height='118'>
+                                                        </td>
+                                                    ");
+                                                    
+                                                    if ($n == $carray_events)
+                                                    	{
+                                                        	if ($myrow2['user_id'] == $id)
+                                                            	{
+                                                                	echo("
+                                                                    <td width='250' height='118'>
+                                                                    </td>
+                                                                	</tr>
+                                                                    ");
+                                                                }
+															else
+                                                            	{
+                                                                	echo("
+                                                                    <td width='250' height='118'>
+                                                                    </td>
+                                                                	</tr>
+                                                                    ");
+                                                                }
+                                                        }
+                                                }
+											else
+                                            	{
+                                                	echo("
+                                                		<td width='250' height='118'>
+                                                        	<table border=0 cellpadding='0' cellspacing='0' height='118' width='250' valign='top'>
+                                                            	<tr><td width='118' height='118' class='list_news' align='left'>
+                                                                	<div class='logo_user'><a href='".define_host()."$myrow_page[p_url]/index.html'><img src='".define_host()."$myrow_page[pl_mid]' alt='$myrow_page[ph1_text]'></a></div>
+                                                                	</td>
+                                                                    <td width='132' height='118' class='list_text_black' align='left' style='background: #fcfcfc url(".define_host()."source/imgs/bgbe.gif) bottom no-repeat'>
+                                                                    <h3 class='list_news'><a href='".define_host()."$myrow_page[p_url]/index.html' class='list_news'>".substrings($myrow_page['p_name_priority'],40)."</a></h3>");
+                                                                    index_events_dates($myrow_page['p_date_start'],$myrow_page['p_date_finish'],$myrow_page['diftime']);
+                                                                    echo("<br clear=all>");if (!empty($myrow_page['p_act'])) {echo("".substrings($myrow_page['p_act'],40)."<br>");}
+                                                                    $place_name = "$myrow_place[pp_name_short] $myrow_place[p_name_priority]";
+                                                                    echo("<a href='".define_host()."$myrow_place[p_url]/index.html' class='link'>".substrings($place_name,40)."</a><br><br>
+                                                                    <a href='".define_host()."$myrow_page[p_url]/index.html' class='link'>Читать дальше</a>
+                                                                	</td>
+															</table>
+                                                        </td>
+													</tr>
+                                                    ");
+                                                }
+                                        }
+                                }
+							
+                            if ($carray_places != 0)
+                            	{
+                                	echo("
+                                    <tr><td width='100%' height='10' class='list_news' align='left' colspan='3'><h2 class='list_news'>Новые развлекательные места в $city_name_dative.</h2><p>Эти развлекательные места $city_name_genitivus совсем недавно появились на страницах нашего сайта, поэтому предлагаем Вам познакомиться с ними поближе.</p></td></tr>");
+                                    
+                                  for ($i = 0; $i <= $carray_places - 1; $i++)
+										{
+                                        	$place_id_plc = $array_places[$i];
+                                            
+                                            $result_page = mysql_query("
+                                            SELECT page.p_id, page.pp_id, page.p_url, page.p_name_priority, page.city_id, page.p_adress, city.city_name, city.country_id, country.country_name, page_h1.ph1_text, page_logo.pl_mid, page_parent.pp_name_short 
+                                            FROM page
+                                            LEFT JOIN city ON city.city_id=page.city_id 
+                                            LEFT JOIN country ON country.country_id=city.country_id 
+                                            LEFT JOIN page_h1 ON page_h1.p_id=page.p_id AND (page_h1.pt_page='12' OR page_h1.pt_page='20' OR page_h1.pt_page='28' OR page_h1.pt_page='37' OR page_h1.pt_page='45' OR page_h1.pt_page='107') 
+                                            LEFT JOIN page_logo ON page_logo.p_id=page.p_id 
+                                            LEFT JOIN page_parent ON page_parent.pp_id=page.pp_id 
+                                            WHERE page.p_id='$place_id_plc'
+                                            ");
+                                            
+                                            $myrow_page = mysql_fetch_array($result_page);
+                                                    
+                                            $result_metro = mysql_query("
+                                            SELECT page_metro.pm_id, page_metro.p_id, page_metro.m_id, metro.m_id, metro.m_name 
+                                            FROM page_metro 
+                                            LEFT JOIN metro ON page_metro.m_id=metro.m_id 
+                                            WHERE page_metro.p_id='$myrow_page[p_id]' ORDER BY page_metro.pm_id");
+                                            
+                                            $array_m_id = array();
+                                            $array_m_name = array();
+                                                while($myrow_metro = mysql_fetch_array($result_metro))
+                                                    {
+                                                        $array_m_id[] = $myrow_metro['m_id'];
+                                                        $array_m_name[] = $myrow_metro['m_name'];
+                                                    }
+                                            $carray_m_id = count($array_m_id);
+                                            
+                                            $m = $i + 1;
+                                            
+                                            if ($m % 2 != 0)
+                                            	{
+                                                	echo("
+                                                    <tr><td width='250' height='118' align='left'>
+                                                            <table border=0 cellpadding='0' cellspacing='0' height='100%' width='100%' valign='top'>
+                                                                <tr><td width='118' height='118' class='list_news' align='left'>
+                                                                    <div class='logo_user'><a href='".define_host()."$myrow_page[p_url]/index.html'><img src='".define_host()."$myrow_page[pl_mid]' alt='$myrow_page[ph1_text]'></a></div>
+                                                                    </td>
+                                                                    <td width='129' height='118' class='list_text_black' align='left'>
+                                                                    <h3 class='list_news'><a href='".define_host()."$myrow_page[p_url]/index.html' class='list_news'>".substrings($myrow_page['p_name_priority'],40)."</a></h3>
+                                                                    <font color='#b2b2b2'>$myrow_page[pp_name_short]</font><br>
+                                                                    <a href='".define_host()."$myrow_page[p_url]/index.html' class='link'>Читать дальше</a>
+                                                                    </td>
+                                                            </table>
+                                                        </td>
+                                                        <td width='4' height='118'>
+                                                        </td>
+                                                    ");
+                                                }
+											else
+                                            	{
+                                                	echo("
+                                                		<td width='250' height='118' align='left'>
+                                                        	<table border=0 cellpadding='0' cellspacing='0' height='100%' width='100%' valign='top'>
+                                                                <tr><td width='118' height='118' class='list_news' align='left'>
+                                                                    <div class='logo_user'><a href='".define_host()."$myrow_page[p_url]/index.html'><img src='".define_host()."$myrow_page[pl_mid]' alt='$myrow_page[ph1_text]'></a></div>
+                                                                    </td>
+                                                                    <td width='129' height='118' class='list_text_black' align='left'>
+                                                                    <h3 class='list_news'><a href='".define_host()."$myrow_page[p_url]/index.html' class='list_news'>".substrings($myrow_page['p_name_priority'],40)."</a></h3>
+                                                                    <font color='#b2b2b2'>$myrow_page[pp_name_short]</font><br>
+                                                                    <a href='".define_host()."$myrow_page[p_url]/index.html' class='link'>Читать дальше</a>
+                                                                    </td>
+                                                            </table>
+                                                        </td>
+													</tr>
+                                                    ");
+                                                }
+                                        }  
+                                    
+                                }
+                            
+                            echo("
+                            <tr><td width='100%' height='10' align='left' colspan='3'></tr>
+                            
+							<tr><td width='100%' colspan='3'></td>
+                            </tr>
+						</table>
+					</td>
+					<td width='3'>
+		            	<table border=0 cellpadding='0' cellspacing='0' width='3' height='100%'>
+        			        <tr><td background='".define_host()."source/imgs/gradient_right_up_line.gif' height='170' width='3'>
+                            	</td>
+							</tr>
+                			<tr><td width='3'>
+                            	</td>
+							</tr>
+                			<tr><td height='170' width='3'>
+                            	</td>
+							</tr>
+                		</table>
+					</td>
+				</tr>
+        		<tr>
+        			<td background='".define_host()."source/imgs/gradient_left_down_corner.gif' width='3' height='3'>
+                    </td>
+                    <td background='".define_host()."source/imgs/gradient_bottom_line.gif' width='504' height='3'>
+                    </td>
+                    <td width='3' height='3'>
+                    </td>
+				</tr>
+			</table>
+		</td>
+    	");
+?>

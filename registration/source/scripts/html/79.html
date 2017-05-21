@@ -1,0 +1,393 @@
+<?php
+		echo ("
+		<td width='510' valign='top'>
+            <table cellpadding='0' cellspacing='0' width='510' height='65' bgcolor='#ffffff'>
+            	<tr><td width='510' height='65'><div style='float:left'><h1>Регистрация на сайте</h1></div></td>
+                </tr>
+				<tr><td height='5'>");require_once('menu_2.html');echo("</td>
+            	</tr>
+            </table>
+        
+        	<table border='0' cellpadding='0' cellspacing='0' width='510' height='300' bgcolor='#ffffff'>
+				<tr><td width='3'>
+        				<table border='0' cellpadding='0' cellspacing='0' width='3' height='100%'>
+                    		<tr><td background='".define_host()."source/imgs/gradient_left_up_line.gif' height='170' width='3'></td>
+                        	</tr>
+		            		<tr><td width='3'></td>
+                        	</tr>
+                        	<tr><td background='".define_host()."source/imgs/gradient_left_down_line.gif' height='170' width='3'></td>
+                            </tr>
+            			</table>
+            		</td>
+            		<td width='504' bgcolor='#fcfcfc'>
+            			<table border=0 cellpadding='0' cellspacing='0' height='340' width='100%' valign='top'>
+							<tr><td height='1' width='100%' class='ternary_menu' colspan='2'>");require_once('menu_3.html');echo("</td>
+                            </tr>");
+                            
+                           if (isset($_POST['submit']))
+                                {
+                                    if (!preg_match("/[^(\w)|(\x7F-\xFF)|(\s)]/",$_POST['submit']))
+                                        {
+                                            $submit = htmlspecialchars($_POST['submit']);
+                                            $submit = strip_tags($submit);
+                                            	
+                                                if ($submit == 'register' || $submit == 'Зарегистрироваться')
+                                                	{
+                                                    	if (getenv("HTTP_CLIENT_IP") && strcasecmp(getenv("HTTP_CLIENT_IP"),"unknown"))
+                                                            {
+                                                                $ip = getenv("HTTP_CLIENT_IP");
+                                                            }
+                                                        elseif (getenv("HTTP_X_FORWARDED_FOR") && strcasecmp(getenv("HTTP_X_FORWARDED_FOR"), "unknown"))
+                                                            {
+                                                                $ip = getenv("HTTP_X_FORWARDED_FOR");
+                                                            }
+                                                        elseif (getenv("REMOTE_ADDR") && strcasecmp(getenv("REMOTE_ADDR"), "unknown"))
+                                                            {
+                                                                $ip = getenv("REMOTE_ADDR");
+                                                            }
+                                                        elseif (!empty($_SERVER['REMOTE_ADDR']) && strcasecmp($_SERVER['REMOTE_ADDR'], "unknown"))
+                                                            {
+                                                                $ip = $_SERVER['REMOTE_ADDR'];
+                                                            }
+                                                        else
+                                                            {
+                                                                $ip = "unknown";
+                                                            }
+                                            
+                                                        mysql_query ("DELETE FROM authorization_fails WHERE UNIX_TIMESTAMP() - UNIX_TIMESTAMP(date) > 300");
+                                                        $result_ip = mysql_query("SELECT number_fails FROM authorization_fails WHERE ip='$ip'",$connect);
+                                                        $myrow_ip = mysql_fetch_array($result_ip);
+                                                        
+                                                            if ($myrow_ip['number_fails'] > 5)
+                                                                {
+                                                                    $msg_class = 'msg_cancel';
+                                                                    $msg_title = "Регистрация не выполнена.";
+                                                                    $msg_text = "Несколько раз подряд Вы неверно указали проверочный код с картинки. Возможность повторной попытки регистрации на сайте появится не ранее чем через пять минут.";
+                                                                }
+                                                            else
+                                                                {
+                                                                	if (isset($_POST['code']))
+                                                                    	{
+                                                                            if (!preg_match("/^[a-z0-9]{6,6}$/",$_POST['code']))
+                                                                                {
+                                                                                    $select = mysql_query ("SELECT ip FROM authorization_fails WHERE ip='$ip'");
+                                                                                    $tmp = mysql_fetch_row ($select);
+                                                                                        if ($ip == $tmp[0])
+                                                                                            {
+                                                                                                //Проверяем, есть ли пользователь в таблице "authorization_fails"
+                                                                                                $result52 = mysql_query("SELECT number_fails FROM authorization_fails WHERE ip='$ip'",$connect);
+                                                                                                $myrow52 = mysql_fetch_array($result52);
+                                                                                                $number_fails = $myrow52[0] + 1;//Если есть, то приплюсовываем количесво.
+                                                                                                mysql_query ("UPDATE authorization_fails SET number_fails=$number_fails,date=NOW() WHERE ip='$ip'");
+                                                                                            }
+                                                                                        else
+                                                                                            {
+                                                                                                //Если за последние 300 секунд ошибок не было, то вставляем новую запись в таблицу "authorization_fails"
+                                                                                                mysql_query ("INSERT INTO authorization_fails (ip,date,number_fails) VALUES ('$ip',NOW(),'1')");
+                                                                                            }
+                                                                                    
+                                                                                    $msg_class = 'msg_cancel';
+                                                                                    $msg_title = "Регистрация не выполнена.";
+                                                                                    $msg_text = "Проверочный символьный код с картинки указан неверно.";
+                                                                                }
+                                                                            else
+                                                                                {
+                                                                                	$code = htmlspecialchars($_POST['code']);
+                                                                                    $code = strip_tags($code);
+                                                                                    
+                                                                                    function generate_code() //Запускаем функцию, генерирующую символьный код.
+                                                                                        {
+                                                                                            $hours = date("H");//Часы
+                                                                                            $minuts = substr(date("H"), 0 , 1);//Минуты
+                                                                                            $mouns = date("m");//Месяцы
+                                                                                            $year_day = date("z");//День в году
+                                                                                            
+                                                                                            $str = $hours . $minuts . $mouns . $year_day; //Создаем строку.
+                                                                                            $str = md5(md5($str)); //Дважды шифруем в md5.
+                                                                                            $str = strrev($str);//Реверс строки.
+                                                                                            $str = substr($str, 3, 6);//Извлекаем 6 символов, начиная с 3.
+                                                                                            
+                                                                                            $array_mix = preg_split('//', $str, -1, PREG_SPLIT_NO_EMPTY);
+                                                                                            srand ((float)microtime()*1000000);
+                                                                                            shuffle ($array_mix);
+                                                                                            return implode("", $array_mix);
+                                                                                        }
+                                                                                        
+                                                                                    function chec_code($code) //Проверяем код.
+                                                                                        {
+                                                                                            $code = trim($code);//Удаляем пробелы.
+                                                                                            $array_mix = preg_split ('//', generate_code(), -1, PREG_SPLIT_NO_EMPTY);
+                                                                                            $m_code = preg_split ('//', $code, -1, PREG_SPLIT_NO_EMPTY);
+                                                                                            $result = array_intersect ($array_mix, $m_code);
+                                                                                                
+                                                                                                if (strlen(generate_code())!=strlen($code))
+                                                                                                    {
+                                                                                                        return FALSE;
+                                                                                                    }
+                                                                                                if (sizeof($result) == sizeof($array_mix))
+                                                                                                    {
+                                                                                                        return TRUE;
+                                                                                                    }
+                                                                                                else
+                                                                                                    {
+                                                                                                        return FALSE;
+                                                                                                    }
+																						}
+																					
+                                                                                    if (!chec_code($code))
+																						{
+                                                                                        	$select = mysql_query ("SELECT ip FROM authorization_fails WHERE ip='$ip'");
+                                                                                            $tmp = mysql_fetch_row ($select);
+                                                                                                if ($ip == $tmp[0])
+                                                                                                    {
+                                                                                                        //Проверяем, есть ли пользователь в таблице "authorization_fails"
+                                                                                                        $result52 = mysql_query("SELECT number_fails FROM authorization_fails WHERE ip='$ip'",$connect);
+                                                                                                        $myrow52 = mysql_fetch_array($result52);
+                                                                                                        $number_fails = $myrow52[0] + 1;//Если есть, то приплюсовываем количесво.
+                                                                                                        mysql_query ("UPDATE authorization_fails SET number_fails=$number_fails,date=NOW() WHERE ip='$ip'");
+                                                                                                    }
+                                                                                                else
+                                                                                                    {
+                                                                                                        //Если за последние 300 секунд ошибок не было, то вставляем новую запись в таблицу "authorization_fails"
+                                                                                                        mysql_query ("INSERT INTO authorization_fails (ip,date,number_fails) VALUES ('$ip',NOW(),'1')");
+                                                                                                    }
+                                                                                            
+                                                                                            $msg_class = 'msg_cancel';
+                                                                                            $msg_title = "Регистрация не выполнена.";
+                                                                                            $msg_text = "Проверочный символьный код с картинки указан неверно.";
+                                                                                        }
+																					else
+                                                                                    	{
+                                                                                        	if (isset($_POST['name']))
+                                                                                                {
+                                                                                                    if (!preg_match("/^(([A-Za-z\ \-]){2,15}|([А-Яа-я\ \-]){2,15})$/is",$_POST['name']))//Допускается использовать либо только русские буквы, либо только английские.
+                                                                                                        {
+                                                                                                            $msg_class = 'msg_cancel';
+                                                                                                            $msg_title = "Регистрация не выполнена.";
+                                                                                                            $msg_text = "В имени допускается использовать только русские или только английские буквы. Имя должно состоять, по меньшей мере, из двух символов и не должно превышать пятнадцати символов.";
+                                                                                                        }
+																									else
+                                                                                                    	{
+                                                                                                        	$name = htmlspecialchars($_POST['name']);
+                                                                                                            $name = strip_tags($name);
+                                                                                                            $name = preg_replace('/ {2,}/',' ',$name);//Убираем повторяющиеся пробелы.
+                                                                                                            if (strlen($name) < 2)
+                                                                                                                {
+                                                                                                                    $msg_class = 'msg_cancel';
+                                                                                                                    $msg_title = "Регистрация не выполнена.";
+                                                                                                                    $msg_text = "В имени допускается использовать только русские или только английские буквы. Имя должно состоять, по меньшей мере, из двух символов и не должно превышать пятнадцати символов.";
+                                                                                                                }
+                                                                                                            else
+                                                                                                                {
+                                                                                                                	$name = mb_convert_case($name, MB_CASE_TITLE, "Windows-1251");//Первая буква каждого нового слова становится большой.
+                                                                                                                    
+                                                                                                                    if (isset($_POST['surname']))
+                                                                                                                        {
+                                                                                                                            if (!preg_match("/^(([A-Za-z\ \-]){2,15}|([А-Яа-я\ \-]){2,15})$/is",$_POST['surname']))//Допускается использовать либо только русские буквы, либо только английские.
+                                                                                                                                {
+                                                                                                                                    $msg_class = 'msg_cancel';
+                                                                                                                                    $msg_title = "Регистрация не выполнена.";
+                                                                                                                                    $msg_text = "В фамилии допускается использовать только русские или только английские буквы. Фамилия должна состоять, по меньшей мере, из двух символов и не должна превышать пятнадцати символов.";
+                                                                                                                                }
+                                                                                                                            else
+                                                                                                                                {
+                                                                                                                                    $surname = htmlspecialchars($_POST['surname']);
+                                                                                                                                    $surname = strip_tags($surname);
+                                                                                                                                    $surname = preg_replace('/ {2,}/',' ',$surname);//Убираем повторяющиеся пробелы.
+                                                                                                                                    if (strlen($surname) < 2)
+                                                                                                                                        {
+                                                                                                                                            $msg_class = 'msg_cancel';
+                                                                                                                                            $msg_title = "Регистрация не выполнена.";
+                                                                                                                                            $msg_text = "В фамилии допускается использовать только русские или только английские буквы. Фамилия должна состоять, по меньшей мере, из двух символов и не должна превышать пятнадцати символов.";
+                                                                                                                                        }
+                                                                                                                                    else
+                                                                                                                                        {
+                                                                                                                                            $surname = mb_convert_case($surname, MB_CASE_TITLE, "Windows-1251");//Первая буква каждого нового слова становится большой.
+                                                                                                                                            
+                                                                                                                                            if (isset($_POST['email']))
+                                                                                                                                            	{
+                                                                                                                                                	if (!preg_match("/[0-9a-z_]+@[0-9a-z_^\.]+\.[a-z]{1,10}/i", $_POST['email']))
+                                                                                                                                                        {
+                                                                                                                                                            $msg_class = 'msg_cancel';
+                                                                                                                                                            $msg_title = "Регистрация не выполнена.";
+                                                                                                                                                            $msg_text = "Вы указали адрес электронной почты в недопустимом формате.";
+                                                                                                                                                        }
+                                                                                                                                                    else
+                                                                                                                                                        {
+                                                                                                                                                        	$email = htmlspecialchars($_POST['email']);
+                                                                            																				$email = strip_tags($email);
+                                                                                                                                                            
+                                                                                                                                                            
+//Проверка на существование пользователя с таким же e-mail
+$result4 = mysql_query("SELECT user_id FROM users WHERE user_email='$email'",$connect);
+$myrow4 = mysql_fetch_array($result4);
+    if (!empty($myrow4['user_id']))
+        {
+            $msg_class = 'msg_cancel';
+            $msg_title = "Регистрация не выполнена.";
+            $msg_text = "Указанный Вами адрес электронной почты уже зарегистрован в системе.";
+        }
+    else
+        {
+            if (isset($_POST['password1']) and isset($_POST['password2']))
+                {
+                    if ($_POST['password1'] != $_POST['password2'])
+                        {
+                            $msg_class = 'msg_cancel';
+                            $msg_title = "Регистрация не выполнена.";
+                            $msg_text = "Вы неверно указали повторный пароль от учетной записи.";
+                        }
+                    else
+                        {
+                            if (!preg_match("/^[a-zA-Z\_0-9\.-]{5,15}$/",$_POST['password1']))
+                                {
+                                    $msg_class = 'msg_cancel';
+                                    $msg_title = "Регистрация не выполнена.";
+                                    $msg_text = "Пароль от учетной записи должен содержать не менее пяти и не более пятнадцати символов. Допускаются буквы латинского алфавита, нижнего и верхнего регистра, а так же символы: точка «.», нижнее подчеркивание «_» и дефис «-».";
+                                }
+                            else
+                                {
+                                    $password = htmlspecialchars($_POST['password1']);
+                                    $password = strip_tags($password);
+                                    
+                                    $password = md5($password);//Шифрование пароля md5.
+                                    $password = strrev($password);//Для надежности добавляем реверс.
+                                    $password = $password."b3p6f";//Можно к паролю добавить несколько своих символов, например, вписав "b3p6f".
+                                    
+                                    
+                                    $result5 = mysql_query("INSERT INTO users (user_name, user_surname, user_password, user_email, user_date) VALUES ('$name', '$surname', '$password', '$email', NOW())",$connect);
+                                    
+                                    if ($result5 == 'TRUE')
+										{
+                                        	$result6 = mysql_query ("SELECT user_id FROM users WHERE user_email='$email'",$connect);
+                                            $myrow6 = mysql_fetch_array($result6);
+                                            $emrev = strrev($email);
+                                            $activation = md5($myrow6['user_id']).md5($emrev);
+                                            
+                                            require_once ("send_mime_mail.html");
+                                            
+                                            $subject = "Подтверждение регистрации.";
+                                            $message = "Здравствуйте, ".$name."!\n\nС вашего электронного почтового ящика совершена регистрация на сайте Cluub.Ru. Для того что бы завершить регистрацию и активировать свой аккаунт перейдите по ссылке:\n".define_host()."login.html?email=".$email."&code=".$activation."\nЭто письмо сгенерировано автоматически, поэтому отвечать на него не нужно. Если вы не регистрировались на сайте Cluub.Ru, просто проигнорируйте или удалите это письмо.\n\nС уважением,\nРедакция Cluub.Ru";
+                                            send_mime_mail('КЛУУБ.РУ','admin@cluub.ru',$email,'windows-1251','windows-1251',$subject,$message);
+                                            
+                                            $msg_class = 'msg_apply';
+                                            $msg_title = "Регистрация почти окончена.";
+                                            $msg_text = "На указанный Вами адрес электронной почты отправлено письмо с ссылкой, для подтверждения Вашего электронного почтового ящика. Обращаем Ваше внимание, ссылка действительна 24 часа.";
+                                        }
+									else
+                                    	{
+                                        	$msg_class = 'msg_cancel';
+                                            $msg_title = "Регистрация не выполнена.";
+                                            $msg_text = "Регистрация не выполнена по причине ошибки на сервере. Повторите попытку немного позже.";
+                                        }
+                                }
+                        }
+                }
+            else
+                {
+                    $msg_class = 'msg_cancel';
+                    $msg_title = "Регистрация не выполнена.";
+                    $msg_text = "Вы не указали пароль от учетной записи.";
+                }
+		}
+                                                                                                                                                        }
+                                                                                                                                                }
+																																			else
+                                                                                                                                            	{
+                                                                                                                                                	$msg_class = 'msg_cancel';
+                                                                                                                                                    $msg_title = "Регистрация не выполнена.";
+                                                                                                                                                    $msg_text = "Вы не указали адрес электронной почты.";
+                                                                                                                                                }
+																																		}
+																																}
+                                                                                                                    	}
+																													else
+                                                                                                                    	{
+                                                                                                                        	$msg_class = 'msg_cancel';
+                                                                                                                            $msg_title = "Регистрация не выполнена.";
+                                                                                                                            $msg_text = "На сайте принято использовать настоящие имя и фаилию в полной форме, написанные русскими или английскими буквами. Имя пользователя является обязательным полем для заполнения.";
+                                                                                                                        }
+                                                                                                                }
+                                                                                                        }
+																								}
+																							else
+                                                                                                {
+                                                                                                    $msg_class = 'msg_cancel';
+                                                                                                    $msg_title = "Регистрация не выполнена.";
+                                                                                                    $msg_text = "На сайте принято использовать настоящие имя и фаилию в полной форме, написанные русскими или английскими буквами. Имя пользователя является обязательным полем для заполнения.";
+                                                                                                }
+                                                                                        }
+                                                                                }
+                                                                        }
+																	else
+                                                                    	{
+                                                                        	$msg_class = 'msg_cancel';
+                                                                            $msg_title = "Регистрация не выполнена.";
+                                                                            $msg_text = "Проверочный символьный код с картинки указан неверно.";
+                                                                        }
+                                                                }
+                                                    }
+											
+                                            if (isset($msg_class) and isset($msg_title) and isset($msg_text))
+                                                {
+                                                    echo("
+                                                    <tr><td width='100%' height='1' class='user_text' align='left' colspan='2'><div class='".$msg_class."'><b>$msg_title</b><br>$msg_text</div></td></tr>
+                                                    ");
+												}
+										}
+								} 
+                            
+                            echo("
+							<tr><td height='30' width='504' class='user_registration' colspan='2' align='left'><h2 class='user'>Зачем нужна регистрация на сайте?</h2><p>Зарегистрировавшись на сайте, вы сможете принимать самое активное участие в жизни сайта – общаться, заводить новые знакомства, обсуждать события, места, знаменитостей, создавать страницы развлекательных заведений, любимых музыкальных групп и артистов, добавлять афиши предстоящих мероприятий.<br><br>Если ваша жизнь, работа или увлечение, так или иначе, связаны с музыкой, клубной индустрией, концертами или вы просто любите развлекаться и отдыхать, то наш ресурс для вас! Процесс регистрации на сайте займет не более двух минут вашего времени!<br><br>Регистрируясь, вы соглашаетесь c <a href='".define_host()."usage.html' class='link'>условиями пользовательского соглашения</a>.</p></td></tr>
+                <tr><td height='30' width='504' class='user_registration' colspan='2' align='left'><h2 class='user'>Зарегистрироваться на сайте</h2>
+                <form action='".define_host()."registration.html' method='post' enctype='multipart/form-data'></td></tr>
+                <tr><td height='30' width='205' class='user_text' align='right'>Имя:</td>
+                <td height='30' width='299' class='user' align='left'><input name='name' type='text' style='width: 210px' maxlength='25'></td></tr>
+                <tr><td height='30' width='205' class='user_text' align='right'>Фамилия:</td>
+                <td height='30' width='299' class='user' align='left'><input name='surname' type='text' style='width: 210px' maxlength='25'></td></tr>
+                
+                <tr><td height='30' width='205' class='user_text' align='right'>Адрес электронной почты:</td>
+                <td height='30' width='299' class='user' align='left'><input name='email' type='text' style='width: 210px' maxlength='40'></td></tr>
+                
+                <tr><td height='30' width='205' class='user_text' align='right'>Пароль от учетной записи:</td>
+                <td height='30' width='299' class='user' align='left'><input name='password1' type='password' style='width: 210px' maxlength='15'></td></tr>
+                
+                <tr><td height='30' width='205' class='user_text' align='right'>Пароль еще раз:</td>
+                <td height='30' width='299' class='user' align='left'><input name='password2' type='password' style='width: 210px' maxlength='15'></td></tr>
+                
+                <tr><td height='30' width='205' class='user_text' align='right'>Введите код с картинки:</td>
+                <td height='30' width='299' class='user' align='left'><img src='".define_host()."source/scripts/html/codegen.php?<?php time() ?>'><br clear='all'><br><input type='text' name='code' style='width: 210px' maxlength='15'></td></tr>
+                
+                <tr><td height='30' width='205' class='user' align='right'></td><td height='30' width='299' class='user' align='left'><button class='registration' type='submit' name='submit' value='register'>Зарегистрироваться</button></form></td></tr>
+
+                            <tr><td width='504' height='30' colspan='2' align='left'>
+                            	</td>
+							</tr>
+						</table>
+					</td>
+					<td width='3'>
+		            	<table border=0 cellpadding='0' cellspacing='0' width='3' height='100%'>
+        			        <tr><td background='".define_host()."source/imgs/gradient_right_up_line.gif' height='170' width='3'>
+                            	</td>
+							</tr>
+                			<tr><td width='3'>
+                            	</td>
+							</tr>
+                			<tr><td height='170' width='3'>
+                            	</td>
+							</tr>
+                		</table>
+					</td>
+				</tr>
+        		<tr>
+        			<td background='".define_host()."source/imgs/gradient_left_down_corner.gif' width='3' height='3'>
+                    </td>
+                    <td background='".define_host()."source/imgs/gradient_bottom_line.gif' width='504' height='3'>
+                    </td>
+                    <td width='3' height='3'>
+                    </td>
+				</tr>
+			</table>
+		</td>
+    	");
+?>

@@ -1,0 +1,660 @@
+/*BODY*/
+BODY {PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FONT-SIZE: 9pt; PADDING-BOTTOM: 0px; MARGIN: 0px; COLOR: #000000; PADDING-TOP: 0px; background-color:#ececec;}
+
+/*TD*/
+TD.text {PADDING-RIGHT: 8px; PADDING-LEFT: 8px; PADDING-BOTTOM: 12px; PADDING-TOP: 8px;}
+TD.text_recomended_place {PADDING-RIGHT: 6px; PADDING-LEFT: 6px; PADDING-BOTTOM: 12px; PADDING-TOP: 6px;}
+TD.text_popular_place {PADDING-RIGHT: 6px; PADDING-LEFT: 6px; PADDING-BOTTOM: 12px; PADDING-TOP: 6px;}
+TD.text_other_place {PADDING-RIGHT: 6px; PADDING-LEFT: 6px; PADDING-BOTTOM: 12px; PADDING-TOP: 6px;}
+TD.text_news {PADDING-RIGHT: 8px; PADDING-LEFT: 8px; PADDING-BOTTOM: 12px; PADDING-TOP: 8px;}
+
+
+
+/*FONT*/
+font.text {FONT-SIZE: 10pt ; COLOR: black; FONT-FAMILY: Tahoma, sans-serif}
+font.main_black {FONT-SIZE: 10pt ; COLOR: #000000 ; font-weight: bold; FONT-FAMILY: Tahoma, sans-serif}
+font.main {FONT-SIZE: 10pt ; COLOR: #6d6d6d ; font-weight: bold; FONT-FAMILY: Tahoma, sans-serif}
+font.mini {FONT-SIZE: 8pt ; COLOR: black; FONT-FAMILY: Tahoma, sans-serif}
+font.news {FONT-SIZE: 8pt ; COLOR: black; FONT-FAMILY: Tahoma, sans-serif}
+font.official_link {FONT-SIZE: 8pt ; COLOR: black; FONT-FAMILY: Tahoma, sans-serif}
+font.title_recomended_place {FONT-SIZE: 8pt ; COLOR: black ; background-color: #ffffff ; FONT-FAMILY: Tahoma, sans-serif}
+font.title_popular_place {FONT-SIZE: 8pt ; COLOR: black ; background-color: #ffffff ; FONT-FAMILY: Tahoma, sans-serif}
+font.title_other_place {FONT-SIZE: 8pt ; COLOR: black ; background-color: #ffffff ; FONT-FAMILY: Tahoma, sans-serif}
+font.text_recomended_place {FONT-SIZE: 8pt ; COLOR: #898989; FONT-FAMILY: Tahoma, sans-serif}
+font.text_popular_place {FONT-SIZE: 8pt ; COLOR: #898989; FONT-FAMILY: Tahoma, sans-serif}
+font.text_other_place {FONT-SIZE: 8pt ; COLOR: #898989; FONT-FAMILY: Tahoma, sans-serif}
+font.official_account {FONT-SIZE: 8pt ; COLOR: #41b800; FONT-FAMILY: Tahoma, sans-serif}
+font.text_request {FONT-SIZE: 8pt ; COLOR: #898989; FONT-FAMILY: Tahoma, sans-serif}
+font.sp {FONT-SIZE: 9pt; COLOR: #a4a4a4 ; margin: 10px 0px 0px 0px; font-weight: none; FONT-FAMILY: Tahoma, sans-serif}
+font.footer {FONT-SIZE: 9pt; COLOR: #898989; font-weight: 500; FONT-FAMILY: Tahoma, sans-serif}
+
+
+/*A*/
+a.main_answer:link {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.main_answer:visited {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.main_answer:hover {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.main_answer:active {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link:link {FONT-SIZE: 9pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link:visited {FONT-SIZE: 9pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link:hover {FONT-SIZE: 9pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link:active {FONT-SIZE: 9pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_recomended_place:link {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_recomended_place:visited {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_recomended_place:hover {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_recomended_place:active {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_popular_place:link {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_popular_place:visited {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_popular_place:hover {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_popular_place:active {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_other_place:link {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_other_place:visited {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_other_place:hover {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_other_place:active {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.steal:link {FONT-SIZE: 9pt ; COLOR: black ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+a.steal:visited {FONT-SIZE: 9pt ; COLOR: black ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+a.steal:hover {FONT-SIZE: 9pt ; COLOR: black ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+a.steal:active {FONT-SIZE: 9pt ; COLOR: black ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+a.owner_question:link {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.owner_question:visited {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.owner_question:hover {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.owner_question:active {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.mistake_question:link {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.mistake_question:visited {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.mistake_question:hover {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.mistake_question:active {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_news:link {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_news:visited {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_news:hover {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_news:active {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+
+/*H1*/
+h1 {FONT-SIZE: 1.4em; COLOR: #fe6f36 ; font-weight: bold ; margin-top: 0.01em; margin-bottom: 0.01em; margin-left: 10px; FONT-FAMILY: Tahoma, sans-serif}
+
+/*H2*/
+h2 {FONT-SIZE: 1.1em ; COLOR: #fe6f36; font-weight: bold ; FONT-FAMILY: Tahoma, sans-serif}
+
+/*H3*/
+h3 {FONT-SIZE: 1.3em ; COLOR: black ; font-weight: lighter ; FONT-FAMILY: Tahoma, sans-serif}
+
+
+/*IMG*/
+IMG {BORDER-TOP-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; BORDER-RIGHT-WIDTH: 0px}
+IMG.logotype {BORDER-RIGHT: 0px; PADDING-RIGHT: 8px; BORDER-TOP: 0px; PADDING-TOP: 23px; BORDER-LEFT: 0px; PADDING-LEFT: 8px; BORDER-BOTTOM: 0px; PADDING-BOTTOM: 17px}
+
+/*DIV*/
+
+.logo_place {BORDER-RIGHT: #d5d5d5 1px solid; PADDING-RIGHT: 8px; BORDER-TOP: #d5d5d5 1px solid; PADDING-LEFT: 8px; BACKGROUND: #ffffff; FLOAT: left; PADDING-BOTTOM: 8px; MARGIN: 0px 0px 12px 0px; BORDER-LEFT: #d5d5d5 1px solid; PADDING-TOP: 8px; BORDER-BOTTOM: #d5d5d5 1px solid}
+.pic {BORDER-RIGHT: #d5d5d5 1px solid; PADDING-RIGHT: 6px; BORDER-TOP: #d5d5d5 1px solid; PADDING-LEFT: 6px; BACKGROUND: #ffffff; FLOAT: left; PADDING-BOTTOM: 6px; MARGIN: 2px 2px 2px 2px; BORDER-LEFT: #d5d5d5 1px solid; PADDING-TOP: 6px; BORDER-BOTTOM: #d5d5d5 1px solid}
+.news_logo {BORDER-RIGHT: #d5d5d5 1px solid; PADDING-RIGHT: 6px; BORDER-TOP: #d5d5d5 1px solid; PADDING-LEFT: 6px; BACKGROUND: #ffffff; FLOAT: left; PADDING-BOTTOM: 6px; MARGIN: 2px 2px 2px 2px; BORDER-LEFT: #d5d5d5 1px solid; PADDING-TOP: 6px; BORDER-BOTTOM: #d5d5d5 1px solid; MARGIN: 0px 0px 8px 0px;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+TD.menu_title {PADDING-RIGHT: 0px; PADDING-LEFT: 12px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px;}
+TD.text_menu {PADDING-RIGHT: 0px; PADDING-LEFT: 12px; PADDING-BOTTOM: 12px; PADDING-TOP: 14px;}
+
+a.menu:link {FONT-SIZE: 10pt ; COLOR: #ffffff ; text-decoration: none ; FONT-FAMILY: Tahoma , sans-serif}
+a.menu:visited {FONT-SIZE: 10pt ; COLOR: #ffffff ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.menu:hover {FONT-SIZE: 10pt ; COLOR: #e5e5e5 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.menu:active {FONT-SIZE: 10pt ; COLOR: #e5e5e5 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+
+a.map:link {FONT-SIZE: 8pt ; COLOR: #e0ae37 ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+a.map:visited {FONT-SIZE: 8pt ; COLOR: #e0ae37 ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+a.map:hover {FONT-SIZE: 8pt ; COLOR: #c0952f ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+a.map:active {FONT-SIZE: 8pt ; COLOR: #c0952f ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+
+a.external:link {FONT-SIZE: 0.7em ; COLOR: black ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+a.external:visited {FONT-SIZE: 0.7em ; COLOR: black ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+a.external:hover {FONT-SIZE: 0.7em ; COLOR: black ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+a.external:active {FONT-SIZE: 0.7em ; COLOR: black ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+
+
+h1.dj {FONT-SIZE: 9pt; COLOR: #248ed7 ; margin-top: 0.01em; margin-bottom: 0.01em; margin-left: 10px; font-weight: bold; FONT-FAMILY: Tahoma, sans-serif}
+h1.tdj {FONT-SIZE: 11pt; COLOR: #ff0000 ; margin-top: 0.01em; margin-bottom: 0.01em; margin-left: 10px; font-weight: bold; FONT-FAMILY: Tahoma, sans-serif}
+h1.tphoto {FONT-SIZE: 11pt; COLOR: #2bc027 ; margin-top: 0.01em; margin-bottom: 0.01em; margin-left: 10px; font-weight: bold; FONT-FAMILY: Tahoma, sans-serif}
+h1.tplace {FONT-SIZE: 11pt; COLOR: #ff00ff ; margin-top: 0.01em; margin-bottom: 0.01em; margin-left: 10px; font-weight: bold; FONT-FAMILY: Tahoma, sans-serif}
+h1.tclub {FONT-SIZE: 11pt; COLOR: #248ed7 ; margin-top: 0.01em; margin-bottom: 0.01em; margin-left: 10px; font-weight: bold; FONT-FAMILY: Tahoma, sans-serif}
+h1.H11 {FONT-SIZE: 14pt; COLOR: black ; margin-top: 0.01em; margin-bottom: 0.01em; margin-left: 10px; font-weight: bold; FONT-FAMILY: Tahoma, sans-serif}
+
+
+h2.tmusic {FONT-SIZE: 10pt; COLOR: #e0ae37 ; margin-top: 0.01em; margin-bottom: 0.01em; margin-left: 10px; font-weight: bold; FONT-FAMILY: Tahoma, sans-serif}
+h2.dj {FONT-SIZE: 9pt; COLOR: #248ed7 ; margin-top: 0.01em; margin-bottom: 0.01em; margin-left: 10px; font-weight: bold; FONT-FAMILY: Tahoma, sans-serif}
+
+
+
+
+
+
+
+
+a.menu2:link {FONT-SIZE: 0.8em ; COLOR: #545454 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.menu2:visited {FONT-SIZE: 0.8em ; COLOR: #545454 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.menu2:hover {FONT-SIZE: 0.8em ; COLOR: black ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.menu2:active {FONT-SIZE: 0.8em ; COLOR: black ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+font.menu2 {FONT-SIZE: 0.8em ; COLOR: black; FONT-FAMILY: Tahoma, sans-serif}
+
+
+
+
+a.link_bottom:link {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_bottom:visited {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_bottom:hover {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.link_bottom:active {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+
+font.textm {FONT-SIZE: 8pt ; COLOR: black; FONT-FAMILY: Tahoma, sans-serif}
+font.m2 {FONT-SIZE: 9pt ; COLOR: #08588e; text-decoration: underline; FONT-FAMILY: Tahoma, sans-serif}
+font.m1 {FONT-SIZE: 9pt ; COLOR: black; FONT-FAMILY: Tahoma, sans-serif}
+font.pages {FONT-SIZE: 9pt ; COLOR: #08588e; text-decoration: none; FONT-FAMILY: Tahoma, sans-serif}
+font.music {FONT-SIZE: 7pt ; COLOR: black ; FONT-FAMILY: Tahoma, sans-serif}
+font.intext {FONT-SIZE: 10pt ; COLOR: black ; FONT-FAMILY: Tahoma, sans-serif}
+font.musictitle {FONT-SIZE: 10pt ; COLOR: #e0ae37 ; FONT-FAMILY: Tahoma, sans-serif}
+font.redtext {FONT-SIZE: 10pt ; COLOR: red ; FONT-FAMILY: Tahoma, sans-serif}
+
+
+
+
+a.tmusic:link {FONT-SIZE: 10pt ; COLOR: #e0ae37 ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+a.tmusic:visited {FONT-SIZE: 10pt ; COLOR: #e0ae37 ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+a.tmusic:hover {FONT-SIZE: 10pt ; COLOR: #c0952f ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+a.tmusic:active {FONT-SIZE: 10pt ; COLOR: #c0952f ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+
+a.top:link {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+a.top:visited {FONT-SIZE: 8pt ; COLOR: #248ed7 ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+a.top:hover {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+a.top:active {FONT-SIZE: 8pt ; COLOR: #08588e ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+
+a.m2:link {FONT-SIZE: 9pt ; COLOR: #829fbe ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.m2:visited {FONT-SIZE: 9pt ; COLOR: #829fbe ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.m2:hover {FONT-SIZE: 9pt ; COLOR: #08588e ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+a.m2:active {FONT-SIZE: 9pt ; COLOR: #08588e ; text-decoration: underline; FONT-FAMILY: Tahoma , sans-serif}
+
+a.pages:link {FONT-SIZE: 9pt ; COLOR: #829fbe ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.pages:visited {FONT-SIZE: 9pt ; COLOR: #829fbe ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.pages:hover {FONT-SIZE: 9pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.pages:active {FONT-SIZE: 9pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+
+a.back:link {FONT-SIZE: 10pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.back:visited {FONT-SIZE: 10pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.back:hover {FONT-SIZE: 10pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.back:active {FONT-SIZE: 10pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+
+
+a.h1:link {FONT-SIZE: 9pt ; COLOR: #dbd8d3 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.h1:visited {FONT-SIZE: 9pt ; COLOR: #dbd8d3 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.h1:hover {FONT-SIZE: 9pt ; COLOR: black ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.h1:active {FONT-SIZE: 9pt ; COLOR: black ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+
+a.h2:link {FONT-SIZE: 9pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.h2:visited {FONT-SIZE: 9pt ; COLOR: #248ed7 ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.h2:hover {FONT-SIZE: 9pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+a.h2:active {FONT-SIZE: 9pt ; COLOR: #08588e ; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+
+P.slink { FONT-SIZE: 7pt; COLOR: #999999; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif ; text-align: left}
+A.slink:link {FONT-SIZE: 7pt; COLOR: #999999; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+A.slink:visited {FONT-SIZE: 7pt; COLOR: #999999; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+A.slink:hover {FONT-SIZE: 7pt; COLOR: #999999; text-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+A.slink:active {FONT-SIZE: 7pt; COLOR: #999999; ttext-decoration: none; FONT-FAMILY: Tahoma , sans-serif}
+
+
+
+
+
+IMG {
+	BORDER-TOP-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; BORDER-RIGHT-WIDTH: 0px
+}
+
+
+.news_photo {
+	BORDER-RIGHT: #d9d9d9 4px solid; BORDER-TOP: #d9d9d9 4px solid; BACKGROUND: #ffffff; FLOAT: left; MARGIN: 4px 4px 4px 4px; BORDER-LEFT: #d9d9d9 4px solid; BORDER-BOTTOM: #d9d9d9 4px solid
+}
+
+
+
+.news_photo IMG {
+	DISPLAY: block
+}
+
+.photo {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 5px; FLOAT: left; PADDING-BOTTOM: 10px; PADDING-TOP: 10px
+}
+.photo A {
+	TEXT-DECORATION: none
+}
+.photo A:hover {
+	TEXT-DECORATION: none
+}
+.photo IMG {
+	BORDER-RIGHT: #dedede 2px solid; PADDING-RIGHT: 2px; BORDER-TOP: #dedede 2px solid; PADDING-LEFT: 2px; BACKGROUND: #ffffff 0% 50%; FILTER: alpha(opacity=90); PADDING-BOTTOM: 2px; BORDER-LEFT: #dedede 1px solid; WIDTH: 140px; PADDING-TOP: 2px; BORDER-BOTTOM: #dedede 1px solid; HEIGHT: 93px; opacity: .90; moz-opacity: .90
+}
+.photo IMG:hover {
+	FILTER: alpha(opacity=100); opacity: 1.00; moz-opacity: 1.00
+}
+
+
+
+.previewfoto {
+	BACKGROUND: url(/data/img/manbg.gif) no-repeat center top; FILTER: alpha(opacity=80); FLOAT: left; align: left; PADDING-TOP: 15px; opacity: 0.80; moz-opacity: 0.80;
+
+BORDER-RIGHT: #9b8d72 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: #9b8d72 1px solid; PADDING-LEFT: 0px; BACKGROUND: #ffffff; FLOAT: left; PADDING-BOTTOM: 1px; MARGIN: 1px 1px 1px 1px; BORDER-LEFT: #9b8d72 1px solid; PADDING-TOP: 1px; BORDER-BOTTOM: #9b8d72 1px solid
+
+
+}
+.previewfoto:hover {
+	FILTER: alpha(opacity=100); COLOR: #ff5600; opacity: 1.00; moz-opacity: 1.00
+}
+.previewfoto .div1 {
+	MARGIN: 0px 1px
+}
+
+
+
+
+
+
+
+
+
+.menu
+{
+	width: 100%;
+	overflow: hidden;	
+}
+
+.menu ul
+{
+	margin: 0px;
+	padding: 0px;
+	padding-left: 12px;
+	padding-top: 12px;
+	font: bold 13pt Tahoma, sans-serif;
+	list-style-type: none;
+}
+
+.menu li
+{
+	display: inline;
+	margin: 0px;
+}
+
+.menu li a
+{
+	float: left;
+	display: block;
+	text-decoration: none;
+	margin: 0px;
+	padding: 8px 12px 8px 12px;
+	border-right: 12px solid #ffffff;
+	color: #ffffff;
+	background: #fe6f36;
+}
+
+.menu li a:visited
+{
+	color: #ffffff;
+}
+
+.menu li a:hover
+{
+	background: #f4f4f4;
+	color: #404040;
+}
+
+.menu li a:focus,
+.menu li a:active
+{
+	background: #f4f4f4;
+	color: #fe6f36;
+}
+
+.menu li.selected a
+{
+	background: #f4f4f4;
+	color: #404040;
+}
+
+
+
+
+
+.page
+{
+	width: 100%;
+	overflow: hidden;	
+}
+
+.page ul
+{
+	margin: 0px;
+	padding: 0px;
+	padding-left: 12px;
+	padding-top: 0px;
+	font: bold 10pt Tahoma, sans-serif;
+	list-style-type: none;
+}
+
+.page li
+{
+	display: inline;
+	margin: 0px;
+}
+
+.page li a
+{
+	float: left;
+	display: block;
+	text-decoration: none;
+	margin: 0px;
+	padding: 6px 10px 6px 10px;
+	border-right: 6px solid #ffffff;
+	color: #ffffff;
+	background: #404040;
+}
+
+.page li a:visited
+{
+	color: #ffffff;
+}
+
+.page li a:hover
+{
+	background: #f4f4f4;
+	color: #404040;
+}
+
+.page li a:focus,
+.page li a:active
+{
+	background: #f4f4f4;
+	color: #404040;
+}
+
+.page li.selected a
+{
+	background: #f4f4f4;
+	color: #404040;
+}
+
+
+
+
+
+
+.button
+{
+	width: 225px;
+	overflow: hidden;
+	border:none;
+}
+
+.button ul
+{
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+	font: bold 8pt Tahoma, sans-serif;
+	border:none;
+}
+
+.button li
+{
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+	border:none;
+}
+
+.button li a
+{
+	/*float: left;*/
+	display: block;
+	/*width: 215px;
+	height: 65px;*/
+	text-decoration: none;
+	margin: 0px 0px 0px 0px;
+	padding-top:5px;
+	padding-right:5px;
+	padding-bottom:5px;
+	padding-left:5px;
+	position: static;
+	text-align:left;
+	color: #ffffff;
+	background: #fe6f36;
+}
+
+.button li a:visited
+{
+	color: #ffffff;
+}
+
+.button li a:hover
+{
+	background: #f4f4f4;
+	color: #404040;
+}
+
+.button li a:focus,
+.button li a:active
+{
+	background: #f4f4f4;
+	color: #fe6f36;
+}
+
+.button li.selected a
+{
+	background: #f4f4f4;
+	color: #404040;
+}
+
+
+
+
+
+
+
+.button_places
+{
+	width: 225px;
+	overflow: hidden;
+	border:none;
+}
+
+.button_places ul
+{
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+	font: bold 8pt Tahoma, sans-serif;
+	border:none;
+}
+
+.button_places li
+{
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+	border:none;
+}
+
+.button_places li a
+{
+	/*float: left;*/
+	display: block;
+	/*width: 215px;
+	height: 65px;*/
+	text-decoration: none;
+	margin: 0px 0px 0px 0px;
+	padding-top:5px;
+	padding-right:5px;
+	padding-bottom:5px;
+	padding-left:5px;
+	position: static;
+	text-align:left;
+	color: #ffffff;
+	background: #404040;
+}
+
+.button_places li a:visited
+{
+	color: #ffffff;
+}
+
+.button_places li a:hover
+{
+	background: #f4f4f4;
+	color: #404040;
+}
+
+.button_places li a:focus,
+.button_places li a:active
+{
+	background: #f4f4f4;
+	color: #fe6f36;
+}
+
+.button_places li.selected a
+{
+	background: #f4f4f4;
+	color: #404040;
+}
+
+
+
+
+
+
+
+.text
+{
+	/*width: 484px;*/
+	overflow: hidden;
+	border:none;
+}
+
+.text ul
+{
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+	font: normal 10pt Tahoma, sans-serif;
+	border:none;
+}
+
+.text li
+{
+	border:none;
+	display: block;
+	/*width: 474px;*/
+	text-decoration: none;
+	margin: 0px 0px 0px 0px;
+	padding-top:5px;
+	padding-right:5px;
+	padding-bottom:5px;
+	padding-left:5px;
+	position: static;
+	text-align:left;
+	color: #404040;
+	background: #f4f4f4;
+}
+
+.text li a
+{
+	text-decoration: none;
+	color: #fe6f36;
+}
+
+.text li a:visited
+{
+	color: #dd602f;
+}
+
+.text li a:hover
+{
+	color: #dd602f;
+	text-decoration:underline;
+}
+
+.text li a:focus,
+.text li a:active
+{
+	color: #dd602f;
+	text-decoration:underline;
+}
+
+
+
+.dj
+{
+	width: 484px;
+	overflow: hidden;
+	border:none;
+}
+
+.dj ul
+{
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+	font: bold 8pt Tahoma, sans-serif;
+	border:none;
+}
+
+.dj li
+{
+	border:none;
+	display: block;
+	/*width: 474px;*/
+	/*height: 65px;*/
+	text-decoration: none;
+	margin: 0px 0px 0px 0px;
+	padding-top:5px;
+	padding-right:5px;
+	padding-bottom:5px;
+	padding-left:5px;
+	position: static;
+	text-align:left;
+	/*color: #404040;
+	background: #f4f4f4;*/
+	color: #ffffff;
+	background: #404040;
+}
+
+
+.club
+{
+	width: 484px;
+	overflow: hidden;
+	border:none;
+}
+
+.club ul
+{
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+	font: bold 8pt Tahoma, sans-serif;
+	border:none;
+}
+
+.club li
+{
+	border:none;
+	display: block;
+	/*width: 474px;*/
+	/*height: 65px;*/
+	text-decoration: none;
+	margin: 0px 0px 0px 0px;
+	padding-top:5px;
+	padding-right:5px;
+	padding-bottom:5px;
+	padding-left:5px;
+	position: static;
+	text-align:left;
+	/*color: #404040;
+	background: #f4f4f4;*/
+	color: #ffffff;
+	background: #fe6f36;
+}

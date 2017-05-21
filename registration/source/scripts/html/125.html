@@ -1,0 +1,168 @@
+<?php
+       	
+        $result_country = mysql_query("
+        SELECT country.country_id, country.country_name, country.country_name_genitivus 
+        FROM country 
+        WHERE country.country_id = '3' 
+        ");
+        $myrow_country = mysql_fetch_array($result_country);
+        
+        echo ("
+		<td width='510' valign='top'>
+            <table cellpadding='0' cellspacing='0' width='510' height='65' bgcolor='#ffffff'>
+            	<tr><td width='510' height='65'><div style='float:left'><h1>Города $myrow_country[country_name_genitivus]</h1></div></td>
+                </tr>
+				<tr><td height='1'>");require_once('menu_2.html');echo("</td>
+            	</tr>
+            </table>
+        
+        	<table border='0' cellpadding='0' cellspacing='0' width='510' height='510' bgcolor='#ffffff'>
+				<tr><td width='3'>
+        				<table border='0' cellpadding='0' cellspacing='0' width='3' height='100%'>
+                    		<tr><td background='".define_host()."source/imgs/gradient_left_up_line.gif' height='170' width='3'></td>
+                        	</tr>
+		            		<tr><td width='3'></td>
+                        	</tr>
+                        	<tr><td background='".define_host()."source/imgs/gradient_left_down_line.gif' height='170' width='3'></td>
+                            </tr>
+            			</table>
+            		</td>
+            		<td width='504' bgcolor='#fcfcfc'>
+            			<table border=0 cellpadding='0' cellspacing='0' height='100%' width='100%' valign='top'>
+							<tr><td height='1' width='100%' class='ternary_menu' colspan='3'>");require_once('menu_3.html');echo("</td>
+                            </tr>");
+                            
+                        $result_cities = mysql_query("
+                        SELECT city.city_id, city.city_name, city.city_url 
+                        FROM city 
+                        WHERE city.country_id = $myrow_country[country_id] 
+                        ORDER by city.city_name
+                        ");
+                        
+                        $array_cities = array();
+                        $array_cities_name = array();
+                        $array_cities_url = array();
+                            while($myrow_cities = mysql_fetch_array($result_cities))
+                                {
+                                    $array_cities[] = $myrow_cities['city_id'];
+                                    $array_cities_name[] = $myrow_cities['city_name'];
+                                    $array_cities_url[] = $myrow_cities['city_url'];
+                                }
+                        
+                        $carray_cities = count($array_cities);
+                        $carray_cities1 = ceil($carray_cities/3);
+                        $carray_cities2 = 2*$carray_cities1;
+                        $carray_cities3 = $carray_cities;
+                        
+                            
+                            echo("
+                            <tr><td width='100%' height='10' class='city' align='left' colspan='3'><p>Ниже в алфавитном порядке представлен список городов $myrow_country[country_name_genitivus]. Выберите тот город, в котором Вы сейчас находитесь для того, чтобы мы смогли Вам показать актуальные анонсы предстоящих мероприятий, фотоотчеты, анкеты развлекательных заведений и новости Вашего региона.</p></td>
+							</tr>
+                            ");
+                            
+                            if ($carray_cities >= 3)
+                            	{
+                                	echo("
+                                    <tr><td width='168' height='10' class='city' align='left'><div class='select_city'><ul>
+                                    ");
+                                    
+                                    for ($j1 = 0; $j1 <= $carray_cities1-1; $j1++)
+                                            {
+                                                $array_cities_url[$j1] = define_host().$array_cities_url[$j1]."/index.html";
+                                                echo("<li");if ($city_id == $array_cities[$j1]){echo (" class='selected'");}else{if($array_cities[$j1] == '1' or $array_cities[$j1] == '2' or $array_cities[$j1] == '3' or $array_cities[$j1] == '4' or $array_cities[$j1] == '5' or $array_cities[$j1] == '6' or $array_cities[$j1] == '7'){echo(" class='big_city'");}}echo("><a href='$array_cities_url[$j1]'>$array_cities_name[$j1]</a></li>");
+                                            }
+                                    echo ("
+                                    	</ul></div>
+                                        </td>
+                                        <td width='168' height='10' class='city' align='left'><div class='select_city'><ul>
+                                    ");
+                                    
+                                    for ($j2 = $carray_cities1; $j2 <= $carray_cities2-1; $j2++)
+                                            {
+                                                $array_cities_url[$j2] = define_host().$array_cities_url[$j2]."/index.html";
+                                                echo("<li");if ($city_id == $array_cities[$j2]){echo (" class='selected'");}else{if($array_cities[$j2] == '1' or $array_cities[$j2] == '2' or $array_cities[$j2] == '3' or $array_cities[$j2] == '4' or $array_cities[$j2] == '5' or $array_cities[$j2] == '6' or $array_cities[$j2] == '7'){echo(" class='big_city'");}}echo("><a href='$array_cities_url[$j2]'>$array_cities_name[$j2]</a></li>");
+                                            }
+                                    echo ("
+                                    	</ul></div>
+                                        </td>
+                                        <td width='168' height='10' class='city' align='left'><div class='select_city'><ul>
+                                    ");
+                                    
+                                    for ($j3 = $carray_cities2; $j3 <= $carray_cities3-1; $j3++)
+                                            {
+                                                $array_cities_url[$j3] = define_host().$array_cities_url[$j3]."/index.html";
+                                                echo("<li");if ($city_id == $array_cities[$j3]){echo (" class='selected'");}else{if($array_cities[$j3] == '1' or $array_cities[$j3] == '2' or $array_cities[$j3] == '3' or $array_cities[$j3] == '4' or $array_cities[$j3] == '5' or $array_cities[$j3] == '6' or $array_cities[$j3] == '7'){echo(" class='big_city'");}}echo("><a href='$array_cities_url[$j3]'>$array_cities_name[$j3]</a></li>");
+                                            }
+                                    echo ("
+                                    	</ul></div>
+                                        </td>
+									</tr>
+                                    ");
+                                }
+							elseif ($carray_cities == 1 or $carray_cities == 2)
+                            	{
+                                	echo("
+                                    <tr><td width='168' height='10' class='city' align='left'><div class='select_city'><ul>
+                                    ");
+                                    
+                                    for ($j1 = 0; $j1 <= $carray_cities-1; $j1++)
+                                            {
+                                                $array_cities_url[$j1] = define_host().$array_cities_url[$j1]."/index.html";
+                                                echo("<li");if ($city_id == $array_cities[$j1]){echo (" class='selected'");}else{if($array_cities[$j1] == '1' or $array_cities[$j1] == '2' or $array_cities[$j1] == '3' or $array_cities[$j1] == '4' or $array_cities[$j1] == '5' or $array_cities[$j1] == '6' or $array_cities[$j1] == '7'){echo(" class='big_city'");}}echo("><a href='$array_cities_url[$j1]'>$array_cities_name[$j1]</a></li>");
+                                            }
+                                    echo ("
+                                    	</ul></div>
+                                        </td>
+                                        <td width='168' height='10' class='city' align='left'>
+                                        </td>
+                                        <td width='168' height='10' class='city' align='left'>
+                                        </td>
+									</tr>
+                                    ");
+                                }
+							else
+                            	{
+                                	echo("
+                                    <tr><td width='502' height='10' class='city' align='left'><p>Произошла ошибка на сервере. Повторите попытку немного позже.</p>
+                                    	</td>
+                                        <td width='1' height='10' class='city' align='left'>
+                                        </td>
+                                        <td width='1' height='10' class='city' align='left'>
+                                        </td>
+									</tr>
+                                    ");
+                                }
+                            
+                            
+                            
+                            echo("                                                        
+							<tr><td width='100%' colspan='3'></td>
+                            </tr>
+						</table>
+					</td>
+					<td width='3'>
+		            	<table border=0 cellpadding='0' cellspacing='0' width='3' height='100%'>
+        			        <tr><td background='".define_host()."source/imgs/gradient_right_up_line.gif' height='170' width='3'>
+                            	</td>
+							</tr>
+                			<tr><td width='3'>
+                            	</td>
+							</tr>
+                			<tr><td height='170' width='3'>
+                            	</td>
+							</tr>
+                		</table>
+					</td>
+				</tr>
+        		<tr>
+        			<td background='".define_host()."source/imgs/gradient_left_down_corner.gif' width='3' height='3'>
+                    </td>
+                    <td background='".define_host()."source/imgs/gradient_bottom_line.gif' width='504' height='3'>
+                    </td>
+                    <td width='3' height='3'>
+                    </td>
+				</tr>
+			</table>
+		</td>
+    	");
+?>

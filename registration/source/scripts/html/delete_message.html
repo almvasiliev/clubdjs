@@ -1,0 +1,130 @@
+<?php
+if (isset($_POST['submit']))
+    {
+    	if (!preg_match("/[^(\w)|(\x7F-\xFF)|(\s)]/",$_POST['submit']))
+            {
+                $submit = htmlspecialchars($_POST['submit']);
+                $submit = strip_tags($submit);
+                    if ($submit == 'delete_message' || $submit == 'Удалить сообщение' || $submit == 'spam_message' || $submit == 'Пожаловаться на спам' || $submit == 'Удалить заметку')
+                        {
+                        	if (isset($_POST['message_id']))
+                            	{
+                                	if (is_numeric($_POST['message_id']))
+                                        {
+                                        	$message_id = htmlspecialchars($_POST['message_id']);
+                                            $message_id = strip_tags($message_id);
+                                            	if (!empty($message_id) and $message_id != '')
+													{
+                                                    	//Проверяем что $message_id есть в таблице messages и $id есть в message_author или message_recipient, т.е. убеждаемся в том, что пользователь причастен к этому сообщению.
+                                                        $result3 = mysql_query("SELECT message_id, message_author, message_recipient FROM messages WHERE message_id='$message_id'");
+														$myrow3 = mysql_fetch_array($result3);
+                                                        	if (!empty($myrow3['message_id']) and $myrow3['message_id'] != '')
+                                                            	{
+                                                                	if ($myrow3['message_author'] == $id or $myrow3['message_recipient'] == $id)
+                                                                    	{
+                                                                        	$result4 = mysql_query("SELECT user_id, user_messages_deleted FROM users WHERE user_id='$id'");
+																			$myrow4 = mysql_fetch_array($result4);
+                                                                            	if (!empty($myrow4['user_id']) and $myrow4['user_id'] != '')
+                                                                                	{
+                                                                                    	if (!empty($myrow4['user_messages_deleted']) and $myrow4['user_messages_deleted'] != '')
+                                                                                        	{
+                                                                                                $string = $myrow4['user_messages_deleted'];
+																								$array = unserialize($string);
+                                                                                                    if (!in_array("$message_id", $array))
+                                                                                                    	{
+                                                                                                        	$array[] = "$message_id";
+																											$new_array = $array;
+                                                                                                            $new_string = serialize($new_array);
+                                                                                                            $result5 = mysql_query("UPDATE users SET user_messages_deleted='$new_string' WHERE user_id='$id'");//Добавили $message_id в список удаленных сообщений.
+                                                                                                            
+                                                                                                            $msg_class = 'msg_inform';
+                                                                                                            $msg_title = "Сообщение удалено.";
+                                                                                                            $msg_text = "Выбранное Вами сообщение было успешно удалено.";
+                                                                                                        }
+																							}
+																						else
+                                                                                        	{
+                                                                                            	$new_array = array($message_id);
+                                                                                                $new_string = serialize($new_array);
+                                                                                                $result5 = mysql_query("UPDATE users SET user_messages_deleted='$new_string' WHERE user_id='$id'");//Добавили $message_id в список удаленных сообщений.
+                                                                                                
+                                                                                                $msg_class = 'msg_inform';
+                                                                                                $msg_title = "Сообщение удалено.";
+                                                                                                $msg_text = "Выбранное Вами сообщение было успешно удалено.";
+                                                                                            }
+                                                                                        		
+                                                                                            if ($submit == 'spam_message' || $submit == 'Пожаловаться на спам')
+                                                                                                {
+                                                                                                    if ($myrow3['message_recipient'] == $id)
+                                                                                                        {
+                                                                                                            $result6 = mysql_query("SELECT user_id, user_trust, user_trust_list FROM users WHERE user_id='$myrow3[message_author]'");
+                                                                                                            $myrow6 = mysql_fetch_array($result6);
+                                                                                                                if (!empty($myrow6['user_trust_list']) and $myrow6['user_trust_list'] != '')
+                                                                                                                    {
+                                                                                                                        $string = $myrow6['user_trust_list'];
+                                                                                                                        $array = unserialize($string);
+                                                                                                                            if (!in_array("$id", $array))
+                                                                                                                                {
+                                                                                                                                    $array[] = "$id";
+                                                                                                                                    $new_array = $array;
+                                                                                                                                    $new_string = serialize($new_array);
+                                                                                                                                    $user_trust = $myrow6['user_trust'];
+                                                                                                                                    $new_user_trust = $user_trust - 1;
+                                                                                                                                    $result7 = mysql_query("UPDATE users SET user_trust='$new_user_trust', user_trust_list='$new_string' WHERE user_id='$myrow6[user_id]'",$connect);//Понизили уровень доверия автора сообщения за спам на один пункт.
+                                                                                                                                }
+                                                                                                                    }
+                                                                                                                else
+                                                                                                                    {
+                                                                                                                        $new_array = array($id);
+                                                                                                                        $new_string = serialize($new_array);
+                                                                                                                        $user_trust = $myrow6['user_trust'];
+                                                                                                                        $new_user_trust = $user_trust - 1;
+                                                                                                                        $result7 = mysql_query("UPDATE users SET user_trust='$new_user_trust', user_trust_list='$new_string' WHERE user_id='$myrow6[user_id]'",$connect);//Понизили уровень доверия автора сообщения за спам на один пункт.
+                                                                                                                    }
+                                                                                                            $msg_class = 'msg_inform';
+                                                                                                            $msg_title = "Сообщение помечено, как спам и удалено.";
+                                                                                                            $msg_text = "Выбранное Вами сообщение было успешно удалено и помечено, как спам.";
+                                                                                                        }
+                                                                                                    else
+                                                                                                        {
+                                                                                                            back2url("$error_404",0);
+                                                                                                        }
+                                                                                                }
+                                                                                    }
+																				else
+                                                                                	{
+                                                                                    	back2url("$error_404",0);
+                                                                                    }
+                                                                        }
+																	else
+                                                                    	{
+                                                                        	back2url("$error_404",0);
+                                                                        }                                                                        
+                                                                }
+															else
+                                                            	{
+                                                                	back2url("$error_404",0);
+                                                                }
+                                                    }
+												else
+                                                	{
+                                                    	back2url("$error_404",0);
+                                                    }
+                                        }
+									else
+                                    	{
+                                        	back2url("$error_404",0);
+                                        }
+                                }
+							else
+                            	{
+                                	back2url("$error_404",0);
+                                }
+                        }
+			}
+		else
+        	{
+            	back2url("$error_404",0);
+            }
+    }
+?>

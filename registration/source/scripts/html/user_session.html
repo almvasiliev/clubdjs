@@ -1,0 +1,183 @@
+<?php
+//Вся процедура работает на сессиях. Именно в сессиях хранится временная информация о пользовтаеле, до тех пор пока он находится на сайте. Важно запустить сессию в самом начале страницы. При входе в учетную запись выполняется проверка пользователя и запускается его сессия (на странице ./registration/test.html). Сейчас в сессиях используется: id, email, password.
+session_start();//Запустили сессию.
+require_once ('define_host.html');
+require_once ("dtbs.html");//Подключились к БД.
+require_once ('goback.html');
+require_once ('back2url.html');
+require_once ('dates.html');
+$error_404 = define_host()."404.html";
+
+	if (isset($_GET['id']))
+		{//Любой URL должен в обязательном порядке содержать [адрес]?id=[число]. Если id присутствует в URL заносим его в локальную переменную $id. id - идентификатор хозяина страницы.
+			if (ctype_digit($_GET['id']))//Если символы в строке $_GET['id'] в формате чисел.
+				{
+					$id = htmlspecialchars($_GET['id']);
+					$id = strip_tags($id);
+						if (empty($id) or $id == '' or $id == '0')
+							{
+								//goback(1,0);
+                                back2url("$error_404",0);
+							}
+				}
+			else
+				{
+					//goback(1,0);
+                    back2url("$error_404",0);
+				}
+		}
+	else
+    	{
+        	//goback(1,0);
+            back2url("$error_404",0);
+		}
+    
+	if (!isset($_SESSION['email']) or !isset($_SESSION['password']))
+		{//Если в сессиях нет email или password.
+            $authorized_user = '0';
+            $myrow2 = '0';
+		} 
+	else
+		{//Иначе проверяем достоверность данных в сессиях и заносим их в локальные переменные
+			$email = $_SESSION['email'];
+            $password = $_SESSION['password'];
+            $result2 = mysql_query("SELECT * FROM users WHERE users.user_email='$email' AND users.user_password='$password'",$connect);
+            $myrow2 = mysql_fetch_array($result2);//Впоследствии MYROW2 отвечает за данные пользователя, который ВОШЕЛ НА СТРАНИЦУ.
+				if (empty($myrow2['user_id']))//Если пользователя с таким сочетанием email и password нет, определяем его неавторизованным.
+					{
+						$authorized_user = '0';
+			            $myrow2 = '0';
+					}
+				else
+                	{
+		    			mysql_query ("UPDATE users SET user_visit_date=NOW() WHERE user_email='$email' AND user_password='$password'");//Записываем дату обращения к сессиям пользователя сайта.
+                        $authorized_user = '1';
+					}
+		}
+
+	$result = mysql_query("SELECT * FROM users WHERE users.user_id='$id'",$connect); 
+	$myrow = mysql_fetch_array($result);//Извлекаем все данные ХОЗЯИНА СТРАНИЦЫ с данным $id.
+		
+        if (empty($myrow['user_id']))
+			{
+				back2url("$error_404",0);//Если пользователя в данным $id нет, выдаем ошибку 404.
+			}
+            
+	//Определяем пользователей онлайн.
+    $result_online = mysql_query("SELECT user_id FROM users WHERE UNIX_TIMESTAMP() - UNIX_TIMESTAMP(user_visit_date) < 300",$connect);
+    $array_online = array();
+    while($myrow_online = mysql_fetch_array($result_online))
+        {
+            $array_online[] = $myrow_online['user_id'];
+        }
+
+	//НАЧАЛО Определяем регион пользователя.
+	
+    $city_array = array(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46);
+	$country_array = array(1,2,3,4);
+    
+    $set_session_key = '0';
+    $set_cookie_key = '0';
+    
+        if ($authorized_user == '1')
+            {
+                if (!isset($city) or !isset($country) or empty($city) or empty($country))
+                	{
+                    	if (isset($_SESSION['city_id']) and isset($_SESSION['country_id']) and ctype_digit($_SESSION['city_id']) and ctype_digit($_SESSION['country_id']))
+                            {
+                                $city = htmlspecialchars($_SESSION['city_id']);
+                                $city = strip_tags($city);
+                                $country = htmlspecialchars($_SESSION['country_id']);
+                                $country = strip_tags($country);
+                            }
+						else
+                        	{
+                            	$country = '1';
+                                $city = '1';
+                                $set_session_key = '1';
+                            }
+                    }
+				else
+                	{
+                    	if (!ctype_digit($city) or !ctype_digit($country))
+                        	{
+                            	$country = '1';
+                                $city = '1';
+                            }
+						
+                        $set_session_key = '1';
+                    }
+
+            }
+        else
+            {
+                if (!isset($city) or !isset($country) or empty($city) or empty($country))
+                	{
+                    	if (isset($_COOKIE['city_id']) and isset($_COOKIE['country_id']) and ctype_digit($_COOKIE['city_id']) and ctype_digit($_COOKIE['country_id']))
+                            {
+                                $city = htmlspecialchars($_COOKIE['city_id']);
+                                $city = strip_tags($city);
+                                $country = htmlspecialchars($_COOKIE['country_id']);
+                                $country = strip_tags($country);
+                            }
+						else
+                        	{
+                            	$country = '1';
+                                $city = '1';
+                                $set_cookie_key = '1';
+                            }
+                    }
+				else
+                	{
+                    	if (!ctype_digit($city) or !ctype_digit($country))
+                        	{
+                            	$country = '1';
+                                $city = '1';
+                            }
+
+						$set_cookie_key = '1';
+                    }
+            }
+    
+    $result_city = mysql_query("SELECT * FROM city WHERE city_id='$city' AND country_id='$country'");
+    $myrow_city = mysql_fetch_array($result_city);
+        if (!empty($myrow_city['city_id']) and !empty($myrow_city['country_id']))
+            {
+                if (in_array($myrow_city['city_id'],$city_array) and in_array($myrow_city['country_id'],$country_array))
+                    {
+                        $country_id = $myrow_city['country_id'];
+                        $city_id = $myrow_city['city_id'];
+                        $city_name = $myrow_city['city_name'];
+                        $city_name_genitivus = $myrow_city['city_name_genitivus'];
+                        $city_name_dative = $myrow_city['city_name_dative'];
+                        $city_url = $myrow_city['city_url'];
+                        $diftime = $myrow_city['diftime'];
+                        	if ($set_session_key == '1' or $set_cookie_key == '1'){$_SESSION['city_id'] = $city_id; $_SESSION['country_id'] = $country_id; setcookie("city_id", "$city_id", time()+9999999, "/"); setcookie("country_id", "$country_id", time()+9999999, "/");}
+                    }
+                else
+                    {
+                        $country_id = '1';
+                        $city_id = '1';
+                        $city_name = 'Москва';
+                        $city_name_genitivus = 'Москвы';
+                        $city_name_dative = 'Москве';
+                        $city_url = 'msk';
+                        $diftime = '0';
+	                        if ($set_session_key == '1' or $set_cookie_key == '1'){$_SESSION['city_id'] = $city_id; $_SESSION['country_id'] = $country_id; setcookie("city_id", "$city_id", time()+9999999, "/"); setcookie("country_id", "$country_id", time()+9999999, "/");}
+                    }
+            }
+        else
+            {
+                $country_id = '1';
+                $city_id = '1';
+                $city_name = 'Москва';
+                $city_name_genitivus = 'Москвы';
+                $city_name_dative = 'Москве';
+                $city_url = 'msk';
+                $diftime = '0';
+                	if ($set_session_key == '1' or $set_cookie_key == '1'){$_SESSION['city_id'] = $city_id; $_SESSION['country_id'] = $country_id; setcookie("city_id", "$city_id", time()+9999999, "/"); setcookie("country_id", "$country_id", time()+9999999, "/");}
+            }
+            
+	//КОНЕЦ Определяем регион пользователя.
+
+?>

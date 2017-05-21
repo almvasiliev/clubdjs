@@ -1,0 +1,140 @@
+<?php
+if (isset($_POST['submit']))
+    {
+        if ($authorized_user == '0')
+        	{
+            	$login = define_host()."login.html";
+                back2url("$login",0);
+            }
+        else
+        	{
+                if (!preg_match("/[^(\w)|(\x7F-\xFF)|(\s)]/",$_POST['submit']))
+                    {
+                        $submit = htmlspecialchars($_POST['submit']);
+                        $submit = strip_tags($submit);
+                            if ($submit == 'add_to_subscribers' || $submit == 'Оставить в подписчиках')
+                                {                            
+                                    if (isset($_POST['friend_id']))
+                                        {
+                                            if (is_numeric($_POST['friend_id']))
+                                                {
+                                                    $friend_id = htmlspecialchars($_POST['friend_id']);
+                                                    $friend_id = strip_tags($friend_id);
+                                                    
+                                                        if (!empty($friend_id) and $friend_id != '')
+                                                            {
+                                                                $result5 = mysql_query("SELECT user_id, user_name FROM users WHERE user_id='$friend_id'");
+																$myrow5 = mysql_fetch_array($result5);
+                                                                	if (!empty($myrow5['user_id']) and $myrow5['user_id'] != '')
+                                                                        {
+                                                                            $result3 = mysql_query("SELECT user_id, user_requests, user_subscribers FROM users WHERE user_id='$myrow2[user_id]'");
+                                                                            $myrow3 = mysql_fetch_array($result3);
+                                                                            
+                                                                                //Удаляем преполагаемого друга из своего списка заявок в друзья.
+                                                                                if (!empty($myrow3['user_requests']) and $myrow3['user_requests'] != '')
+                                                                                    {
+                                                                                        $string_requests = $myrow3['user_requests'];
+                                                                                        $array_requests = unserialize($string_requests);
+                                                                                            if (in_array("$friend_id", $array_requests))
+                                                                                                {
+                                                                                                    $w = array_search("$friend_id",$array_requests);
+                                                                                                    unset($array_requests[$w]);
+                                                                                                    $array_requests = array_values($array_requests);
+                                                                                                    $new_array_requests = $array_requests;
+                                                                                                    $new_string_requests = serialize($new_array_requests);
+                                                                                                    $result14 = mysql_query("UPDATE users SET user_requests='$new_string_requests' WHERE user_id='$myrow2[user_id]'",$connect);//Удалили ID предполагаемого друга из списока заявок.
+                                                                                                }
+                                                                                    }
+                                                                                
+                                                                                $msg_class = 'msg_inform';
+                                                                                $msg_title = "Изменения сохранены.";
+                                                                                $msg_text = "Теперь $myrow5[user_name] отсутствует в списке заявок в Ваши друзья.";
+                                                                                
+                                                                                //Смотрим а есть ли я в друзьях у этого пользователя, если есть то в отправлям его в подписчики, если нет то ничего не делаем.
+                                                                                $result6 = mysql_query("SELECT user_id, user_friends FROM users WHERE user_id='$friend_id'");
+                                                                            	$myrow6 = mysql_fetch_array($result6);
+                                                                                	if (!empty($myrow6['user_friends']) and $myrow6['user_friends'] != '')
+                                                                                    	{
+                                                                                        	$string_friends = $myrow6['user_friends'];
+                                                                                        	$array_friends = unserialize($string_friends);
+                                                                                            	if (in_array($myrow2['user_id'], $array_friends))
+                                                                                                	{
+                                                                                                    	//Добавляем преполагаемого друга в свой список подписчиков.
+                                                                                                        if (!empty($myrow3['user_subscribers']) and $myrow3['user_subscribers'] != '')
+                                                                                                            {
+                                                                                                                $string = $myrow3['user_subscribers'];
+                                                                                                                $array = unserialize($string);
+                                                                                                                    if (!in_array("$friend_id", $array))
+                                                                                                                        {
+                                                                                                                            $array[] = "$friend_id";
+                                                                                                                            $new_array = $array;
+                                                                                                                            $new_string = serialize($new_array);
+                                                                                                                            $result4 = mysql_query("UPDATE users SET user_subscribers='$new_string' WHERE user_id='$myrow2[user_id]'");//Добавили ID предполагаемого друга в список подписчиков.
+                                                                                                                            
+                                                                                                                            $msg_class = 'msg_inform';
+                                                                                                                            $msg_title = "Изменения сохранены.";
+                                                                                                                            $msg_text = "Теперь $myrow5[user_name] у Вас в подписчиках.";
+                                                                                                                        }
+                                                                                                            }
+                                                                                                        else
+                                                                                                            {
+                                                                                                                $new_array = array($friend_id);
+                                                                                                                $new_string = serialize($new_array);
+                                                                                                                $result4 = mysql_query("UPDATE users SET user_subscribers='$new_string' WHERE user_id='$myrow2[user_id]'");//Добавили ID предполагаемого друга в список подписчиков.
+                                                                                                                
+                                                                                                                $msg_class = 'msg_inform';
+                                                                                                                $msg_title = "Изменения сохранены.";
+                                                                                                                $msg_text = "Теперь $myrow5[user_name] у Вас в подписчиках.";
+                                                                                                            }
+                                                                                                    }
+                                                                                        }
+																		}
+																	else//Повидимому ID пользователя, которого мы хотим удалить, уже нет в БД (заблокирован), поэтому удаляем его из списка друзей на совсем.
+                                                                    	{
+                                                                        	$result3 = mysql_query("SELECT user_id, user_requests, user_subscribers FROM users WHERE user_id='$myrow2[user_id]'");
+                                                                            $myrow3 = mysql_fetch_array($result3);
+                                                                            
+                                                                                //Удаляем преполагаемого друга из своего списка заявок в друзья.
+                                                                                if (!empty($myrow3['user_requests']) and $myrow3['user_requests'] != '')
+                                                                                    {
+                                                                                        $string_requests = $myrow3['user_requests'];
+                                                                                        $array_requests = unserialize($string_requests);
+                                                                                            if (in_array("$friend_id", $array_requests))
+                                                                                                {
+                                                                                                    $w = array_search("$friend_id",$array_requests);
+                                                                                                    unset($array_requests[$w]);
+                                                                                                    $array_requests = array_values($array_requests);
+                                                                                                    $new_array_requests = $array_requests;
+                                                                                                    $new_string_requests = serialize($new_array_requests);
+                                                                                                    $result14 = mysql_query("UPDATE users SET user_requests='$new_string_requests' WHERE user_id='$myrow2[user_id]'",$connect);//Удалили ID предполагаемого друга из списока заявок.
+                                                                                                }
+                                                                                    }
+																			
+                                                                            $msg_class = 'msg_inform';
+                                                                            $msg_title = "Изменения сохранены.";
+                                                                            $msg_text = "Теперь $myrow5[user_name] отсутствует в списке заявок в Ваши друзья.";
+                                                                        }
+                                                            }
+                                                        else
+                                                            {
+                                                                back2url("$error_404",0);
+                                                            }
+                                                }
+                                            else
+                                                {
+                                                    back2url("$error_404",0);
+                                                }
+                                        }
+                                    else
+                                        {
+                                            back2url("$error_404",0);
+                                        }
+                                }
+                    }
+                else
+                    {
+                        back2url("$error_404",0);
+                    }
+			}
+    }
+?>

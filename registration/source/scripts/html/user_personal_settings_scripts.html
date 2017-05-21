@@ -1,0 +1,153 @@
+<script>
+				function rewrite_days()
+					{
+					    var days = document.getElementById('day');
+					    var month = document.getElementById('month');
+					    var year = document.getElementById('year');
+					    var days_in_month = new Array(31,28,31,30,31,30,31,31,30,31,30,31);
+						    if (month.value != 0)
+    							{
+							        if ((year.value % 4 == 0) && (month.value == 2))
+								        {
+								            days.length = 30;
+								            days.item(29).value = 29;
+								            days.item(29).text = 29;
+								        }
+							        else
+								        {
+								            days.length = days_in_month[month.value - 1] + 1;
+									            for (var k = 29; k < days.length; k++)
+										            {
+								        		        days.item(k).value = k;
+								               			days.item(k).text = k;
+								            		}
+						        		}
+							    }
+					}
+			</script>
+
+			<script type="text/javascript">
+				function set_action_country() 
+					{
+						action_for_script_country = document.getElementById('get_action_country');
+							if (action_for_script_country.value == '')
+								{
+									document.getElementById('Страна').style.display = "block";
+									document.getElementById('Россия').style.display = "none";
+									document.getElementById('Украина').style.display = "none";
+									document.getElementById('Белоруссия').style.display = "none";
+									document.getElementById('Казахстан').style.display = "none";
+									document.getElementById('Другая страна').style.display = "none";
+								}
+			
+							if (action_for_script_country.value == 'Россия')
+								{
+									document.getElementById('Страна').style.display = "none";
+									document.getElementById('Россия').style.display = "block";
+									document.getElementById('Украина').style.display = "none";
+									document.getElementById('Белоруссия').style.display = "none";
+									document.getElementById('Казахстан').style.display = "none";
+									document.getElementById('Другая страна').style.display = "none";
+								}
+							
+							if (action_for_script_country.value == 'Украина')
+								{
+									document.getElementById('Страна').style.display = "none";
+									document.getElementById('Россия').style.display = "none";
+									document.getElementById('Украина').style.display = "block";
+									document.getElementById('Белоруссия').style.display = "none";
+									document.getElementById('Казахстан').style.display = "none";
+									document.getElementById('Другая страна').style.display = "none";
+								}
+								
+							if (action_for_script_country.value == 'Белоруссия')
+								{
+									document.getElementById('Страна').style.display = "none";
+									document.getElementById('Россия').style.display = "none";
+									document.getElementById('Украина').style.display = "none";
+									document.getElementById('Белоруссия').style.display = "block";
+									document.getElementById('Казахстан').style.display = "none";
+									document.getElementById('Другая страна').style.display = "none";
+								}
+								
+							if (action_for_script_country.value == 'Казахстан')
+								{
+									document.getElementById('Страна').style.display = "none";
+									document.getElementById('Россия').style.display = "none";
+									document.getElementById('Украина').style.display = "none";
+									document.getElementById('Белоруссия').style.display = "none";
+									document.getElementById('Казахстан').style.display = "block";
+									document.getElementById('Другая страна').style.display = "none";
+								}
+								
+							if (action_for_script_country.value == 'Другая страна')
+								{
+									document.getElementById('Страна').style.display = "none";
+									document.getElementById('Россия').style.display = "none";
+									document.getElementById('Украина').style.display = "none";
+									document.getElementById('Белоруссия').style.display = "none";
+									document.getElementById('Казахстан').style.display = "none";
+									document.getElementById('Другая страна').style.display = "block";
+								}
+					}
+			</script>
+
+			<script type="text/javascript">
+				function set_action_city_russia()
+					{
+						action_for_script_russia = document.getElementById('get_action_city_russia');
+							if (action_for_script_russia.value == 'Другой город России')
+								{
+									document.getElementById('Другой город России').style.display = "block";
+								}
+							else
+								{
+									document.getElementById('Другой город России').style.display = "none";
+								}
+					}
+			</script>
+
+			<script type="text/javascript">
+				function set_action_city_ukraine()
+					{
+						action_for_script_ukraine = document.getElementById('get_action_city_ukraine');
+							if (action_for_script_ukraine.value == 'Другой город Украины')
+								{
+									document.getElementById('Другой город Украины').style.display = "block";
+								}
+							else
+								{
+									document.getElementById('Другой город Украины').style.display = "none";
+								}
+					}
+			</script>
+
+			<script type="text/javascript">
+				function set_action_city_belorussia() 
+					{
+						action_for_script_belorussia = document.getElementById('get_action_city_belorussia');
+							if (action_for_script_belorussia.value == 'Другой город Белоруссии')
+								{
+									document.getElementById('Другой город Белоруссии').style.display = "block";
+								}
+							else
+								{
+									document.getElementById('Другой город Белоруссии').style.display = "none";
+								}
+					}
+			</script>
+
+			<script type="text/javascript">
+				function set_action_city_kazakhstan()
+					{
+						action_for_script_kazakhstan = document.getElementById('get_action_city_kazakhstan');
+							if (action_for_script_kazakhstan.value == 'Другой город Казахстана')
+								{
+									document.getElementById('Другой город Казахстана').style.display = "block";
+								}
+							else
+								{
+									document.getElementById('Другой город Казахстана').style.display = "none";
+								}
+					}
+			</script>

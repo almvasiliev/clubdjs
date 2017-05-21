@@ -1,0 +1,1030 @@
+<?php
+        //НАЧАЛО Подсчет заявок в друзья
+		$string_requests = $myrow['user_requests'];
+			if (empty($string_requests) or $string_requests == '')
+				{
+					$req = '';
+				}
+			else
+				{
+					$array_requests = unserialize($string_requests);
+					$carray_requests = count($array_requests);
+						if ($carray_requests == 0)
+							{
+								$req = '';
+							}
+						else
+							{
+								$req = "+$carray_requests";
+							}
+				}
+		//КОНЕЦ Подсчет заявок в друзья.
+					
+		//НАЧАЛО Подсчет непрочитанных сообщений
+		$result_inbox_novisit = mysql_query("SELECT * FROM messages WHERE message_recipient='$id' AND message_visited='0'",$connect);
+		$array_inbox_novisit = array();
+			while($myrow_inbox_novisit = mysql_fetch_array($result_inbox_novisit))
+				{
+					$array_inbox_novisit[] = $myrow_inbox_novisit['message_id'];
+				}
+			
+		$string_user_messages_deleted = $myrow['user_messages_deleted'];
+			if (!empty($string_user_messages_deleted) or $string_user_messages_deleted!='')
+					{
+						$array_user_messages_deleted = unserialize($string_user_messages_deleted);
+						$array_inbox_novisit = array_diff($array_inbox_novisit, $array_user_messages_deleted);//Новые полученные сообщения завычетом удаленных сообщений.
+					}
+			$array_inbox_novisit = array_values($array_inbox_novisit);					
+			$carray_inbox_novisit = count($array_inbox_novisit);
+				if ($carray_inbox_novisit == 0)
+					{
+						$in_new = '';
+					}
+				else
+					{
+						$in_new = "+$carray_inbox_novisit";
+					}
+		//КОНЕЦ Подсчет непрочитанных сообщений
+
+		echo ("
+		<td width='510' valign='top'>
+            <table cellpadding='0' cellspacing='0' width='510' height='65' bgcolor='#ffffff'>
+            	<tr><td width='510' height='65'><div style='float:left'><h1>".$myrow['user_name']." ".$myrow['user_surname']."</h1></div><div class='user_online'>Онлайн</div></td>
+                </tr>
+				<tr><td height='5'>");require_once('menu_2.html');echo("</td>
+            	</tr>
+            </table>
+        
+        	<table border='0' cellpadding='0' cellspacing='0' width='510' height='300' bgcolor='#ffffff'>
+				<tr><td width='3'>
+        				<table border='0' cellpadding='0' cellspacing='0' width='3' height='100%'>
+                    		<tr><td background='".define_host()."source/imgs/gradient_left_up_line.gif' height='170' width='3'></td>
+                        	</tr>
+		            		<tr><td width='3'></td>
+                        	</tr>
+                        	<tr><td background='".define_host()."source/imgs/gradient_left_down_line.gif' height='170' width='3'></td>
+                            </tr>
+            			</table>
+            		</td>
+            		<td width='504' bgcolor='#fcfcfc'>
+            			<table border=0 cellpadding='0' cellspacing='0' height='100%' width='100%' valign='top'>
+							<tr><td height='1' width='100%' class='ternary_menu' colspan='2'>");require_once('menu_3.html');echo("</td>
+                            </tr>");
+                            
+                                if (isset($_POST['submit']))
+                                    {
+                                        if (!preg_match("/[^(\w)|(\x7F-\xFF)|(\s)]/",$_POST['submit']))
+                                            {
+                                                $submit = htmlspecialchars($_POST['submit']);
+                                                $submit = strip_tags($submit);
+                                                    if ($submit == 'save_personal_info' || $submit == 'Сохранить личные данные')
+                                        				{
+                                                        	
+                                                            
+                                                            
+                                                            if (isset($_POST['name']))
+                                                                {
+                                                                    if (!preg_match("/^(([A-Za-z\ \-]){2,15}|([А-Яа-я\ \-]){2,15})$/is",$_POST['name']))//Допускается использовать либо только русские буквы, либо только английские.
+                                                                        {
+                                                                            $msg_class = 'msg_cancel';
+                                                                            $msg_title = "Изменения не сохранены.";
+                                                                            $msg_text = "В имени допускается использовать только русские или только английские буквы. Имя должно состоять, по меньшей мере, из двух символов и не должно превышать пятнадцати символов.";
+                                                                        }
+                                                                    else
+                                                                        {
+                                                                            $name = htmlspecialchars($_POST['name']);
+                                                                            $name = strip_tags($name);
+                                                                            $name = preg_replace('/ {2,}/',' ',$name);//Убираем повторяющиеся пробелы.
+                                                                            
+                                                                                if (strlen($name) < 2)
+                                                                                    {
+                                                                                        $msg_class = 'msg_cancel';
+                                                                                        $msg_title = "Изменения не сохранены.";
+                                                                                        $msg_text = "В имени допускается использовать только русские или только английские буквы. Имя должно состоять, по меньшей мере, из двух символов и не должно превышать пятнадцати символов.";
+                                                                                    }
+                                                                                else
+                                                                                    {
+                                                                                        $name = mb_convert_case($name, MB_CASE_TITLE, "Windows-1251");//Первая буква каждого нового слова становится большой.
+                                                                                            
+                                                                                            if (isset($_POST['surname']))
+                                                                                                {
+                                                                                                    if (!preg_match("/^(([A-Za-z\ \-]){2,15}|([А-Яа-я\ \-]){2,15})$/is",$_POST['surname']))//Допускается использовать либо только русские буквы, либо только английские.
+                                                                                                        {
+                                                                                                            $msg_class = 'msg_cancel';
+                                                                                                            $msg_title = "Изменения не сохранены.";
+                                                                                                            $msg_text = "В фамилии допускается использовать только русские или только английские буквы. Фамилия должна состоять, по меньшей мере, из двух символов и не должно превышать пятнадцати символов.";
+                                                                                                        }
+                                                                                                    else
+                                                                                                        {
+                                                                                                            $surname = htmlspecialchars($_POST['surname']);
+                                                                                                            $surname = strip_tags($surname);
+                                                                                                            $surname = preg_replace('/ {2,}/',' ',$surname);//Убираем повторяющиеся пробелы.
+                                                                                                                
+                                                                                                                if (strlen($surname) < 2)
+                                                                                                                    {
+                                                                                                                        $msg_class = 'msg_cancel';
+                                                                                                                        $msg_title = "Изменения не сохранены.";
+                                                                                                                        $msg_text = "В фамилии допускается использовать только русские или только английские буквы. Фамилия должна состоять, по меньшей мере, из двух символов и не должно превышать пятнадцати символов.";
+                                                                                                                    }
+                                                                                                                else
+                                                                                                                    {
+                                                                                                                        $surname = mb_convert_case($surname, MB_CASE_TITLE, "Windows-1251");//Первая буква каждого нового слова становится большой.
+                                                                                                                        
+                                                                                                                        if (isset($_POST['sex']))
+                                                                                                                            {
+                                                                                                                                $sex = htmlspecialchars($_POST['sex']);
+                                                                                                                                $sex = strip_tags($sex);
+                                                                                                                                    if ($sex == '')
+                                                                                                                                        {
+                                                                                                                                            unset($sex);
+                                                                                                                                        }
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        if (isset($_POST['day']))
+                                                                                                                            {
+                                                                                                                                $day = htmlspecialchars($_POST['day']);
+                                                                                                                                $day = strip_tags($day);
+                                                                                                                                    if ($day == '')
+                                                                                                                                        {
+                                                                                                                                            unset($day);
+                                                                                                                                        }
+                                                                                                                            }
+                                                                                                                            
+                                                                                                                        if (isset($_POST['month']))
+                                                                                                                            {
+                                                                                                                                $month = htmlspecialchars($_POST['month']);
+                                                                                                                                $month = strip_tags($month);
+                                                                                                                                    if ($month == '')
+                                                                                                                                        {
+                                                                                                                                            unset($month);
+                                                                                                                                        }
+                                                                                                                            }
+                                                                                                    
+                                                                                                                        if (isset($_POST['year']))
+                                                                                                                            {
+                                                                                                                                $year = htmlspecialchars($_POST['year']);
+                                                                                                                                $year = strip_tags($year);
+                                                                                                                                    if ($year == '')
+                                                                                                                                        {
+                                                                                                                                            unset($year);
+                                                                                                                                        }
+                                                                                                                            }
+                                                                                                    
+                                                                                                                        $date = $year."-".$month."-".$day;
+                                                                                                                        
+                                                                                                                        if (isset($_POST['country_select']))
+                                                                                                                            {
+                                                                                                                                $country_select_submit = htmlspecialchars($_POST['country_select']);
+                                                                                                                                $country_select_submit = strip_tags($country_select_submit);
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        if (isset($_POST['country_other']))
+                                                                                                                            {
+                                                                                                                                if (preg_match("/^(([A-Za-z\ \-]){2,25}|([А-Яа-я\ \-]){2,25})$/is",$_POST['country_other']))//Допускается использовать либо только русские буквы, либо только английские.
+                                                                                                                                    {
+                                                                                                                                        $country_other_submit = htmlspecialchars($_POST['country_other']);
+                                                                                                                                        $country_other_submit = strip_tags($country_other_submit);
+                                                                                                                                        $country_other_submit = preg_replace('/ {2,}/',' ',$country_other_submit);//Убираем повторяющиеся пробелы.
+                                                                                                                                        
+                                                                                                                                            if (strlen($country_other_submit) < 2)
+                                                                                                                                                {
+                                                                                                                                                    $country_other_submit = '';
+                                                                                                                                                }
+                                                                                                                                    }
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        if (isset($_POST['city_other']))
+                                                                                                                            {
+                                                                                                                                if (preg_match("/^(([A-Za-z\ \-]){2,25}|([А-Яа-я\ \-]){2,25})$/is",$_POST['city_other']))//Допускается использовать либо только русские буквы, либо только английские.
+                                                                                                                                    {
+                                                                                                                                        $city_other_submit = htmlspecialchars($_POST['city_other']);
+                                                                                                                                        $city_other_submit = strip_tags($city_other_submit);
+                                                                                                                                        $city_other_submit = preg_replace('/ {2,}/',' ',$city_other_submit);//Убираем повторяющиеся пробелы.
+                                                                                                                                        
+                                                                                                                                            if (strlen($city_other_submit) < 2)
+                                                                                                                                                {
+                                                                                                                                                    $city_other_submit = '';
+                                                                                                                                                }
+                                                                                                                                    }
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        if (isset($_POST['city_russia']))
+                                                                                                                            {
+                                                                                                                                $city_russia_submit = htmlspecialchars($_POST['city_russia']);
+                                                                                                                                $city_russia_submit = strip_tags($city_russia_submit);
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        if (isset($_POST['city_russia_other']))
+                                                                                                                            {
+                                                                                                                                if (preg_match("/^(([A-Za-z\ \-]){2,25}|([А-Яа-я\ \-]){2,25})$/is",$_POST['city_russia_other']))//Допускается использовать либо только русские буквы, либо только английские.
+                                                                                                                                    {
+                                                                                                                                        $city_russia_other_submit = htmlspecialchars($_POST['city_russia_other']);
+                                                                                                                                        $city_russia_other_submit = strip_tags($city_russia_other_submit);
+                                                                                                                                        $city_russia_other_submit = preg_replace('/ {2,}/',' ',$city_russia_other_submit);//Убираем повторяющиеся пробелы.
+                                                                                                                                        
+                                                                                                                                            if (strlen($city_russia_other_submit) < 2)
+                                                                                                                                                {
+                                                                                                                                                    $city_russia_other_submit = '';
+                                                                                                                                                }
+                                                                                                                                    }
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        if (isset($_POST['city_ukraine']))
+                                                                                                                            {
+                                                                                                                                $city_ukraine_submit = htmlspecialchars($_POST['city_ukraine']);
+                                                                                                                                $city_ukraine_submit = strip_tags($city_ukraine_submit);
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        if (isset($_POST['city_ukraine_other']))
+                                                                                                                            {
+                                                                                                                                if (preg_match("/^(([A-Za-z\ \-]){2,25}|([А-Яа-я\ \-]){2,25})$/is",$_POST['city_ukraine_other']))//Допускается использовать либо только русские буквы, либо только английские.
+                                                                                                                                    {
+                                                                                                                                        $city_ukraine_other_submit = htmlspecialchars($_POST['city_ukraine_other']);
+                                                                                                                                        $city_ukraine_other_submit = strip_tags($city_ukraine_other_submit);
+                                                                                                                                        $city_ukraine_other_submit = preg_replace('/ {2,}/',' ',$city_ukraine_other_submit);//Убираем повторяющиеся пробелы.
+                                                                                                                                        
+                                                                                                                                            if (strlen($city_ukraine_other_submit) < 2)
+                                                                                                                                                {
+                                                                                                                                                    $city_ukraine_other_submit = '';
+                                                                                                                                                }
+                                                                                                                                    }
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        if (isset($_POST['city_belorussia']))
+                                                                                                                            {
+                                                                                                                                $city_belorussia_submit = htmlspecialchars($_POST['city_belorussia']);
+                                                                                                                                $city_belorussia_submit = strip_tags($city_belorussia_submit);
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        if (isset($_POST['city_belorussia_other']))
+                                                                                                                            {
+                                                                                                                                if (preg_match("/^(([A-Za-z\ \-]){2,25}|([А-Яа-я\ \-]){2,25})$/is",$_POST['city_belorussia_other']))//Допускается использовать либо только русские буквы, либо только английские.
+                                                                                                                                    {
+                                                                                                                                        $city_belorussia_other_submit = htmlspecialchars($_POST['city_belorussia_other']);
+                                                                                                                                        $city_belorussia_other_submit = strip_tags($city_belorussia_other_submit);
+                                                                                                                                        $city_belorussia_other_submit = preg_replace('/ {2,}/',' ',$city_belorussia_other_submit);//Убираем повторяющиеся пробелы.
+                                                                                                                                        
+                                                                                                                                            if (strlen($city_belorussia_other_submit) < 2)
+                                                                                                                                                {
+                                                                                                                                                    $city_belorussia_other_submit = '';
+                                                                                                                                                }
+                                                                                                                                    }
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        if (isset($_POST['city_kazakhstan']))
+                                                                                                                            {
+                                                                                                                                $city_kazakhstan_submit = htmlspecialchars($_POST['city_kazakhstan']);
+                                                                                                                                $city_kazakhstan_submit = strip_tags($city_kazakhstan_submit);
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        if (isset($_POST['city_kazakhstan_other']))
+                                                                                                                            {
+                                                                                                                                if (preg_match("/^(([A-Za-z\ \-]){2,25}|([А-Яа-я\ \-]){2,25})$/is",$_POST['city_kazakhstan_other']))//Допускается использовать либо только русские буквы, либо только английские.
+                                                                                                                                    {
+                                                                                                                                        $city_kazakhstan_other_submit = htmlspecialchars($_POST['city_kazakhstan_other']);
+                                                                                                                                        $city_kazakhstan_other_submit = strip_tags($city_kazakhstan_other_submit);
+                                                                                                                                        $city_kazakhstan_other_submit = preg_replace('/ {2,}/',' ',$city_kazakhstan_other_submit);//Убираем повторяющиеся пробелы.
+                                                                                                                                        
+                                                                                                                                            if (strlen($city_kazakhstan_other_submit) < 2)
+                                                                                                                                                {
+                                                                                                                                                    $city_kazakhstan_other_submit = '';
+                                                                                                                                                }
+                                                                                                                                    }
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        if (empty($country_select_submit) or ($country_select_submit == ''))
+                                                                                                                            {
+                                                                                                                                $country_submit = '';
+                                                                                                                                $city_submit = '';
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        elseif ($country_select_submit == 'Другая страна')
+                                                                                                                            if (!empty($country_other_submit) and ($country_other_submit!=''))
+                                                                                                                                {
+                                                                                                                                    $country_submit = $country_other_submit;
+                                                                                                                                        if (!empty($city_other_submit) and ($city_other_submit!=''))
+                                                                                                                                            {
+                                                                                                                                                $city_submit = $city_other_submit;
+                                                                                                                                            }
+                                                                                                                                        else
+                                                                                                                                            {
+                                                                                                                                                $city_submit = '';
+                                                                                                                                            }
+                                                                                                                                }
+                                                                                                                            else
+                                                                                                                                {
+                                                                                                                                    $country_submit = '';
+                                                                                                                                    $city_submit = '';
+                                                                                                                                }
+                                                                                                                                
+                                                                                                                        elseif ($country_select_submit == 'Россия')
+                                                                                                                            {
+                                                                                                                                $country_submit = 'Россия';
+                                                                                                                                    if (!empty($city_russia_submit) and ($city_russia_submit!=''))
+                                                                                                                                        {
+                                                                                                                                            if ($city_russia_submit == 'Другой город России')
+                                                                                                                                                {
+                                                                                                                                                    if (!empty($city_russia_other_submit) and ($city_russia_other_submit!=''))
+                                                                                                                                                        {
+                                                                                                                                                            $city_submit = $city_russia_other_submit;
+                                                                                                                                                        }
+                                                                                                                                                    else
+                                                                                                                                                        {
+                                                                                                                                                            $city_submit = '';
+                                                                                                                                                        }
+                                                                                                                                                }
+                                                                                                                                            else
+                                                                                                                                                {
+                                                                                                                                                    $city_submit = $city_russia_submit;
+                                                                                                                                                }
+                                                                                                                                        }
+                                                                                                                                    else
+                                                                                                                                        {
+                                                                                                                                            $city_submit = '';
+                                                                                                                                        }
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        elseif ($country_select_submit == 'Украина')
+                                                                                                                            {
+                                                                                                                                $country_submit = 'Украина';
+                                                                                                                                    if (!empty($city_ukraine_submit) and ($city_ukraine_submit!=''))
+                                                                                                                                        {
+                                                                                                                                            if ($city_ukraine_submit == 'Другой город Украины')
+                                                                                                                                                {
+                                                                                                                                                    if (!empty($city_ukraine_other_submit) and ($city_ukraine_other_submit!=''))
+                                                                                                                                                        {
+                                                                                                                                                            $city_submit = $city_ukraine_other_submit;
+                                                                                                                                                        }
+                                                                                                                                                    else
+                                                                                                                                                        {
+                                                                                                                                                            $city_submit = '';
+                                                                                                                                                        }
+                                                                                                                                                }
+                                                                                                                                            else
+                                                                                                                                                {
+                                                                                                                                                    $city_submit = $city_ukraine_submit;
+                                                                                                                                                }
+                                                                                                                                        }
+                                                                                                                                    else
+                                                                                                                                        {
+                                                                                                                                            $city_submit = '';
+                                                                                                                                        }
+                                                                                                                            }
+                                                                                                                            
+                                                                                                                        elseif ($country_select_submit == 'Белоруссия')
+                                                                                                                            {
+                                                                                                                                $country_submit = 'Белоруссия';
+                                                                                                                                    if (!empty($city_belorussia_submit) and ($city_belorussia_submit!=''))
+                                                                                                                                        {
+                                                                                                                                            if ($city_belorussia_submit == 'Другой город Белоруссии')
+                                                                                                                                                {
+                                                                                                                                                    if (!empty($city_belorussia_other_submit) and ($city_belorussia_other_submit!=''))
+                                                                                                                                                        {
+                                                                                                                                                            $city_submit = $city_belorussia_other_submit;
+                                                                                                                                                        }
+                                                                                                                                                    else
+                                                                                                                                                        {
+                                                                                                                                                            $city_submit = '';
+                                                                                                                                                        }
+                                                                                                                                                }
+                                                                                                                                            else
+                                                                                                                                                {
+                                                                                                                                                    $city_submit = $city_belorussia_submit;
+                                                                                                                                                }
+                                                                                                                                        }
+                                                                                                                                    else
+                                                                                                                                        {
+                                                                                                                                            $city_submit = '';
+                                                                                                                                        }
+                                                                                                                            }
+                                                                                                                            
+                                                                                                                        else
+                                                                                                                            {
+                                                                                                                                $country_submit = 'Казахстан';
+                                                                                                                                    if (!empty($city_kazakhstan_submit) and ($city_kazakhstan_submit!=''))
+                                                                                                                                        {
+                                                                                                                                            if ($city_kazakhstan_submit == 'Другой город Казахстана')
+                                                                                                                                                {
+                                                                                                                                                    if (!empty($city_kazakhstan_other_submit) and ($city_kazakhstan_other_submit!=''))
+                                                                                                                                                        {
+                                                                                                                                                            $city_submit = $city_kazakhstan_other_submit;
+                                                                                                                                                        }
+                                                                                                                                                    else
+                                                                                                                                                        {
+                                                                                                                                                            $city_submit = '';
+                                                                                                                                                        }
+                                                                                                                                                }
+                                                                                                                                            else
+                                                                                                                                                {
+                                                                                                                                                    $city_submit = $city_kazakhstan_submit;
+                                                                                                                                                }
+                                                                                                                                        }
+                                                                                                                                    else
+                                                                                                                                        {
+                                                                                                                                            $city_submit = '';
+                                                                                                                                        }
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        if (!empty($country_submit) and ($country_submit!=''))
+                                                                                                                            {
+                                                                                                                                $country_submit = mb_convert_case($country_submit, MB_CASE_TITLE, "Windows-1251");//Первая буква каждого нового слова становится большой.
+                                                                                                                            }    
+                                                                                                                         
+                                                                                                                         if (!empty($city_submit) and ($city_submit!=''))
+                                                                                                                            {
+                                                                                                                                $city_submit = mb_convert_case($city_submit, MB_CASE_TITLE, "Windows-1251");//Первая буква каждого нового слова становится большой.
+                                                                                                                            }
+                                                                                                                         
+                                                                                                                         if ($city_submit == 'Ростов На Дону')
+                                                                                                                            {
+                                                                                                                                $city_submit = 'Ростов на Дону';
+                                                                                                                            }
+                                                                                                                         
+                                                                                                                        if ($city_submit == 'Комсомольск На Амуре')
+                                                                                                                            {
+                                                                                                                                $city_submit = 'Комсомольск на Амуре';
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        if (isset($_POST['activities']))
+                                                                                                                            {
+                                                                                                                                if (preg_match("/^[A-Za-zА-Яа-я0-9\ \-]+$/",$_POST['activities']))
+                                                                                                                                    {
+                                                                                                                                        $activities = htmlspecialchars($_POST['activities']);
+                                                                                                                                        $activities = strip_tags($activities);
+                                                                                                                                        $activities = preg_replace('/ {2,}/',' ',$activities);//Убираем повторяющиеся пробелы.
+                                                                                                                                    }
+                                                                                                                                else
+                                                                                                                                    {
+                                                                                                                                        $activities = '';
+                                                                                                                                    }
+                                                                                                                            }
+                                                                                                                        else
+                                                                                                                            {
+                                                                                                                                $activities = '';
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        if (isset($_POST['interests']))
+                                                                                                                            {
+                                                                                                                                if (preg_match("/^[A-Za-zА-Яа-я0-9\ \-]+$/",$_POST['interests']))
+                                                                                                                                    {
+                                                                                                                                        $interests = htmlspecialchars($_POST['interests']);
+                                                                                                                                        $interests = strip_tags($interests);
+                                                                                                                                        $interests = preg_replace('/ {2,}/',' ',$interests);//Убираем повторяющиеся пробелы.
+                                                                                                                                    }
+                                                                                                                                else
+                                                                                                                                    {
+                                                                                                                                        $interests = '';
+                                                                                                                                    }
+                                                                                                                            }
+                                                                                                                        else
+                                                                                                                            {
+                                                                                                                                $interests = '';
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        if (isset($_POST['music']))
+                                                                                                                            {
+                                                                                                                                if (preg_match("/^[A-Za-zА-Яа-я0-9\ \-]+$/",$_POST['music']))
+                                                                                                                                    {
+                                                                                                                                        $music = htmlspecialchars($_POST['music']);
+                                                                                                                                        $music = strip_tags($music);
+                                                                                                                                        $music = preg_replace('/ {2,}/',' ',$music);//Убираем повторяющиеся пробелы.
+                                                                                                                                    }
+                                                                                                                                else
+                                                                                                                                    {
+                                                                                                                                        $music = '';
+                                                                                                                                    }
+                                                                                                                            }
+                                                                                                                        else
+                                                                                                                            {
+                                                                                                                                $music = '';
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        if (isset($_POST['about']))
+                                                                                                                            {
+                                                                                                                                if (preg_match("/^[A-Za-zА-Яа-я0-9\ \-]+$/",$_POST['about']))
+                                                                                                                                    {
+                                                                                                                                        $about = htmlspecialchars($_POST['about']);
+                                                                                                                                        $about = strip_tags($about);
+                                                                                                                                        $about = preg_replace('/ {2,}/',' ',$about);//Убираем повторяющиеся пробелы.
+                                                                                                                                    }
+                                                                                                                                else
+                                                                                                                                    {
+                                                                                                                                        $about = '';
+                                                                                                                                    }
+                                                                                                                            }
+                                                                                                                        else
+                                                                                                                            {
+                                                                                                                                $about = '';
+                                                                                                                            }
+                                                                                                                        
+                                                                                                                        $result4 = mysql_query("UPDATE users SET user_name='$name', user_surname='$surname', user_birthday='$date', user_sex='$sex', user_country='$country_submit', user_city='$city_submit', user_activities='$activities', user_interests='$interests', user_music='$music', user_about='$about' WHERE user_id='$id'",$connect);
+                                                                                                                        
+                                                                                                                        if ($result4 == 'TRUE')
+                                                                                                                            {
+                                                                                                                                //goback(1,0);
+                                                                                                                                $msg_class = 'msg_apply';
+                                                                                                                                $msg_title = "Изменения сохранены.";
+                                                                                                                                $msg_text = "Новые данные будут отражены на Вашей странице.";
+                                                                                                                            }
+                                                                                                                        else
+                                                                                                                            {
+                                                                                                                                $msg_class = 'msg_cancel';
+                                                                                                                                $msg_title = "Изменения не сохранены.";
+                                                                                                                                $msg_text = "Изменения не были сохранены по причине ошибки на сервере. Повторите попытку немного позже.";
+                                                                                                                            }                                                     
+                                                                                                                    }
+                                                                                                        }
+                                                                                                }
+                                                                                            else
+                                                                                                {
+                                                                                                    $msg_class = 'msg_cancel';
+                                                                                                    $msg_title = "Изменения не сохранены.";
+                                                                                                    $msg_text = "На сайте принято использовать настоящие имя и фаилию в полной форме, написанные русскими или английскими буквами. Фамилия пользователя является обязательным полем для заполнения.";
+                                                                                                }
+                                                                                    }
+                                                                        }
+                                                                }
+                                                            else
+                                                                {
+                                                                    $msg_class = 'msg_cancel';
+                                                                    $msg_title = "Изменения не сохранены.";
+                                                                    $msg_text = "На сайте принято использовать настоящие имя и фаилию в полной форме, написанные русскими или английскими буквами. Имя пользователя является обязательным полем для заполнения.";
+                                                                }
+                                                            
+                                                            
+                                                            if (isset($msg_class) and isset($msg_title) and isset($msg_text))
+                                                            	{
+																	echo("
+                                                                    <tr><td width='100%' height='1' class='user_text' align='left' colspan='2'><div class='".$msg_class."'><b>$msg_title</b><br>$msg_text</div></td></tr>
+                                                                    ");
+																}
+                                                            
+                                                        }
+											}
+										$result = mysql_query("SELECT * FROM users WHERE users.user_id='$id'",$connect); 
+                                        $myrow = mysql_fetch_array($result);//Извлекаем все данные ХОЗЯИНА СТРАНИЦЫ с данным $id.
+                                            
+                                            if (empty($myrow['user_id']))
+                                                {
+                                                    back2url("$error_404",0);//Если пользователя в данным $id нет, выдаем огибку 404.
+                                                }
+									}
+                            
+                            
+                            
+                            
+                            $ymd = explode("-", $myrow['user_birthday']);
+                            $y = $ymd[0];
+                            $m = $ymd[1];
+                            $d = $ymd[2];
+                            $y = (int) $y;
+                            $m = (int) $m;
+                            $d = (int) $d;
+                            
+                            
+							echo("                            
+                            <tr><td width='100%' height='10' class='user_text' align='left' colspan='2'><div class='topic'><h2 class='user'>Изменить личные данные</h2><p>Расскажите о себе. Эта информация будет доступна другим пользователям сайта. Это позволит повысить уровень доверия к вам лично, к вашим отзывам и оценкам.</p></div>
+                            <form action='settings.html?id=".$myrow['user_id']."&section=personal' method='post'></td></tr>
+                            
+                            
+                            <tr><td height='30' width='205' class='user_text' align='right'>Имя:</td>
+                            <td height='30' width='299' class='user' align='left'><input name='name' type='text' style='width: 210px' value='".$myrow['user_name']."' autocomplete='off'></td></tr>
+                            <tr><td height='30' width='205' class='user_text' align='right'>Фамилия:</td>
+                            <td height='30' width='299' class='user' align='left'><input name='surname' type='text' style='width: 210px' value='".$myrow['user_surname']."' autocomplete='off'></td></tr>
+                            <tr><td height='30' width='205' class='user_text' align='right'>Пол:</td>
+                            <td height='30' width='299' class='user' align='left'><select name ='sex' style='width: 210px'>");                
+                            //НАЧАЛО Выбрать пол
+                            $sexarray = array('- Не выбран -','Женский','Мужской');
+                                for ($k = 0; $k < 3; $k++)
+                                    {
+                                        if ($k == $myrow['user_sex'])
+                                            {
+                                                echo '<option value="'.$k.'" selected>'.$sexarray[$k].'</option>';
+                                            }
+                                        else
+                                            {
+                                                echo '<option value="'.$k.'">'.$sexarray[$k].'</option>';
+                                            }
+                                    }
+                            //КОНЕЦ Выбрать пол
+                            
+                            echo ("</select></td></tr>
+                            <tr><td height='30' width='205' class='user_text' align='right'>День рождения:</td>
+                            <td height='30' width='299' class='user'  align='left'><select name='day' style='width: 63px' id='day'>");
+                            //НАЧАЛО Дата дня рождения
+                                for ($k = 0; $k < 32; $k++)
+                                    {	
+                                        $k = (int) $k;
+                                        $s = $k;
+                                            if ($k < 10) {$k = '0'.$k;}
+                                            if ($d == $s)
+                                                {
+                                                    if ($d == 0)
+                                                        {
+                                                            $j = 'День:';
+                                                        }
+                                                    else
+                                                        {
+                                                            $j = $s;
+                                                        }
+                                                    echo '<option value="'.$k.'" selected>'.$j.'</option>';
+                                                }
+                                            else
+                                                {
+                                                    if ($s == 0)
+                                                        {
+                                                            $j = 'День:';
+                                                        }
+                                                    else
+                                                        {
+                                                            $j = $s;
+                                                        }
+                                                    echo '<option value="'.$k.'">'.$j.'</option>';
+                                                }
+                                    }
+                            
+                            echo ("</select><select name='month' style='width: 90px' id='month' onChange='rewrite_days();'>");
+                            $marray = array('Месяц:','Января','Февраля','Марта','Апреля','Мая','Июня','Июля','Августа','Сентября','Октября','Ноября','Декабря');       
+                                for ($k = 0; $k < 13; $k++)
+                                    {
+                                        $k = (int) $k;
+                                        $s = $k;
+                                        if ($k < 10) {$k = '0'.$k;}
+                                        if ($m == $s)
+                                            {
+                                                echo '<option value="'.$k.'" selected>'.$marray[$s].'</option>';
+                                            }
+                                        else
+                                            {
+                                                echo '<option value="'.$k.'">'.$marray[$s].'</option>';
+                                            }
+                                    }
+                                echo ("</select><select name='year' style='width: 57px' id='year' onChange='rewrite_days();'>");
+                            
+                            if ($y == '0')
+                                {
+                                    echo '<option value="0000" selected>Год:</option>';
+                                }
+                            else
+                                {
+                                    echo '<option value="0000">Год:</option>';
+                                }
+                            
+                            for ($k = date("Y") - 16; $k>1931; $k--)
+                                {
+                                    if ($k == $y)
+                                        {
+                                            echo '<option value="'.$k.'" selected>'.$k.'</option>';
+                                            if ($k == 1932){break;}
+                                            else{$k--;}
+                                        }
+                                    echo '<option value="'.$k.'">'.$k.'</option>';
+                                }
+                            //КОНЕЦ Дата дня рождения
+                            
+                            echo ("</select></td></tr>
+                            <tr><td height='30' width='205' class='user_text' align='right'>Страна:</td>
+                            <td height='30' width='299' class='user' align='left'>");
+                            
+                            //НАЧАЛО СТРАНЫ И ГОРОДА
+                            //НАЧАЛО ВЫПАДАЮЩЕЕ МЕНЮ СТРАН
+                            echo ("<select name='country_select' style='width: 210px' id='get_action_country' onclick='set_action_country()'>");
+                                if (empty($myrow['user_country']) or $myrow['user_country']=='')
+                                    {
+                                        echo ("<option value='' selected>- Страна не указана -</option><option value='Россия'>Россия</option><option value='Украина'>Украина</option><option value='Белоруссия'>Белоруссия</option><option value='Казахстан'>Казахстан</option><option value='Другая страна'>Другая страна</option>");
+                                    }
+                                elseif ($myrow['user_country']=='Россия')
+                                    {
+                                        echo ("<option value=''>- Страна не указана -</option><option value='Россия' selected>Россия</option><option value='Украина'>Украина</option><option value='Белоруссия'>Белоруссия</option><option value='Казахстан'>Казахстан</option><option value='Другая страна'>Другая страна</option>");
+                                    }
+                                elseif ($myrow['user_country']=='Украина')
+                                    {
+                                        echo ("<option value=''>- Страна не указана -</option><option value='Россия'>Россия</option><option value='Украина' selected>Украина</option><option value='Белоруссия'>Белоруссия</option><option value='Казахстан'>Казахстан</option><option value='Другая страна'>Другая страна</option>");
+                                    }
+                                elseif ($myrow['user_country']=='Белоруссия')
+                                    {
+                                        echo ("<option value=''>- Страна не указана -</option><option value='Россия'>Россия</option><option value='Украина'>Украина</option><option value='Белоруссия' selected>Белоруссия</option><option value='Казахстан'>Казахстан</option><option value='Другая страна'>Другая страна</option>");
+                                    }
+                                elseif ($myrow['user_country']=='Казахстан')
+                                    {
+                                        echo ("<option value=''>- Страна не указана -</option><option value='Россия'>Россия</option><option value='Украина'>Украина</option><option value='Белоруссия'>Белоруссия</option><option value='Казахстан' selected>Казахстан</option><option value='Другая страна'>Другая страна</option>");
+                                    }
+                                else
+                                    {
+                                        echo ("<option value=''>- Страна не указана -</option><option value='Россия'>Россия</option><option value='Украина'>Украина</option><option value='Белоруссия'>Белоруссия</option><option value='Казахстан'>Казахстан</option><option value='Другая страна' selected>Другая страна</option>");
+                                    }
+                            echo ("</select>");
+                            //КОНЕЦ ВЫПАДАЮЩЕЕ МЕНЮ СТРАН
+                            
+                            
+                            
+                            echo ("</td></tr><tr><td height='30' width='205' class='user_text' align='right'>Город:</td>
+                            <td height='30' width='299' class='user' align='left'>");
+                            //НАЧАЛО ВЫПАДАЮЩЕЕ МЕНЮ ГОРОДОВ
+                            
+                            if (empty($myrow['user_country']) or $myrow['user_country']=='')
+                                {
+                                    echo ("<div id='Страна' style = 'display: block;'>");
+                                }
+                            else
+                                {
+                                    echo ("<div id='Страна' style = 'display: none;'>");
+                                }
+                    
+                            echo ("<select name='city_none' style='width: 210px'><option value=''>- Город не указан -</option></select></div>");
+            
+                            if (!empty($myrow['user_country']) and ($myrow['user_country']!='Страна') and ($myrow['user_country']!='Россия') and ($myrow['user_country']!='Украина') and ($myrow['user_country']!='Белоруссия') and ($myrow['user_country']!='Казахстан'))
+                                {
+                                    echo ("<div id='Другая страна' style = 'display: block;'>");
+                                }
+                            else
+                                {
+                                    echo ("<div id='Другая страна' style = 'display: none;'>");
+                                }
+                    
+                            echo("<input type='text' name='country_other' style='width: 210px' maxlength=20 placeholder='- Страна не указана -' value='".$myrow['user_country']."' autocomplete='off'><br clear='all'><input type='text' name='city_other' style='width: 210px' maxlength=20 placeholder='- Город не указан -' value='".$myrow['user_city']."' autocomplete='off'></div>");
+                    
+                            //НАЧАЛО ВЫПАДАЮЩЕЕ МЕНЮ ГОРОДОВ РОССИИ
+                    
+                            if ($myrow['user_country']=='Россия')
+                                {
+                                    echo ("<div id='Россия' style = 'display: block;'>");
+                                }
+                            else
+                                {
+                                    echo ("<div id='Россия' style = 'display: none;'>");
+                                }
+            
+                            echo ("<select name='city_russia' style='width: 210px' id='get_action_city_russia' onclick='set_action_city_russia()'>");
+            
+                                    $k1=0;
+                                    $k2=0;
+                                    if (empty($myrow['user_city']) or $myrow['user_city']=='')
+                                        {
+                                            echo ("<option value='' selected>- Город не указан -</option>");
+                                            $k1=1;
+                                        }
+                                    else
+                                        {	
+                                            echo ("<option value=''>- Город не указан -</option>");
+                                        }
+                                            $check_city_russia = mysql_query("SELECT city_name FROM city WHERE country_id=1 ORDER BY city_name",$connect);
+                                            while ($myrow_city_russia = mysql_fetch_array($check_city_russia))
+                                                {
+                                                    $city_russia[]=$myrow_city_russia['city_name'];
+                                                }
+                                             $ccity_russia=count($city_russia);
+                                             for ($i = 0; $i < $ccity_russia; $i++)
+                                                {
+                                                    if ($myrow['user_city'] == $city_russia[$i])
+                                                        {$k2=1;
+                                                        echo '<option value="'.$city_russia[$i].'" selected>'.$city_russia[$i].'</option>';
+                                                        if ($i==$ccity_russia-1){break;}
+                                                        else{$i++;}
+                                                        }
+                                                        
+                                            echo '<option value="'.$city_russia[$i].'">'.$city_russia[$i].'</option>';
+                                        }
+                                             
+                                    if ($k1==1 or $k2==1)
+                                        {
+                                            echo ("<option value='Другой город России'>Другой город</option>");
+                                            echo ("</select>");
+                                            echo ("<div id='Другой город России' style = 'display: none;'>");
+                                        }
+                                    else
+                                        {
+                                            echo ("<option value='Другой город России' selected>Другой город</option>");
+                                            echo ("</select>");
+                                            echo ("<div id='Другой город России' style = 'display: block;'>");
+                                        }
+            
+                                    echo ("<input type='text' name='city_russia_other' style='width: 210px' maxlength=20 value='".$myrow['user_city']."' autocomplete='off'></div></div>");
+            
+            //КОНЕЦ ВЫПАДАЮЩЕЕ МЕНЮ ГОРОДОВ РОССИИ
+            
+            //НАЧАЛО ВЫПАДАЮЩЕЕ МЕНЮ ГОРОДОВ УКРАИНЫ
+                    
+                if ($myrow['user_country']=='Украина')
+                    {
+                        echo ("<div id='Украина' style = 'display: block;'>");
+                    }
+                else
+                    {
+                        echo ("<div id='Украина' style = 'display: none;'>");
+                    }
+            
+                echo ("<select name='city_ukraine' style='width: 210px' id='get_action_city_ukraine' onclick='set_action_city_ukraine()'>");
+            
+                                    $k3=0;
+                                    $k4=0;
+                                    if (empty($myrow['user_city']) or $myrow['user_city']=='')
+                                        {
+                                            echo ("<option value='' selected>- Город не указан -</option>");
+                                            $k3=1;
+                                        }
+                                    else
+                                        {	
+                                            echo ("<option value=''>- Город не указан -</option>");
+                                        }
+                                            $check_city_ukraine = mysql_query("SELECT city_name FROM city WHERE country_id=2 ORDER BY city_name",$connect);
+                                            while ($myrow_city_ukraine = mysql_fetch_array($check_city_ukraine))
+                                                {
+                                                    $city_ukraine[]=$myrow_city_ukraine['city_name'];
+                                                }
+                                             $ccity_ukraine=count($city_ukraine);
+                                             for ($i = 0; $i < $ccity_ukraine; $i++)
+                                                {
+                                                    if ($myrow['user_city'] == $city_ukraine[$i])
+                                                        {$k4=1;
+                                                        echo '<option value="'.$city_ukraine[$i].'" selected>'.$city_ukraine[$i].'</option>';
+                                                        if ($i==$ccity_ukraine-1){break;}
+                                                        else{$i++;}
+                                                        }
+                                                        
+                                            echo '<option value="'.$city_ukraine[$i].'">'.$city_ukraine[$i].'</option>';
+                                        }
+                                             
+                                    if ($k3==1 or $k4==1)
+                                        {
+                                            echo ("<option value='Другой город Украины'>Другой город</option>");
+                                            echo ("</select>");
+                                            echo ("<div id='Другой город Украины' style = 'display: none;'>");
+                                        }
+                                    else
+                                        {
+                                            echo ("<option value='Другой город Украины' selected>Другой город</option>");
+                                            echo ("</select>");
+                                            echo ("<div id='Другой город Украины' style = 'display: block;'>");
+                                        }
+            
+                                    echo ("<input type='text' name='city_ukraine_other' style='width: 210px' maxlength=20 value='".$myrow['user_city']."' autocomplete='off'></div></div>");
+                    
+            //КОНЕЦ ВЫПАДАЮЩЕЕ МЕНЮ ГОРОДОВ УКРАИНЫ
+            
+            //НАЧАЛО ВЫПАДАЮЩЕЕ МЕНЮ ГОРОДОВ БЕЛОРУССИИ
+                    
+                if ($myrow['user_country']=='Белоруссия')
+                    {
+                        echo ("<div id='Белоруссия' style = 'display: block;'>");
+                    }
+                else
+                    {
+                        echo ("<div id='Белоруссия' style = 'display: none;'>");
+                    }
+            
+                echo ("<select name='city_belorussia' style='width: 210px' id='get_action_city_belorussia' onclick='set_action_city_belorussia()'>");
+            
+                                    $k5=0;
+                                    $k6=0;
+                                    if (empty($myrow['user_city']) or $myrow['user_city']=='')
+                                        {
+                                            echo ("<option value='' selected>- Город не указан -</option>");
+                                            $k5=1;
+                                        }
+                                    else
+                                        {	
+                                            echo ("<option value=''>- Город не указан -</option>");
+                                        }
+                                            $check_city_belorussia = mysql_query("SELECT city_name FROM city WHERE country_id=3 ORDER BY city_name",$connect);
+                                            while ($myrow_city_belorussia = mysql_fetch_array($check_city_belorussia))
+                                                {
+                                                    $city_belorussia[]=$myrow_city_belorussia['city_name'];
+                                                }
+                                             $ccity_belorussia=count($city_belorussia);
+                                             for ($i = 0; $i < $ccity_belorussia; $i++)
+                                                {
+                                                    if ($myrow['user_city'] == $city_belorussia[$i])
+                                                        {$k6=1;
+                                                        echo '<option value="'.$city_belorussia[$i].'" selected>'.$city_belorussia[$i].'</option>';
+                                                        if ($i==$ccity_belorussia-1){break;}
+                                                        else{$i++;}
+                                                        }
+                                                        
+                                            echo '<option value="'.$city_belorussia[$i].'">'.$city_belorussia[$i].'</option>';
+                                        }
+                                             
+                                    if ($k5==1 or $k6==1)
+                                        {
+                                            echo ("<option value='Другой город Белоруссии'>Другой город</option>");
+                                            echo ("</select>");
+                                            echo ("<div id='Другой город Белоруссии' style = 'display: none;'>");
+                                        }
+                                    else
+                                        {
+                                            echo ("<option value='Другой город Белоруссии' selected>Другой город</option>");
+                                            echo ("</select>");
+                                            echo ("<div id='Другой город Белоруссии' style = 'display: block;'>");
+                                        }
+            
+                                    echo ("<input type='text' name='city_belorussia_other' style='width: 210px' maxlength=20 value='".$myrow['user_city']."' autocomplete='off'></div></div>");
+            
+            //КОНЕЦ ВЫПАДАЮЩЕЕ МЕНЮ ГОРОДОВ БЕЛОРУССИИ
+            
+            //НАЧАЛО ВЫПАДАЮЩЕЕ МЕНЮ ГОРОДОВ КАЗАХСТАНА
+                    
+                if ($myrow['user_country']=='Казахстан')
+                    {
+                        echo ("<div id='Казахстан' style = 'display: block;'>");
+                    }
+                else
+                    {
+                        echo ("<div id='Казахстан' style = 'display: none;'>");
+                    }
+            
+                echo ("<select name='city_kazakhstan' style='width: 210px' id='get_action_city_kazakhstan' onclick='set_action_city_kazakhstan()'>");
+            
+                                    $k7=0;
+                                    $k8=0;
+                                    if (empty($myrow['user_city']) or $myrow['user_city']=='')
+                                        {
+                                            echo ("<option value='' selected>- Город не указан -</option>");
+                                            $k7=1;
+                                        }
+                                    else
+                                        {	
+                                            echo ("<option value=''>- Город не указан -</option>");
+                                        }
+                                            $check_city_kazakhstan = mysql_query("SELECT city_name FROM city WHERE country_id=4 ORDER BY city_name",$connect);
+                                            while ($myrow_city_kazakhstan = mysql_fetch_array($check_city_kazakhstan))
+                                                {
+                                                    $city_kazakhstan[]=$myrow_city_kazakhstan['city_name'];
+                                                }
+                                             $ccity_kazakhstan=count($city_kazakhstan);
+                                             for ($i = 0; $i < $ccity_kazakhstan; $i++)
+                                                {
+                                                    if ($myrow['user_city'] == $city_kazakhstan[$i])
+                                                        {$k8=1;
+                                                        echo '<option value="'.$city_kazakhstan[$i].'" selected>'.$city_kazakhstan[$i].'</option>';
+                                                        if ($i==$ccity_kazakhstan-1){break;}
+                                                        else{$i++;}
+                                                        }
+                                                        
+                                            echo '<option value="'.$city_kazakhstan[$i].'">'.$city_kazakhstan[$i].'</option>';
+                                        }
+                                             
+                                    if ($k7==1 or $k8==1)
+                                        {
+                                            echo ("<option value='Другой город Казахстана'>Другой город</option>");
+                                            echo ("</select>");
+                                            echo ("<div id='Другой город Казахстана' style = 'display: none;'>");
+                                        }
+                                    else
+                                        {
+                                            echo ("<option value='Другой город Казахстана' selected>Другой город</option>");
+                                            echo ("</select>");
+                                            echo ("<div id='Другой город Казахстана' style = 'display: block;'>");
+                                        }
+            
+                                    echo ("<input type='text' name='city_kazakhstan_other' style='width: 210px' maxlength=20 value='".$myrow['user_city']."' autocomplete='off'></div></div>");
+            
+            //КОНЕЦ ВЫПАДАЮЩЕЕ МЕНЮ ГОРОДОВ КАЗАХСТАНА
+            //КОНЕЦ ВЫПАДАЮЩЕЕ МЕНЮ ГОРОДОВ
+                            echo ("</td></tr>");
+                            //НАЧАЛО ДЕЯТЕЛЬНОСТЬ
+                            echo ("<tr><td height='30' width='205' class='user_text' align='right'>Деятельность:</td>
+                            <td height='30' width='299' class='user' align='left'><textarea name='activities' style='resize: none; overflow-x: hidden; overflow-y: hidden; height: 88px; width: 210px' placeholder='Расскажите какое участие Вы принимаете в клубной жизни своего города.' autocomplete='off'>".$myrow['user_activities']."</textarea></td></tr>");
+                            //КОНЕЦ ДЕЯТЕЛЬНОСТЬ
+                            //НАЧАЛО ИНТЕРЕСЫ
+                            echo ("<tr><td height='30' width='205' class='user_text' align='right'>Интересы:</td>
+                            <td height='30' width='299' class='user' align='left'><textarea name='interests' style='resize: none; overflow-x: hidden; overflow-y: hidden; height: 88px; width: 210px' placeholder='Чем вы интересуетесь в жизни?' autocomplete='off'>".$myrow['user_interests']."</textarea></td></tr>");
+                            //КОНЕЦ ИНТЕРЕСЫ
+                            //НАЧАЛО ЛЮБИМАЯ МУЗЫКА
+                            echo ("<tr><td height='30' width='205' class='user_text' align='right'>Любимая музыка:</td>
+                            <td height='30' width='299' class='user' align='left'><textarea name='music' style='resize: none; overflow-x: hidden; overflow-y: hidden; height: 88px; width: 210px' placeholder='Любимые исполнители, музыкальные группы, ди-джеи.' autocomplete='off'>".$myrow['user_music']."</textarea></td></tr>");
+                            //КОНЕЦ ЛЮБИМАЯ МУЗЫКА
+                            //НАЧАЛО О СЕБЕ
+                            echo ("<tr><td height='30' width='205' class='user_text' align='right'>О себе:</td>
+                            <td height='30' width='299' class='user' align='left'><textarea name='about' style='resize: none; overflow-x: hidden; overflow-y: hidden; height: 88px; width: 210px' placeholder='Расскажите немного о себе.' autocomplete='off'>".$myrow['user_about']."</textarea></td></tr>");
+                            //КОНЕЦ О СЕБЕ
+                            echo ("<tr><td height='30' width='205' class='user' align='right'></td><td height='30' width='299' class='user' align='left'><button class='settings_personal' type='submit' name='submit' value='save_personal_info'>Сохранить личные данные</button></form><br><br></td></tr><tr><td width='504' colspan='2' align='left'></td></tr>                            
+                            
+                            <tr><td width='100%' colspan='2'></td></tr>
+						</table>
+					</td>
+					<td width='3'>
+		            	<table border=0 cellpadding='0' cellspacing='0' width='3' height='100%'>
+        			        <tr><td background='".define_host()."source/imgs/gradient_right_up_line.gif' height='170' width='3'>
+                            	</td>
+							</tr>
+                			<tr><td width='3'>
+                            	</td>
+							</tr>
+                			<tr><td height='170' width='3'>
+                            	</td>
+							</tr>
+                		</table>
+					</td>
+				</tr>
+        		<tr>
+        			<td background='".define_host()."source/imgs/gradient_left_down_corner.gif' width='3' height='3'>
+                    </td>
+                    <td background='".define_host()."source/imgs/gradient_bottom_line.gif' width='504' height='3'>
+                    </td>
+                    <td width='3' height='3'>
+                    </td>
+				</tr>
+			</table>
+		</td>
+    	");
+?>

@@ -1,0 +1,105 @@
+<?php
+		echo ("
+		<td width='510' valign='top'>
+            <table cellpadding='0' cellspacing='0' width='510' height='65' bgcolor='#ffffff'>
+            	<tr><td width='510' height='65'><div style='float:left'><h1>Вход на сайт</h1></div></td>
+                </tr>
+				<tr><td height='5'>");require_once('menu_2.html');echo("</td>
+            	</tr>
+            </table>
+        
+        	<table border='0' cellpadding='0' cellspacing='0' width='510' height='300' bgcolor='#ffffff'>
+				<tr><td width='3'>
+        				<table border='0' cellpadding='0' cellspacing='0' width='3' height='100%'>
+                    		<tr><td background='".define_host()."source/imgs/gradient_left_up_line.gif' height='170' width='3'></td>
+                        	</tr>
+		            		<tr><td width='3'></td>
+                        	</tr>
+                        	<tr><td background='".define_host()."source/imgs/gradient_left_down_line.gif' height='170' width='3'></td>
+                            </tr>
+            			</table>
+            		</td>
+            		<td width='504' bgcolor='#fcfcfc'>
+            			<table border=0 cellpadding='0' cellspacing='0' height='340' width='100%' valign='top'>
+							<tr><td height='1' width='100%' class='ternary_menu' colspan='2'>");require_once('menu_3.html');echo("</td>
+                            </tr>");
+                            
+                            if (isset($_POST['submit']) or isset($_GET['code']))
+                                {
+                                    if (isset($msg_class) and isset($msg_title) and isset($msg_text))
+                                        {
+                                            echo("
+                                            <tr><td width='100%' height='1' class='user_text' align='left' colspan='2'><div class='".$msg_class."'><b>$msg_title</b><br>$msg_text</div></td></tr>
+                                            ");
+										}
+								}
+                            
+                            echo("
+							<tr><td height='10' width='504' class='user_registration' colspan='2' align='left'><h2 class='user'>Автроизоваться на сайте</h2><form action='".define_host()."login.html' method='post' enctype='multipart/form-data'>
+                            	<p>Если вы уже зарегистрированы на сайте, введите свой адрес электронной почты и пароль от учетной записи.</p></td></tr>
+                            
+                            </tr>
+                            <tr><td height='30' width='205' class='user_text' align='right'>Адрес электронной почты:
+								</td>
+                				<td height='30' width='299' class='user' align='left'><input style='width: 210px' name='email' type='text' maxlength='50'");
+                                if (isset($_COOKIE['email']))//если есть переменная с логином в COOKIE, вставляем в форму ее значение
+                                	{
+                                    	echo (" value='".$_COOKIE['email']."'");
+									}
+								echo(">
+                                </td>
+							</tr>
+                            <tr><td height='30' width='205' class='user_text' align='right'>Пароль от учетной записи:
+                            	</td>
+								<td height='30' width='299' class='user' align='left'><input style='width: 210px' name='password' type='password' maxlength='15'");
+								if (isset($_COOKIE['password']))//если есть переменная с паролем в COOKIE, вставляем в форму ее значение
+									{
+				                    	echo (" value='".$_COOKIE['password']."'");
+									}
+								echo(">
+                                </td>
+							</tr>
+                            <tr><td height='30' width='205' class='user_text' align='right'>Запомнить меня:
+                            	</td>
+                                <td height='30' width='299' class='user' align='left'><input name='save' type='checkbox' value='1' style='margin: 6px 0 0px 0'>
+                                </td>
+							</tr>
+							<tr><td height='30' width='205' class='user_text' align='right'>
+                            	</td>
+								<td height='30' width='299' class='user' align='left'>
+                                </td>
+							</tr>
+                            <tr><td height='30' width='205' class='user' align='right'></td><td height='30' width='299' class='user' align='left'><button class='login' type='submit' name='submit' value='login'>Войти</button></form>
+                            	</td>
+							</tr>
+                            <tr><td width='504' height='335' class='user' colspan='2' align='left'>
+                            	</td>
+                            </tr>
+						</table>
+					</td>
+					<td width='3'>
+		            	<table border=0 cellpadding='0' cellspacing='0' width='3' height='100%'>
+        			        <tr><td background='".define_host()."source/imgs/gradient_right_up_line.gif' height='170' width='3'>
+                            	</td>
+							</tr>
+                			<tr><td width='3'>
+                            	</td>
+							</tr>
+                			<tr><td height='170' width='3'>
+                            	</td>
+							</tr>
+                		</table>
+					</td>
+				</tr>
+        		<tr>
+        			<td background='".define_host()."source/imgs/gradient_left_down_corner.gif' width='3' height='3'>
+                    </td>
+                    <td background='".define_host()."source/imgs/gradient_bottom_line.gif' width='504' height='3'>
+                    </td>
+                    <td width='3' height='3'>
+                    </td>
+				</tr>
+			</table>
+		</td>
+    	");
+?>

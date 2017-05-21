@@ -1,0 +1,18 @@
+<?php
+require_once ('define_host.html');
+function menu_user($authorized_user,$myrow2)
+	{
+		if ($authorized_user == 1)
+			{
+				define("user_dir", define_host()."user/");
+				echo ("<div class='user_menu'><ul><li>".$myrow2['user_name']." ".$myrow2['user_surname']."</li><li class='partition'>|</li><li><a href='".user_dir."index.html?id=".$myrow2['user_id']."'>Личная страница</a></li><li class='partition'>|</li><li><a href='".user_dir."friends.html?id=".$myrow2['user_id']."'>Друзья</a></li><li class='partition'>|</li><li><a href='".user_dir."messages.html?id=".$myrow2['user_id']."'>Сообщения</a></li><li class='partition'>|</li><li><a href='".user_dir."exit.html'>Выйти</a></li></ul></div>");
+			}
+			
+		else //($authorized_user == 0)
+			{
+				define("login", define_host()."login.html");
+                define("registration", define_host()."registration.html");                
+				echo ("<div class='user_menu'><ul><li><a href='".login."'>Войти</a></li><li class='partition'>|</li><li><a href='".registration."'>Зарегистрироваться</a></li></ul></div>");
+			}
+	}
+?>

@@ -1,0 +1,79 @@
+<?php 
+
+function dates($date,$diftime)
+	{
+        //$diftime = -1*60*60;//Разница времени относительно серверного времени.
+        //$date = '2013-05-27 01:01:00';//Время из БД, т.е. серверное время.
+    
+        $date = str_replace(' ', '-', $date);
+        $date = str_replace(':', '-', $date);
+        $date = explode("-", $date);
+        $month_array = array('','янв.','фев.','мар.','апр.','мая','июн.','июл.','авг.','сен.','окт.','ноя.','дек.');
+        $day_array = array('','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31');
+        $hour_array = array('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23');
+        $minute_array = array('00','01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59');
+        $second_array = array('00','01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59');      
+        $date_year = intval($date[0]);
+        $date_month = intval($date[1]);
+        $date_day = intval($date[2]);
+        $date_hour = intval($date[3]);
+        $date_minute = intval($date[4]);
+        $date_second = intval($date[5]);
+        $dateunix = mktime ($date_hour, $date_minute, $date_second, $date_month, $date_day, $date_year);//Вычисляем метку времени UNIX для пользовательской даты
+        $dateunix = $dateunix + $diftime;    
+        $date = date("Y-m-d H:i:s", $dateunix);
+        $date = str_replace(' ', '-', $date);
+        $date = str_replace(':', '-', $date);
+        $date = explode("-", $date);
+        $date_year = intval($date[0]);
+        $date_month = intval($date[1]);
+        $date_day = intval($date[2]);
+        $date_hour = intval($date[3]);
+        $date_minute = intval($date[4]);
+        $date_second = intval($date[5]);
+        
+        $date_today = date('Y-m-d');
+        $date_today = explode("-", $date_today);
+        $date_year_today = intval($date_today[0]);
+        $date_month_today = intval($date_today[1]);
+        $date_day_today = intval($date_today[2]);
+        $dateunix_today = mktime ('00', '00', '00', $date_month_today, $date_day_today, $date_year_today);//Вычисляем метку времени UNIX для серверного времени на стыке вчера/сегодня
+        $dateunix_today = $dateunix_today + $diftime;    
+        $date_today = date("Y-m-d H:i:s", $dateunix_today);
+        $date_today = explode("-", $date_today);
+        $date_year_today = intval($date_today[0]);
+        $date_month_today = intval($date_today[1]);
+        $date_day_today = intval($date_today[2]);    
+        
+        if ($date_year_today == $date_year and $date_month_today == $date_month and $date_day_today == $date_day)
+            {
+                echo ("сегодня в $hour_array[$date_hour]:$minute_array[$date_minute]");/*:$second_array[$date_second]");*/
+            }
+        elseif ($date_year_today == $date_year and $date_month_today == $date_month and $date_day_today == $date_day + 1)
+            {
+                echo ("вчера в $hour_array[$date_hour]:$minute_array[$date_minute]");/*:$second_array[$date_second]");*/
+            }
+		elseif ($date_year_today == $date_year and $date_month_today == $date_month + 1 and $date_day_today == '1')
+            {
+                echo ("вчера в $hour_array[$date_hour]:$minute_array[$date_minute]");/*:$second_array[$date_second]");*/
+            }
+		elseif ($date_year_today == $date_year + 1 and $date_month_today == '1' and $date_month == '12' and $date_day_today == '1' and $date_day == '31')
+            {
+                echo ("вчера в $hour_array[$date_hour]:$minute_array[$date_minute]");/*:$second_array[$date_second]");*/
+            }
+        else
+            {
+                if ($date_year_today == $date_year)
+                    {
+                        echo ("$day_array[$date_day] $month_array[$date_month] в ");
+                        echo ("$hour_array[$date_hour]:$minute_array[$date_minute]");/*:$second_array[$date_second]");*/
+                    }
+                else
+                    {
+                        echo ("$day_array[$date_day] $month_array[$date_month] $date_year в ");
+                        echo ("$hour_array[$date_hour]:$minute_array[$date_minute]");/*:$second_array[$date_second]");*/
+                    }
+            }
+	}
+
+?>

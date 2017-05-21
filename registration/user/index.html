@@ -1,0 +1,20 @@
+<?php
+require_once ('../source/scripts/html/user_session.html');
+if ($myrow2['user_id'] == $id)
+	{
+    	$page='82';
+	}
+else
+	{
+    	require_once('../source/scripts/html/add_to_friends.html');
+        require_once('../source/scripts/html/remove_from_friends.html');
+        if ($authorized_user == '1')
+        	{
+                $result22 = mysql_query("SELECT users.user_friends FROM users WHERE users.user_id='$myrow2[user_id]'");
+            	$myrow22 = mysql_fetch_array($result22);
+                $myrow2['user_friends'] = $myrow22['user_friends'];
+            }
+        $page='99';
+	}
+require_once ('../source/scripts/html/page.html');
+?>

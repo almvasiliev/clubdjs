@@ -1,0 +1,62 @@
+<?php
+//ПОПУЛЯРНЫЕ ДИ-ДЖЕИ
+$result_lc_key_7 = mysql_query("SELECT page.p_id, page.p_name_priority, page.p_url, page.p_ar, page_parent.pp_name_short FROM page, page_parent WHERE page.pp_id='7' AND page_parent.pp_id=page.pp_id ORDER by page.p_fr DESC LIMIT $array_lim_lc[$i]");
+$array_id_p_7 = array();
+$array_name_priority_p_7 = array();
+$array_url_p_7 = array();
+$array_ar_p_7 = array();
+$array_name_short_pp_7 = array();
+	while($myrow_lc_key_7 = mysql_fetch_array($result_lc_key_7))
+        		{
+            		$array_id_p_7[] = $myrow_lc_key_7['p_id'];
+                    $array_name_priority_p_7[] = $myrow_lc_key_7['p_name_priority'];
+                    $array_url_p_7[] = $myrow_lc_key_7['p_url'];
+                    $array_ar_p_7[] = $myrow_lc_key_7['p_ar'];
+                    $array_name_short_pp_7[] = $myrow_lc_key_7['pp_name_short'];
+				}
+			
+			$carray_lc_7 = count($array_id_p_7);
+			
+            if ($carray_lc_7 > '1')
+            	{
+                	echo("
+						<table cellpadding='0' cellspacing='0' width='160' height='40'>
+						<tr>
+						<td width='3' height='15' background='".define_host()."source/imgs/point_corner_up.gif'></td>
+						<td width='154' height='15' background='".define_host()."source/imgs/point_up.gif'><p align=center><font class='title_popular_place'>&nbsp;&nbsp;Популярные ди-джеи&nbsp;&nbsp;</font></p></td>
+						<td width='3' height='15' background='".define_host()."source/imgs/point_corner_up.gif'></td>
+						</tr>
+						<tr>
+						<td width='3' height='22' background='".define_host()."source/imgs/point.gif'></td>
+						<td width='154' height='22' valign=top class='text_popular_place' bgcolor='#fcfcfc'><p align='left'><font class='text_popular_place'>Эти ди-джеи пользуются особой популярностью у пользователей сайта:</font></p>
+                        ");                   
+                    
+                    for ($j = 0; $j <= $carray_lc_7-1; $j++)
+            			{
+							$string = $array_name_short_pp_7[$j]." ".$array_name_priority_p_7[$j];
+                            $move_min = round((5-$array_ar_p_7[$j])/5*51);
+                            $array_ar_p_7[$j] = round($array_ar_p_7[$j],1);
+                            
+                            echo("<div style='float: left; width:100%;'><a href='".define_host()."".$array_url_p_7[$j]."/index.html' class='link_popular_place'>".$string."</a><br>
+                            <div class='rating_min'><div class='bg_rating' style='background-position: -".$move_min."px 0;'><p class='stars' title='");if ($array_ar_p_7[$j] == '0'){echo("Без оценки'");}else{echo("Средний рейтинг: ".$array_ar_p_7[$j]."&nbsp;из&nbsp;5'");}echo("></p></div></div></div>
+                            ");
+						} 
+					echo("
+                    	</td>
+						<td width='3' height='22' background='".define_host()."source/imgs/point.gif'></td>
+						</tr>
+						<tr>
+						<td width='3' height='3' background='".define_host()."source/imgs/point.gif'></td>
+						<td width='154' height='3' background='".define_host()."source/imgs/point.gif'></td>
+						<td width='3' height='3' background='".define_host()."source/imgs/point.gif'></td>
+						</tr>
+						</table>
+						
+						<table cellpadding='0' cellspacing='0' width='160' height='15'>
+						<tr>
+						<td width='160' height='15'></td>
+						</tr>
+						</table>
+                        ");
+				}
+?>

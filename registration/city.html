@@ -1,0 +1,27 @@
+<?php
+require_once ('source/scripts/html/page_session.html');
+if (isset($_GET['country']))
+	{
+		if (preg_match("/^[a-z]{1,}$/",$_GET['country']) and ($_GET['country'] == 'russia' or $_GET['country'] == 'ukraine' or $_GET['country'] == 'belorussia' or $_GET['country'] == 'kazakhstan'))
+			{
+				$country = htmlspecialchars($_GET['country']);
+				$country = strip_tags($country);
+			}
+		else
+			{
+				back2url("$error_404",0);
+			}
+	}
+else
+	{
+		$country = 'russia';
+	}
+
+if ($country == 'russia') {$page='76';}
+elseif ($country == 'ukraine') {$page='124';}
+elseif ($country == 'belorussia') {$page='125';}
+elseif ($country == 'kazakhstan') {$page='126';}
+else {back2url("$error_404",0);}
+
+require_once ('source/scripts/html/page.html');
+?>

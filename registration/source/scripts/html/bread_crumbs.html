@@ -1,0 +1,135 @@
+<?php
+        if (isset($page_id) and !empty($page_id) and $page_id!=0)
+        	{
+        		$result_p = mysql_query("SELECT page.p_id, page.pp_id, page.p_url, page.p_name_priority, page.city_id FROM page WHERE page.p_id='$page_id'");
+            	$myrow_p = mysql_fetch_array($result_p);
+            	$id_pp = $myrow_p['pp_id'];
+                $id_city = $myrow_p['city_id'];
+                $name_url = $myrow_p['p_url'];
+                $name_priority = $myrow_p['p_name_priority'];
+                
+                if (isset($id_pp) and !empty($id_pp) and $id_pp != '0')
+                	{
+                    	$result_pp = mysql_query("SELECT page_parent.pp_id, page_parent.pp_name_short, page_parent.pp_type FROM page_parent WHERE page_parent.pp_id='$id_pp'");
+                      	$myrow_pp = mysql_fetch_array($result_pp);
+                        $name_short_pp = $myrow_pp['pp_name_short'];
+                        $name_type_pp = $myrow_pp['pp_type'];
+                        
+	                        if (empty($name_short_pp) or !isset($name_short_pp))
+                            	{
+			                    	$name_short_pp = '';
+			                    }
+							
+                            if (empty($name_type_pp) or !isset($name_type_pp))
+                            	{
+			                    	$name_type_pp = '';
+			                    }
+					}
+                else
+                	{
+                    	$name_short_pp = '';
+                        $name_type_pp = '';
+                    }
+			}
+		else
+        	{
+            	$name_url = '';
+                $name_short_pp = '';
+                $name_type_pp = '';
+                $name_priority = '';
+            }
+        
+        if (isset($id_city) and !empty($id_city) and $id_city != '0')
+        	{
+				$result_c = mysql_query("SELECT city.city_id, city.city_name, city.city_name_genitivus, city.city_name_dative, city.city_url FROM city WHERE city.city_id='$id_city'");
+                $myrow_c = mysql_fetch_array($result_c);
+                $id_city = $myrow_c['city_id'];
+                $name_city = $myrow_c['city_name'];
+                $name_city_genitivus = $myrow_c['city_name_genitivus'];
+                $name_city_dative = $myrow_c['city_name_dative'];
+                $url_city = $myrow_c['city_url'];
+
+                	if (!isset($url_city) or empty($url_city) or $url_city == '0')
+                    	{
+                        	$result_ct = mysql_query("SELECT city.city_id, city.city_name, city.city_name_genitivus, city.city_name_dative, city.city_url FROM city WHERE city.city_url='$city_url'");
+                            $myrow_ct = mysql_fetch_array($result_ct);
+                            $url_city = $myrow_ct['city_url'];
+                            $name_city = $myrow_ct['city_name'];
+                            $name_city_genitivus = $myrow_ct['city_name_genitivus'];
+                			$name_city_dative = $myrow_ct['city_name_dative'];
+                        }
+                    
+			}
+		else
+        	{
+            	$result_ct = mysql_query("SELECT city.city_id, city.city_name, city.city_name_genitivus, city.city_name_dative, city.city_url FROM city WHERE city.city_url='$city_url'");
+                $myrow_ct = mysql_fetch_array($result_ct);
+                $url_city = $myrow_ct['city_url'];
+                $name_city = $myrow_ct['city_name'];
+                $name_city_genitivus = $myrow_ct['city_name_genitivus'];
+                $name_city_dative = $myrow_ct['city_name_dative'];
+            }
+
+        $result_bc = mysql_query("SELECT bc_id, bc_name, bc_url FROM bread_crumbs WHERE pt_page='$page' AND bc_show='1' ORDER BY bc_sort");
+        
+        $array_id_bc = array();
+        $array_name_bc = array();
+        $array_url_bc = array();
+        	
+            while($myrow_bc = mysql_fetch_array($result_bc))
+        		{
+            		$array_id_bc[] = $myrow_bc['bc_id'];
+                    $array_name_bc[] = $myrow_bc['bc_name'];
+		            $array_url_bc[] = $myrow_bc['bc_url'];
+				}
+        
+        $here = $name_short_pp." ".$name_priority;
+        
+        if ($name_type_pp == '1')
+        	{
+            	$here = $here." (".$name_city.")";
+            }
+        
+        	echo ("
+            <table cellpadding='0' cellspacing='0' width='960' height='40' bgcolor='#ffffff'>
+            <tr><td width='15' height='40' rowspan='2'></td>
+            <td width='930' height='25'><p align='left'><font class=text>");
+            
+            $carray = count($array_name_bc);
+            	for ($i = 0; $i <= $carray-1; $i++)
+            		{
+						$array_name_bc[$i] = str_replace('$name',$here, "$array_name_bc[$i]");
+                        $array_name_bc[$i] = str_replace('$article',$here, "$array_name_bc[$i]");
+                        $array_name_bc[$i] = str_replace('$city_genitivus',$name_city_genitivus, "$array_name_bc[$i]");
+                        $array_name_bc[$i] = str_replace('$city_dative',$name_city_dative, "$array_name_bc[$i]");
+                        $array_name_bc[$i] = str_replace('$city',$name_city, "$array_name_bc[$i]");
+                        
+                        $array_url_bc[$i] = str_replace('$name',$name_url, "$array_url_bc[$i]");
+                        $array_url_bc[$i] = str_replace('$city_url',$city_url, "$array_url_bc[$i]");
+                        $array_url_bc[$i] = str_replace('$id',$id, "$array_url_bc[$i]");
+                        $array_url_bc[$i] = define_host().$array_url_bc[$i];
+                        
+                        if ($i > '0')
+                        	{
+                            	echo("&nbsp;<img border='0' src='".define_host()."source/imgs/arrow_right_crumbs.gif' height='9' width='9'>&nbsp;");
+                            }
+                        
+                        if ($i == $carray-1)
+                        	{
+                            	echo("$array_name_bc[$i]");
+                            }
+						else
+                        	{
+                            	echo("<a href='".$array_url_bc[$i]."' class='link'>$array_name_bc[$i]</a>");
+                            }
+                    }
+			
+            echo ("
+            </font></p></td>
+            <td width='15' height='40' rowspan='2'></td>
+            </tr>
+            <tr><td width='930' height='15'></td>
+            </tr>
+            </table>
+            ");
+?>

@@ -1,0 +1,42 @@
+<?php
+function menu_main($city_url,$page)
+	{
+		//define("main_dir", define_host()."$city_url/");
+		
+        $result_pt = mysql_query("SELECT mm_id FROM page_type WHERE pt_page='$page'");
+        $myrow_pt = mysql_fetch_array($result_pt);
+        
+        $result_mm = mysql_query("SELECT * FROM main_menu ORDER BY mm_sort");
+        $array_id_mm = array();
+        $array_name_mm = array();
+        $array_url_mm = array();
+        	while($myrow_mm = mysql_fetch_array($result_mm))
+        		{
+            		$array_id_mm[] = $myrow_mm['mm_id'];
+                    $array_name_mm[] = $myrow_mm['mm_name'];
+		            $array_url_mm[] = $myrow_mm['mm_url'];
+				}
+			
+            echo ("<div class='main_menu'><ul>");
+            
+            $carray = count($array_name_mm);
+            	for ($i = 0; $i <= $carray-1; $i++)
+            		{
+						
+                        $array_url_mm[$i] = str_replace('$city',$city_url, "$array_url_mm[$i]");
+                        $array_url_mm[$i] = define_host().$array_url_mm[$i];
+                        
+                        if ($array_url_mm[$i] == 'more.html')
+                        	{
+                            	echo ("<li");if ($myrow_pt['mm_id'] == $array_id_mm[$i]){echo (" class='selected'");}echo("><a href='".define_host()."more.html'>Åù¸&nbsp;<img src='".define_host()."source/imgs/arrow_down.gif'></a></li>");
+                            }
+                        else
+                        	{
+                            	echo ("<li");if ($myrow_pt['mm_id'] == $array_id_mm[$i]){echo (" class='selected'");}echo("><a href='$array_url_mm[$i]'>$array_name_mm[$i]</a></li>");
+							}
+					}
+			
+            echo ("</ul></div>");
+
+	}
+?>

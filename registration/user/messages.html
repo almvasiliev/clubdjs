@@ -1,0 +1,60 @@
+<?php
+require_once ('../source/scripts/html/user_session.html');
+if (isset($_GET['section']))
+	{
+		if (preg_match("/^[a-z]{1,}$/",$_GET['section']) and ($_GET['section'] == 'inbox' or $_GET['section'] == 'outbox' or $_GET['section'] == 'notes'))
+			{
+				$section = htmlspecialchars($_GET['section']);
+				$section = strip_tags($section);
+			}
+		else
+			{
+				back2url('".define_host()."404.html',0);
+			}
+	}
+else
+	{
+		$section = 'inbox';
+	}
+
+if ($myrow2['user_id'] == $id)
+	{
+        if (empty($section) or $section == 'inbox')
+        	{
+            	require_once('../source/scripts/html/delete_message.html');
+                $result22 = mysql_query("SELECT users.user_messages_deleted FROM users WHERE users.user_id='$myrow[user_id]'");
+                $myrow22 = mysql_fetch_array($result22);
+                $myrow['user_messages_deleted'] = $myrow22['user_messages_deleted'];                
+                $page='92';
+			}
+        elseif ($section == 'outbox')
+        	{
+                require_once('../source/scripts/html/send_message.html');
+                
+                require_once('../source/scripts/html/delete_message.html');
+                $result22 = mysql_query("SELECT users.user_messages_deleted FROM users WHERE users.user_id='$myrow[user_id]'");
+                $myrow22 = mysql_fetch_array($result22);
+                $myrow['user_messages_deleted'] = $myrow22['user_messages_deleted'];
+                $page='93';
+			}
+        elseif ($section == 'notes')
+        	{
+            	require_once('../source/scripts/html/send_message.html');
+                
+                require_once('../source/scripts/html/delete_message.html');
+                $result22 = mysql_query("SELECT users.user_messages_deleted FROM users WHERE users.user_id='$myrow[user_id]'");
+                $myrow22 = mysql_fetch_array($result22);
+                $myrow['user_messages_deleted'] = $myrow22['user_messages_deleted'];
+                $page='94';
+			}
+        else
+        	{
+            	back2url("$error_404",0);
+			}
+	}
+else
+	{
+    	back2url("$error_404",0);
+	}
+require_once ('../source/scripts/html/page.html');
+?>

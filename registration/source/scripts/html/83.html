@@ -1,0 +1,106 @@
+<?php
+        
+        //НАЧАЛО Подсчет непрочитанных сообщений
+        $result_inbox_novisit = mysql_query("SELECT * FROM messages WHERE message_recipient='$id' AND message_visited='0'",$connect);
+        $array_inbox_novisit = array();
+            while($myrow_inbox_novisit = mysql_fetch_array($result_inbox_novisit))
+                {
+                    $array_inbox_novisit[] = $myrow_inbox_novisit['message_id'];
+                }
+            $string_user_messages_deleted = $myrow['user_messages_deleted'];
+                if (!empty($string_user_messages_deleted) or $string_user_messages_deleted!='')
+                    {
+                        $array_user_messages_deleted = unserialize($string_user_messages_deleted);
+                        $array_inbox_novisit = array_diff($array_inbox_novisit, $array_user_messages_deleted);//Новые полученные сообщения завычетом удаленных сообщений.
+                    }
+                    $array_inbox_novisit = array_values($array_inbox_novisit);					
+                    $carray_inbox_novisit = count($array_inbox_novisit);
+                        if ($carray_inbox_novisit == 0)
+                            {
+                                $in_new = '';
+                            }
+                        else
+                            {
+                                $in_new = "+$carray_inbox_novisit";
+                            }
+        //КОНЕЦ Подсчет непрочитанных сообщений
+        
+        
+        //Подсчет заявок в друзья
+		$string_requests = $myrow['user_requests'];
+			if (empty($string_requests) or $string_requests == '')
+				{
+					$req = '';
+				}
+			else
+				{
+					$array_requests = unserialize($string_requests);
+					$carray_requests = count($array_requests);
+						if ($carray_requests == 0)
+							{
+								$req = '';
+							}
+						else
+							{
+								$req = "+$carray_requests";
+							}
+				}
+		//КОНЕЦ Подсчет заявок в друзья.
+        
+        echo ("
+		<td width='510' valign='top'>
+            <table cellpadding='0' cellspacing='0' width='510' height='65' bgcolor='#ffffff'>
+            	<tr><td width='510' height='65'><div style='float:left'><h1>".$myrow['user_name']." ".$myrow['user_surname']."</h1></div><div class='user_online'>Онлайн</div></td>
+                </tr>
+				<tr><td height='5'>");require_once('menu_2.html');echo("</td>
+            	</tr>
+            </table>
+        
+        	<table border='0' cellpadding='0' cellspacing='0' width='510' height='300' bgcolor='#ffffff'>
+				<tr><td width='3'>
+        				<table border='0' cellpadding='0' cellspacing='0' width='3' height='100%'>
+                    		<tr><td background='".define_host()."source/imgs/gradient_left_up_line.gif' height='170' width='3'></td>
+                        	</tr>
+		            		<tr><td width='3'></td>
+                        	</tr>
+                        	<tr><td background='".define_host()."source/imgs/gradient_left_down_line.gif' height='170' width='3'></td>
+                            </tr>
+            			</table>
+            		</td>
+            		<td width='504' bgcolor='#fcfcfc'>
+            			<table border=0 cellpadding='0' cellspacing='0' height='100%' width='100%' valign='top'>
+							<tr><td height='1' width='100%' class='ternary_menu'>");require_once('menu_3.html');echo("</td>
+                            </tr>
+							<tr><td height='600' width='504' class='text' valign='top'></td>
+							</tr>
+							<tr>
+							<td width='504' class='text' valign='top'></td>
+							</tr>
+						</table>
+					</td>
+					<td width='3'>
+		            	<table border=0 cellpadding='0' cellspacing='0' width='3' height='100%'>
+        			        <tr><td background='".define_host()."source/imgs/gradient_right_up_line.gif' height='170' width='3'>
+                            	</td>
+							</tr>
+                			<tr><td width='3'>
+                            	</td>
+							</tr>
+                			<tr><td height='170' width='3'>
+                            	</td>
+							</tr>
+                		</table>
+					</td>
+				</tr>
+        		<tr>
+        			<td background='".define_host()."source/imgs/gradient_left_down_corner.gif' width='3' height='3'>
+                    </td>
+                    <td background='".define_host()."source/imgs/gradient_bottom_line.gif' width='504' height='3'>
+                    </td>
+                    <td width='3' height='3'>
+                    </td>
+				</tr>
+			</table>
+		</td>
+    	");
+?>

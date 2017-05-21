@@ -1,0 +1,18 @@
+<?php
+		echo("
+	</table>
+        ");
+        $result_br = mysql_query("SELECT * FROM bottom_row WHERE pt_page='$page' AND br_show='1' ORDER by br_sort");
+        $array_key_br = array();
+			while($myrow_br = mysql_fetch_array($result_br))
+        		{
+            		$array_key_br[] = $myrow_br['br_key'];
+				}
+			
+			$carray = count($array_key_br);
+			
+			for ($i = 0; $i <= $carray-1; $i++)
+            		{
+                        require_once ("br_key_".$array_key_br[$i].".html");
+					}
+?>

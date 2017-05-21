@@ -1,0 +1,345 @@
+<?php
+		echo ("
+		<td width='510' valign='top'>
+            <table cellpadding='0' cellspacing='0' width='510' height='65' bgcolor='#ffffff'>
+            	<tr><td width='510' height='65'><div style='float:left'><h1>Восстановление пароля</h1></div></td>
+                </tr>
+				<tr><td height='5'>");require_once('menu_2.html');echo("</td>
+            	</tr>
+            </table>
+        
+        	<table border='0' cellpadding='0' cellspacing='0' width='510' height='300' bgcolor='#ffffff'>
+				<tr><td width='3'>
+        				<table border='0' cellpadding='0' cellspacing='0' width='3' height='100%'>
+                    		<tr><td background='".define_host()."source/imgs/gradient_left_up_line.gif' height='170' width='3'></td>
+                        	</tr>
+		            		<tr><td width='3'></td>
+                        	</tr>
+                        	<tr><td background='".define_host()."source/imgs/gradient_left_down_line.gif' height='170' width='3'></td>
+                            </tr>
+            			</table>
+            		</td>
+            		<td width='504' bgcolor='#fcfcfc'>
+            			<table border=0 cellpadding='0' cellspacing='0' height='340' width='100%' valign='top'>
+							<tr><td height='1' width='100%' class='ternary_menu' colspan='2'>");require_once('menu_3.html');echo("</td>
+                            </tr>");
+                            
+                            if (isset($_POST['submit']))
+                                {
+                                    if (!preg_match("/[^(\w)|(\x7F-\xFF)|(\s)]/",$_POST['submit']))
+                                        {
+                                            $submit = htmlspecialchars($_POST['submit']);
+                                            $submit = strip_tags($submit);
+                                            	
+                                                if ($submit == 'recover' || $submit == 'Восстановить пароль')
+                                                	{
+                                                    	if (getenv("HTTP_CLIENT_IP") && strcasecmp(getenv("HTTP_CLIENT_IP"),"unknown"))
+                                                            {
+                                                                $ip = getenv("HTTP_CLIENT_IP");
+                                                            }
+                                                        elseif (getenv("HTTP_X_FORWARDED_FOR") && strcasecmp(getenv("HTTP_X_FORWARDED_FOR"), "unknown"))
+                                                            {
+                                                                $ip = getenv("HTTP_X_FORWARDED_FOR");
+                                                            }
+                                                        elseif (getenv("REMOTE_ADDR") && strcasecmp(getenv("REMOTE_ADDR"), "unknown"))
+                                                            {
+                                                                $ip = getenv("REMOTE_ADDR");
+                                                            }
+                                                        elseif (!empty($_SERVER['REMOTE_ADDR']) && strcasecmp($_SERVER['REMOTE_ADDR'], "unknown"))
+                                                            {
+                                                                $ip = $_SERVER['REMOTE_ADDR'];
+                                                            }
+                                                        else
+                                                            {
+                                                                $ip = "unknown";
+                                                            }
+                                            
+                                                        mysql_query ("DELETE FROM authorization_fails WHERE UNIX_TIMESTAMP() - UNIX_TIMESTAMP(date) > 300");
+                                                        $result_ip = mysql_query("SELECT number_fails FROM authorization_fails WHERE ip='$ip'",$connect);
+                                                        $myrow_ip = mysql_fetch_array($result_ip);
+                                                        
+                                                            if ($myrow_ip['number_fails'] > 5)
+                                                                {
+                                                                    $msg_class = 'msg_cancel';
+                                                                    $msg_title = "Пароль не восстановлен.";
+                                                                    $msg_text = "Несколько раз подряд была допущена ошибка в запросе. Возможность повторной попытки восстановить пароль от учетной записи появится не ранее чем через пять минут.";
+                                                                }
+                                                            else
+                                                                {
+                                                                	if (isset($_POST['code']))
+                                                                    	{
+                                                                            if (!preg_match("/^[a-z0-9]{6,6}$/",$_POST['code']))
+                                                                                {
+                                                                                    $select = mysql_query ("SELECT ip FROM authorization_fails WHERE ip='$ip'");
+                                                                                    $tmp = mysql_fetch_row ($select);
+                                                                                        if ($ip == $tmp[0])
+                                                                                            {
+                                                                                                //Проверяем, есть ли пользователь в таблице "authorization_fails"
+                                                                                                $result52 = mysql_query("SELECT number_fails FROM authorization_fails WHERE ip='$ip'",$connect);
+                                                                                                $myrow52 = mysql_fetch_array($result52);
+                                                                                                $number_fails = $myrow52[0] + 1;//Если есть, то приплюсовываем количесво.
+                                                                                                mysql_query ("UPDATE authorization_fails SET number_fails=$number_fails,date=NOW() WHERE ip='$ip'");
+                                                                                            }
+                                                                                        else
+                                                                                            {
+                                                                                                //Если за последние 300 секунд ошибок не было, то вставляем новую запись в таблицу "authorization_fails"
+                                                                                                mysql_query ("INSERT INTO authorization_fails (ip,date,number_fails) VALUES ('$ip',NOW(),'1')");
+                                                                                            }
+                                                                                    
+                                                                                    $msg_class = 'msg_cancel';
+                                                                                    $msg_title = "Пароль не восстановлен.";
+                                                                                    $msg_text = "Проверочный символьный код с картинки указан неверно.";
+                                                                                }
+                                                                            else
+                                                                                {
+                                                                                	$code = htmlspecialchars($_POST['code']);
+                                                                                    $code = strip_tags($code);
+                                                                                    
+                                                                                    function generate_code() //Запускаем функцию, генерирующую символьный код.
+                                                                                        {
+                                                                                            $hours = date("H");//Часы
+                                                                                            $minuts = substr(date("H"), 0 , 1);//Минуты
+                                                                                            $mouns = date("m");//Месяцы
+                                                                                            $year_day = date("z");//День в году
+                                                                                            
+                                                                                            $str = $hours . $minuts . $mouns . $year_day; //Создаем строку.
+                                                                                            $str = md5(md5($str)); //Дважды шифруем в md5.
+                                                                                            $str = strrev($str);//Реверс строки.
+                                                                                            $str = substr($str, 3, 6);//Извлекаем 6 символов, начиная с 3.
+                                                                                            
+                                                                                            $array_mix = preg_split('//', $str, -1, PREG_SPLIT_NO_EMPTY);
+                                                                                            srand ((float)microtime()*1000000);
+                                                                                            shuffle ($array_mix);
+                                                                                            return implode("", $array_mix);
+                                                                                        }
+                                                                                        
+                                                                                    function chec_code($code) //Проверяем код.
+                                                                                        {
+                                                                                            $code = trim($code);//Удаляем пробелы.
+                                                                                            $array_mix = preg_split ('//', generate_code(), -1, PREG_SPLIT_NO_EMPTY);
+                                                                                            $m_code = preg_split ('//', $code, -1, PREG_SPLIT_NO_EMPTY);
+                                                                                            $result = array_intersect ($array_mix, $m_code);
+                                                                                                
+                                                                                                if (strlen(generate_code())!=strlen($code))
+                                                                                                    {
+                                                                                                        return FALSE;
+                                                                                                    }
+                                                                                                if (sizeof($result) == sizeof($array_mix))
+                                                                                                    {
+                                                                                                        return TRUE;
+                                                                                                    }
+                                                                                                else
+                                                                                                    {
+                                                                                                        return FALSE;
+                                                                                                    }
+																						}
+																					
+                                                                                    if (!chec_code($code))
+																						{
+                                                                                        	$select = mysql_query ("SELECT ip FROM authorization_fails WHERE ip='$ip'");
+                                                                                            $tmp = mysql_fetch_row ($select);
+                                                                                                if ($ip == $tmp[0])
+                                                                                                    {
+                                                                                                        //Проверяем, есть ли пользователь в таблице "authorization_fails"
+                                                                                                        $result52 = mysql_query("SELECT number_fails FROM authorization_fails WHERE ip='$ip'",$connect);
+                                                                                                        $myrow52 = mysql_fetch_array($result52);
+                                                                                                        $number_fails = $myrow52[0] + 1;//Если есть, то приплюсовываем количесво.
+                                                                                                        mysql_query ("UPDATE authorization_fails SET number_fails=$number_fails,date=NOW() WHERE ip='$ip'");
+                                                                                                    }
+                                                                                                else
+                                                                                                    {
+                                                                                                        //Если за последние 300 секунд ошибок не было, то вставляем новую запись в таблицу "authorization_fails"
+                                                                                                        mysql_query ("INSERT INTO authorization_fails (ip,date,number_fails) VALUES ('$ip',NOW(),'1')");
+                                                                                                    }
+                                                                                            
+                                                                                            $msg_class = 'msg_cancel';
+                                                                                            $msg_title = "Пароль не восстановлен.";
+                                                                                    		$msg_text = "Проверочный символьный код с картинки указан неверно.";
+                                                                                        }
+																					else
+                                                                                    	{
+                                                                                        	if (isset($_POST['email']))
+																								{
+                                                                                                	if (!preg_match("/[0-9a-z_]+@[0-9a-z_^\.]+\.[a-z]{1,10}/i", $_POST['email']))
+																										{
+                                                                                                        	$select = mysql_query ("SELECT ip FROM authorization_fails WHERE ip='$ip'");
+                                                                                                            $tmp = mysql_fetch_row ($select);
+                                                                                                                if ($ip == $tmp[0])
+                                                                                                                    {
+                                                                                                                        //Проверяем, есть ли пользователь в таблице "authorization_fails"
+                                                                                                                        $result52 = mysql_query("SELECT number_fails FROM authorization_fails WHERE ip='$ip'",$connect);
+                                                                                                                        $myrow52 = mysql_fetch_array($result52);
+                                                                                                                        $number_fails = $myrow52[0] + 1;//Если есть, то приплюсовываем количесво.
+                                                                                                                        mysql_query ("UPDATE authorization_fails SET number_fails=$number_fails,date=NOW() WHERE ip='$ip'");
+                                                                                                                    }
+                                                                                                                else
+                                                                                                                    {
+                                                                                                                        //Если за последние 300 секунд ошибок не было, то вставляем новую запись в таблицу "authorization_fails"
+                                                                                                                        mysql_query ("INSERT INTO authorization_fails (ip,date,number_fails) VALUES ('$ip',NOW(),'1')");
+                                                                                                                    }
+                                                                                                            
+                                                                                                            $msg_class = 'msg_cancel';
+                                                                                                            $msg_title = "Пароль не восстановлен.";
+                                                                                                            $msg_text = "Адрес электронной почты указан неверно.";
+                                                                                                        }
+																									else
+                                                                                                    	{
+                                                                                                        	$email = htmlspecialchars($_POST['email']);
+																											$email = strip_tags($email);
+                                                                                                            
+                                                                                                            $result = mysql_query("SELECT user_id, user_name, user_surname, user_activation FROM users WHERE user_email='$email'");
+                                                                                                            $myrow = mysql_fetch_array($result);
+                                                                                                            	
+                                                                                                                if (empty($myrow['user_id']))
+                                                                                                                    {
+                                                                                                                        $select = mysql_query ("SELECT ip FROM authorization_fails WHERE ip='$ip'");
+                                                                                                                        $tmp = mysql_fetch_row ($select);
+                                                                                                                            if ($ip == $tmp[0])
+                                                                                                                                {
+                                                                                                                                    //Проверяем, есть ли пользователь в таблице "authorization_fails"
+                                                                                                                                    $result52 = mysql_query("SELECT number_fails FROM authorization_fails WHERE ip='$ip'",$connect);
+                                                                                                                                    $myrow52 = mysql_fetch_array($result52);
+                                                                                                                                    $number_fails = $myrow52[0] + 1;//Если есть, то приплюсовываем количесво.
+                                                                                                                                    mysql_query ("UPDATE authorization_fails SET number_fails=$number_fails,date=NOW() WHERE ip='$ip'");
+                                                                                                                                }
+                                                                                                                            else
+                                                                                                                                {
+                                                                                                                                    //Если за последние 300 секунд ошибок не было, то вставляем новую запись в таблицу "authorization_fails"
+                                                                                                                                    mysql_query ("INSERT INTO authorization_fails (ip,date,number_fails) VALUES ('$ip',NOW(),'1')");
+                                                                                                                                }
+                                                                                                                        $msg_class = 'msg_cancel';
+                                                                                                                        $msg_title = "Пароль не восстановлен.";
+                                                                                                                        $msg_text = "Адрес электронной почты указан неверно.";
+                                                                                                                    }
+																												else
+                                                                                                                	{
+                                                                                                                    	if ($myrow['user_activation'] == '0')
+                                                                                                                            {
+                                                                                                                                $msg_class = 'msg_cancel';
+                                                                                                                                $msg_title = "Пароль не восстановлен.";
+                                                                                                                                $msg_text = "Ваша учетная запись не активирована. На указанный Вами адрес электронной почты, ранее было отправлено письмо с ссылкой, для подтверждения электронного почтового ящика. Ссылка действительна 24 часа с момента регистрации. Если времени с момента регистрации прошло больше 24-х часов, зарегистрируйтесь повторно.";
+                                                                                                                            }
+																														else
+                                                                                                                        	{
+$datenow = date('YmdHis');
+$new_password = md5($datenow);
+$new_password = substr($new_password, 2, 6);
+$new_password_sh = strrev(md5($new_password))."b3p6f";
+mysql_query("UPDATE users SET user_password='$new_password_sh' WHERE user_email='$email'");
+
+require_once ("send_mime_mail.html");
+
+$subject = "Восстановление пароля.";
+$message = "Здравствуйте, ".$myrow['user_name']."!\n\nПо Вашему запросу мы сгенерировали новый пароль от Вашей учетной записи. Теперь Вы сможете зайти на сайт Cluub.Ru, используя его. После входа в свою учетную запись мы рекомендуем сменить пароль.\n\nНовый пароль: ".$new_password."\n\nС уважением,\nРедакция Cluub.Ru";
+send_mime_mail('КЛУУБ.РУ','admin@cluub.ru',$email,'windows-1251','windows-1251',$subject,$message);
+
+$msg_class = 'msg_apply';
+$msg_title = "Пароль успешно восстановлен.";
+$msg_text = "На Ваш почтовый ящик отправлено письмо с новым паролем от учетной записи.";
+                                                                                                                            }
+                                                                                                                    }
+                                                                                                        }
+                                                                                                }
+																							else
+                                                                                            	{
+                                                                                                	$select = mysql_query ("SELECT ip FROM authorization_fails WHERE ip='$ip'");
+                                                                                                    $tmp = mysql_fetch_row ($select);
+                                                                                                        if ($ip == $tmp[0])
+                                                                                                            {
+                                                                                                                //Проверяем, есть ли пользователь в таблице "authorization_fails"
+                                                                                                                $result52 = mysql_query("SELECT number_fails FROM authorization_fails WHERE ip='$ip'",$connect);
+                                                                                                                $myrow52 = mysql_fetch_array($result52);
+                                                                                                                $number_fails = $myrow52[0] + 1;//Если есть, то приплюсовываем количесво.
+                                                                                                                mysql_query ("UPDATE authorization_fails SET number_fails=$number_fails,date=NOW() WHERE ip='$ip'");
+                                                                                                            }
+                                                                                                        else
+                                                                                                            {
+                                                                                                                //Если за последние 300 секунд ошибок не было, то вставляем новую запись в таблицу "authorization_fails"
+                                                                                                                mysql_query ("INSERT INTO authorization_fails (ip,date,number_fails) VALUES ('$ip',NOW(),'1')");
+                                                                                                            }
+                                                                                                    
+                                                                                                    $msg_class = 'msg_cancel';
+                                                                                                    $msg_title = "Пароль не восстановлен.";
+                                                                                                    $msg_text = "Адрес электронного почтового ящика указан неверно.";
+                                                                                                }
+                                                                                        }
+                                                                                    
+																				}
+																		}
+																	else
+                                                                    	{
+                                                                        	$select = mysql_query ("SELECT ip FROM authorization_fails WHERE ip='$ip'");
+                                                                            $tmp = mysql_fetch_row ($select);
+                                                                                if ($ip == $tmp[0])
+                                                                                    {
+                                                                                        //Проверяем, есть ли пользователь в таблице "authorization_fails"
+                                                                                        $result52 = mysql_query("SELECT number_fails FROM authorization_fails WHERE ip='$ip'",$connect);
+                                                                                        $myrow52 = mysql_fetch_array($result52);
+                                                                                        $number_fails = $myrow52[0] + 1;//Если есть, то приплюсовываем количесво.
+                                                                                        mysql_query ("UPDATE authorization_fails SET number_fails=$number_fails,date=NOW() WHERE ip='$ip'");
+                                                                                    }
+                                                                                else
+                                                                                    {
+                                                                                        //Если за последние 300 секунд ошибок не было, то вставляем новую запись в таблицу "authorization_fails"
+                                                                                        mysql_query ("INSERT INTO authorization_fails (ip,date,number_fails) VALUES ('$ip',NOW(),'1')");
+                                                                                    }
+                                                                            
+                                                                            $msg_class = 'msg_cancel';
+                                                                            $msg_title = "Пароль не восстановлен.";
+                                                                            $msg_text = "Проверочный символьный код с картинки указан неверно.";
+                                                                        }
+                                                                }
+															
+														if (isset($msg_class) and isset($msg_title) and isset($msg_text))
+                                                            {
+                                                                echo("
+                                                                <tr><td width='100%' height='1' class='user_text' align='left' colspan='2'><div class='".$msg_class."'><b>$msg_title</b><br>$msg_text</div></td></tr>
+                                                                ");
+															}
+                                                    }
+										}
+								}
+                                                            
+                            echo("
+							<tr><td height='30' width='504' class='user_registration' colspan='2' align='left'><h2 class='user'>Забыли пароль от учетной записи? Не расстраивайтесь!</h2><p>Укажите адрес электронной почты, который вы указывали при регистрации на нашем сайте и проверочный код с картинки. После чего вам будет выслано письмо с новым паролем от учетной записи.</p></td></tr>
+                <tr><td height='30' width='504' class='user_registration' colspan='2' align='left'><h2 class='user'>Восстановить пароль от учетной записи</h2>
+                <form action='".define_host()."recover.html' method='post' enctype='multipart/form-data'></td></tr>
+                                
+                <tr><td height='30' width='205' class='user_text' align='right'>Адрес электронной почты:</td>
+                <td height='30' width='299' class='user' align='left'><input name='email' type='text' style='width: 210px' maxlength='40'></td></tr>
+               
+                <tr><td height='30' width='205' class='user_text' align='right'>Введите код с картинки:</td>
+                <td height='30' width='299' class='user' align='left'><img src='".define_host()."source/scripts/html/codegen.php?<?php time() ?>'><br clear='all'><br><input type='text' name='code' style='width: 210px' maxlength='15'></td></tr>
+                
+                <tr><td height='30' width='205' class='user' align='right'></td><td height='30' width='299' class='user' align='left'><button class='recover' type='submit' name='submit' value='recover'>Восстановить пароль</button></form></td></tr>
+                			<tr><td height='200' width='504' colspan='2' align='left'>
+                            	</td>
+							</tr>
+						</table>
+					</td>
+					<td width='3'>
+		            	<table border=0 cellpadding='0' cellspacing='0' width='3' height='100%'>
+        			        <tr><td background='".define_host()."source/imgs/gradient_right_up_line.gif' height='170' width='3'>
+                            	</td>
+							</tr>
+                			<tr><td width='3'>
+                            	</td>
+							</tr>
+                			<tr><td height='170' width='3'>
+                            	</td>
+							</tr>
+                		</table>
+					</td>
+				</tr>
+        		<tr>
+        			<td background='".define_host()."source/imgs/gradient_left_down_corner.gif' width='3' height='3'>
+                    </td>
+                    <td background='".define_host()."source/imgs/gradient_bottom_line.gif' width='504' height='3'>
+                    </td>
+                    <td width='3' height='3'>
+                    </td>
+				</tr>
+			</table>
+		</td>
+    	");
+?>

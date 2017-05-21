@@ -1,0 +1,98 @@
+<?php
+require_once ('../source/scripts/html/user_session.html');
+if (isset($_GET['section']))
+	{
+		if (preg_match("/^[a-z]{1,}$/",$_GET['section']) and ($_GET['section'] == 'all' or $_GET['section'] == 'online' or $_GET['section'] == 'requests' or $_GET['section'] == 'subscribers' or $_GET['section'] == 'common' or $_GET['section'] == 'search'))
+			{
+				$section = htmlspecialchars($_GET['section']);
+				$section = strip_tags($section);
+			}
+		else
+			{
+				back2url("$error_404",0);
+			}
+	}
+else
+	{
+		$section = 'all';
+	}
+
+if ($myrow2['user_id'] == $id)
+	{
+        if (empty($section) or $section == 'all')
+        	{
+                require_once('../source/scripts/html/remove_from_friends.html');
+                    if ($authorized_user == '1')
+                        {
+                            $result22 = mysql_query("SELECT users.user_friends, users.user_requests, users.user_subscribers FROM users WHERE users.user_id='$myrow[user_id]'");
+                            $myrow22 = mysql_fetch_array($result22);
+                            $myrow['user_friends'] = $myrow22['user_friends'];
+                            $myrow['user_requests'] = $myrow22['user_requests'];
+                            $myrow['user_subscribers'] = $myrow22['user_subscribers'];
+                        }
+                $page='87';
+			}
+        elseif ($section == 'online')
+        	{
+            	require_once('../source/scripts/html/remove_from_friends.html');
+                	if ($authorized_user == '1')
+                        {
+                            $result22 = mysql_query("SELECT users.user_friends, users.user_requests, users.user_subscribers FROM users WHERE users.user_id='$myrow[user_id]'");
+                            $myrow22 = mysql_fetch_array($result22);
+                            $myrow['user_friends'] = $myrow22['user_friends'];
+                            $myrow['user_requests'] = $myrow22['user_requests'];
+                            $myrow['user_subscribers'] = $myrow22['user_subscribers'];
+                        }
+                $page='88';
+			}
+        elseif ($section == 'requests')
+        	{
+            	require_once('../source/scripts/html/add_to_friends.html');
+                require_once('../source/scripts/html/add_to_subscribers.html');
+                	if ($authorized_user == '1')
+                        {
+                            $result22 = mysql_query("SELECT users.user_friends, users.user_requests, users.user_subscribers FROM users WHERE users.user_id='$myrow[user_id]'");
+                            $myrow22 = mysql_fetch_array($result22);
+                            $myrow['user_friends'] = $myrow22['user_friends'];
+                            $myrow['user_requests'] = $myrow22['user_requests'];
+                            $myrow['user_subscribers'] = $myrow22['user_subscribers'];
+                        }
+                $page='89';
+			}
+        elseif ($section == 'subscribers')
+        	{
+            	require_once('../source/scripts/html/add_to_friends.html');
+                	if ($authorized_user == '1')
+                        {
+                            $result22 = mysql_query("SELECT users.user_friends, users.user_requests, users.user_subscribers FROM users WHERE users.user_id='$myrow[user_id]'");
+                            $myrow22 = mysql_fetch_array($result22);
+                            $myrow['user_friends'] = $myrow22['user_friends'];
+                            $myrow['user_requests'] = $myrow22['user_requests'];
+                            $myrow['user_subscribers'] = $myrow22['user_subscribers'];
+                        }
+                $page='90';
+			}
+        elseif ($section == 'search')
+        	{
+            	require_once('../source/scripts/html/add_to_friends.html');
+                	if ($authorized_user == '1')
+                        {
+                            $result22 = mysql_query("SELECT users.user_friends, users.user_requests, users.user_subscribers FROM users WHERE users.user_id='$myrow[user_id]'");
+                            $myrow22 = mysql_fetch_array($result22);
+                            $myrow['user_friends'] = $myrow22['user_friends'];
+                            $myrow['user_requests'] = $myrow22['user_requests'];
+                            $myrow['user_subscribers'] = $myrow22['user_subscribers'];
+                        }
+                $page='91';
+			}
+        else {back2url("$error_404",0);}
+	}
+else
+	{
+    	if (empty($section) or $section == 'all'){$page='104';}
+        elseif ($section == 'online'){$page='105';}
+        elseif ($section == 'common'){$page='106';}
+        else {back2url("$error_404",0);}
+	}
+require_once ('../source/scripts/html/page.html');
+?>

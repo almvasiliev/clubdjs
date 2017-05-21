@@ -1,0 +1,8 @@
+<?php
+require_once ('define_host.html');
+function menu_headline()
+	{
+		define("headline_dir", define_host());		
+		echo ("<div class='headline_menu'><ul><li class='selected'>Клубная жизнь</li><li class='partition'><img src='".headline_dir."source/imgs/headline_menu_partition.gif'></li><li><a href='".headline_dir."advert.html'>Реклама на сайте</a></li></ul></div>");
+	}
+?>

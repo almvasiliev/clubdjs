@@ -1,0 +1,14 @@
+<?php
+$username1 = "cluub";
+$password1 = "clubDJs123";
+$connect = mysql_connect('localhost',$username1,$password1);
+mysql_query("SET NAMES 'cp1251'");
+	if (!$connect)
+		{
+			exit("Не удается подключиться к БД.");
+		}
+	else
+		{
+			mysql_select_db('wwwcluubru_clubdjsru',$connect);
+		}
+?>

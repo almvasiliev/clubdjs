@@ -1,0 +1,21 @@
+<?php
+
+function substrings($string,$count)
+	{//Позволяет из большого текста выбрать определенное количество символов, а так же не просто обрубить слово, а вывести его до конца.
+		$string = substr($string, 0, $count+1);
+			if (strlen($string) > $count)
+            	{
+                	$string = wordwrap($string, $count);
+                    $i = strpos($string, "\n");
+                    	if ($i)
+                        	{
+                            	$string = substr($string, 0, $i);
+							}
+					return ("$string...");
+				}
+			else
+            	{
+                	return ("$string");
+                }
+	}
+?>

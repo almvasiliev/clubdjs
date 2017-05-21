@@ -1,0 +1,22 @@
+	<script type="text/javascript" src="../source/scripts/js/cropresizer.js">
+    </script>
+	
+	<script type="text/javascript">
+	//<![CDATA[
+	cropresizer.getObject("photo1").init({
+		cropWidth : 200,
+		cropHeight : 200,
+		onUpdate : function() {
+    var form = document.getElementById("formId");
+    if (form) {
+        form.wp.value = this.iWidth;
+		form.hp.value = this.iHeight;
+		form.w.value = this.cropWidth;
+        form.h.value = this.cropHeight;
+        form.y.value = (this.cropTop - this.iTop);
+        form.x.value = (this.cropLeft - this.iLeft);
+    }
+}
+	});
+	//]]>
+	</script>

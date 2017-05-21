@@ -1,0 +1,31 @@
+<?php
+
+		$result_tr = mysql_query("SELECT * FROM top_row WHERE pt_page='$page' AND tr_show='1' ORDER by tr_sort");
+        $array_key_tr = array();
+			while($myrow_tr = mysql_fetch_array($result_tr))
+        		{
+            		$array_key_tr[] = $myrow_tr['tr_key'];
+				}
+			
+			$carray = count($array_key_tr);
+			
+			for ($i = 0; $i <= $carray-1; $i++)
+            		{
+                        require_once ("tr_key_".$array_key_tr[$i].".html");
+					}
+			
+            if ($carray == '0')
+            	{
+                	echo("
+                    <table cellpadding='0' cellspacing='0' width='100%' height='20' bgcolor='#ffffff'>                        
+                    <tr height='20'>
+                    <td width='100%' height='20'></td>
+                    </tr>
+                    </table>
+					");
+                }
+            
+        echo("
+        <table cellpadding='0' cellspacing='0' width='960' height='100' bgcolor='#ffffff'>
+        ");
+?>

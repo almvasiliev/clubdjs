@@ -1,0 +1,67 @@
+<?php
+
+        if (!isset($frn) or empty($frn)){$frn = '';}
+        if (!isset($onl) or empty($onl)){$onl = '';}
+        if (!isset($req) or empty($req)){$req = '';}
+        if (!isset($sub) or empty($sub)){$sub = '';}
+        if (!isset($com) or empty($com)){$com = '';}
+        if (!isset($in_new) or empty($in_new)){$in_new = '';}
+        if (!isset($not) or empty($not)){$not = '';}
+        
+        $result_pt = mysql_query("SELECT m3_id FROM page_type WHERE pt_page='$page'");
+        $myrow_pt = mysql_fetch_array($result_pt);
+        $m3_id = $myrow_pt['m3_id'];
+        
+        if (isset($page_id) and !empty($page_id) and $page_id!=0)
+        	{
+        		$result_p = mysql_query("SELECT p_id, p_url FROM page WHERE p_id='$page_id'");
+            	$myrow_p = mysql_fetch_array($result_p);
+            	$name_url = $myrow_p['p_url'];
+			}
+		else
+        	{
+            	$name_url = '';
+            }
+        
+        $result_m3_type = mysql_query("SELECT m3_type FROM menu_3 WHERE m3_id='$m3_id'");
+        $myrow_m3_type = mysql_fetch_array($result_m3_type);
+        $m3_type = $myrow_m3_type['m3_type'];
+        
+        $result_m3 = mysql_query("SELECT m3_id, m3_name, m3_url, m3_counter FROM menu_3 WHERE m3_type='$m3_type' ORDER BY m3_sort");
+        
+        $array_id_m3 = array();
+        $array_name_m3 = array();
+        $array_url_m3 = array();
+        $array_counter_m3 = array();
+        	while($myrow_m3 = mysql_fetch_array($result_m3))
+        		{
+            		$array_id_m3[] = $myrow_m3['m3_id'];
+                    $array_name_m3[] = $myrow_m3['m3_name'];
+		            $array_url_m3[] = $myrow_m3['m3_url'];
+                    $array_counter_m3[] = $myrow_m3['m3_counter'];
+				}
+			
+            echo ("<div class='ternary_menu'><ul>");
+            $carray = count($array_name_m3);
+            	for ($i = 0; $i <= $carray-1; $i++)
+            		{
+                        $array_name_m3[$i] = $array_name_m3[$i].$array_counter_m3[$i];
+						$array_name_m3[$i] = str_replace('21',"<font size='-1'><sup>&nbsp;$frn</sup></font>", "$array_name_m3[$i]");
+                        $array_name_m3[$i] = str_replace('22',"<font size='-1'><sup>&nbsp;$onl</sup></font>", "$array_name_m3[$i]");
+                        $array_name_m3[$i] = str_replace('23',"<font size='-1'><sup>&nbsp;$req</sup></font>", "$array_name_m3[$i]");
+                        $array_name_m3[$i] = str_replace('24',"<font size='-1'><sup>&nbsp;$sub</sup></font>", "$array_name_m3[$i]");
+                        $array_name_m3[$i] = str_replace('104',"<font size='-1'><sup>&nbsp;$frn</sup></font>", "$array_name_m3[$i]");
+                        $array_name_m3[$i] = str_replace('105',"<font size='-1'><sup>&nbsp;$onl</sup></font>", "$array_name_m3[$i]");
+                        $array_name_m3[$i] = str_replace('106',"<font size='-1'><sup>&nbsp;$com</sup></font>", "$array_name_m3[$i]");
+                        $array_name_m3[$i] = str_replace('92',"<font size='-1'><sup>&nbsp;$in_new</sup></font>", "$array_name_m3[$i]");
+                        $array_name_m3[$i] = str_replace('94',"<font size='-1'><sup>&nbsp;$not</sup></font>", "$array_name_m3[$i]");
+                        
+                        $array_name_m3[$i] = str_replace('none',"<font size='-1'><sup>&nbsp;</sup></font>", "$array_name_m3[$i]");
+                        $array_url_m3[$i] = str_replace('$name',$name_url, "$array_url_m3[$i]");
+                        $array_url_m3[$i] = str_replace('$city',$city_url, "$array_url_m3[$i]");
+                        $array_url_m3[$i] = str_replace('$id',$id, "$array_url_m3[$i]");
+                        $array_url_m3[$i] = define_host().$array_url_m3[$i];
+                      	echo("<li");if ($m3_id == $array_id_m3[$i]){echo (" class='selected'");}echo("><a href='$array_url_m3[$i]'>$array_name_m3[$i]</a></li>");
+					}
+            echo ("</ul></div>");
+?>

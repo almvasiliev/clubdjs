@@ -1,0 +1,293 @@
+<?php
+        
+        if (isset($_GET['p']))
+            {
+                if (ctype_digit($_GET['p']))//Если символы в строке $_GET['p'] цифровые, то...
+                    {
+                        $p = htmlspecialchars($_GET['p']);
+                        $p = strip_tags($p);
+                    }
+                else
+                    {
+                        back2url("$error_404",0);
+                    }
+            }
+            else
+                {
+                    $p = '1';
+                }
+                
+            if (isset($_GET['per']))
+            {
+                if (ctype_digit($_GET['per']) and ($_GET['per'] == 10 or $_GET['per'] == 50 or $_GET['per'] == 100))//Если символы в строке $_GET['per'] цифровые, то...
+                    {
+                        $per = htmlspecialchars($_GET['per']);
+                        $per = strip_tags($per);
+                    }
+                else
+                    {
+                        back2url("$error_404",0);
+                    }
+            }
+            else
+                {
+                    $per = '10';
+                }
+            
+		require_once ("pages.html");
+		require_once ("array_shuffle.html");
+        
+        //НАЧАЛО Подсчет друзей
+		$string_friends = $myrow['user_friends'];
+			if (empty($string_friends) or $string_friends == '')
+				{
+					$frn = '';
+				}
+			else
+				{
+					$array_friends = unserialize($string_friends);
+					$carray_friends = count($array_friends);
+						if ($carray_friends == 0)
+							{
+								$frn = '';
+							}
+						else
+							{
+								$frn = "$carray_friends";
+							}
+				}
+		//КОНЕЦ Подсчет друзей.
+        
+        //НАЧАЛО Подсчет друзей онлайн
+		$string_friends = $myrow['user_friends'];
+			if (empty($string_friends) or $string_friends == '')
+				{
+					$onl = '';
+				}
+			else
+				{
+					$array_friends = unserialize($string_friends);
+					$carray_friends = count($array_friends);
+						if ($carray_friends == 0)
+							{
+								$onl = '';
+							}
+						else
+							{
+								$array_online_friends = array_intersect($array_friends,$array_online);
+								$array_online_friends = array_values($array_online_friends);
+								$carray_online_friends = count($array_online_friends);
+									if ($carray_online_friends == 0)
+										{
+											$onl = '';
+										}
+									else
+										{
+											$onl = $carray_online_friends;
+										}
+								
+							}
+				}
+		//КОНЕЦ Подсчет друзей онлайн.
+					
+		//НАЧАЛО Подсчет общих друзей
+		$string_friends = $myrow['user_friends'];
+		$string_friends2 = $myrow2['user_friends'];
+			if (empty($string_friends) or $string_friends == '' or empty($string_friends2) or $string_friends2 == '')
+				{
+					$com = '';
+				}
+			else
+				{
+					$array_friends = unserialize($string_friends);
+					$array_friends2 = unserialize($string_friends2);
+					$carray_friends = count($array_friends);
+					$carray_friends2 = count($array_friends2);
+						if ($carray_friends == 0 or $carray_friends2 == 0)
+							{
+								$com = '';
+							}
+						else
+							{
+								$array_common_friends = array_intersect($array_friends,$array_friends2);
+								$array_common_friends = array_values($array_common_friends);
+								$carray_common_friends = count($array_common_friends);
+									if ($carray_common_friends == 0)
+										{
+											$com = '';
+										}
+									else
+										{
+											$com = $carray_common_friends;
+										}
+								
+							}
+				}
+		//КОНЕЦ Подсчет общих друзей.
+        
+        //НАЧАЛО Определяем пользователь онлайн или нет
+        if (in_array($id,$array_online))
+        	{
+            	$user_online = 'Онлайн';
+			}
+		else
+        	{
+            	$user_online = '';
+			}
+		//КОНЕЦ Определяем пользователь онлайн или нет.
+        
+        echo ("
+		<td width='510' valign='top'>
+            <table cellpadding='0' cellspacing='0' width='510' height='65' bgcolor='#ffffff'>
+            	<tr><td width='510' height='65'><div style='float:left'><h1>".$myrow['user_name']." ".$myrow['user_surname']."</h1></div><div class='user_online'>$user_online</div></td>
+                </tr>
+				<tr><td height='5'>");require_once('menu_2.html');echo("</td>
+            	</tr>
+            </table>
+        
+        	<table border='0' cellpadding='0' cellspacing='0' width='510' height='300' bgcolor='#ffffff'>
+				<tr><td width='3'>
+        				<table border='0' cellpadding='0' cellspacing='0' width='3' height='100%'>
+                    		<tr><td background='".define_host()."source/imgs/gradient_left_up_line.gif' height='170' width='3'></td>
+                        	</tr>
+		            		<tr><td width='3'></td>
+                        	</tr>
+                        	<tr><td background='".define_host()."source/imgs/gradient_left_down_line.gif' height='170' width='3'></td>
+                            </tr>
+            			</table>
+            		</td>
+            		<td width='504' bgcolor='#fcfcfc'>
+            			<table border=0 cellpadding='0' cellspacing='0' height='100%' width='100%' valign='top'>
+							<tr><td height='1' width='100%' class='ternary_menu' colspan='3'>");require_once('menu_3.html');echo("</td>
+                            </tr>
+                            
+                            <tr><td width='100%' height='10' class='list_friends' align='left' colspan='3'><h2 class='list_friends'>Список общих друзей</h2><p>Список общих друзей включает в себя тех людей, которых вы и ".$myrow['user_name']." считаете своими друзьями.</p></td></tr>
+							<tr><td width='100%' height='10' align='left' colspan='3'>
+                            ");
+					
+                            //НАЧАЛО Сраницы
+                            pages("friends.html?id=$myrow[user_id]",$section,$com,$per,$p);
+                            per_pages("friends.html?id=$myrow[user_id]",$section,$com,$per,$p);
+                            //КОНЕЦ Сраницы
+                            echo ("</td></tr>");
+                            
+                            if ($key == 1)
+                                {
+                                                    
+                                $string_frn = $myrow['user_friends'];//друзья хозяина страницы
+                                $string_frn2 = $myrow2['user_friends'];//друзья пользователя зашедшего на страницу
+                                    if ((!empty($string_frn) or $string_frn!='') and (!empty($string_frn2) or $string_frn2!=''))
+                                        {
+                                            $array_frn = unserialize($string_frn);
+                                            $array_frn2 = unserialize($string_frn2);
+                                            $carray_frn = count($array_frn);
+                                            $carray_frn2 = count($array_frn2);
+                                                if ($carray_frn!=0 and $carray_frn2!=0)
+                                                    {
+                                                        $array_com = array_intersect($array_frn,$array_frn2);
+                                                        $array_com = array_values($array_com);
+                                                        $carray_com = count($array_com);
+                                                            if ($carray_com!=0)
+                                                                {
+                                                                    for ($i = $min_unit; $i <= $max_unit; $i++)
+                                                                        {
+                                                                            $friend_id_com = $array_com[$i];
+                                                                            $result3 = mysql_query("SELECT user_id, user_name, user_surname, user_snapshot_mid, user_city, user_country FROM users WHERE user_id='$friend_id_com'",$connect);
+                                                                            $myrow3 = mysql_fetch_array($result3);
+            
+                                                                                echo ("<tr><td background='".define_host()."source/imgs/section_line.gif' width='100%' height='3' colspan='3'></td></tr>");
+                                                                                
+                                                                                echo ("<tr><td width='118' height='10' class='list_friends' align='left'><div class='logo_user'><a href='".define_host()."user/index.html?id=$myrow3[user_id]'><img src='$myrow3[user_snapshot_mid]' alt='$myrow3[user_name] $myrow3[user_surname]'></a></div></td><td width='208' height='10' class='list_friends' align='left'><h3 class='list_friends'><a href='".define_host()."user/index.html?id=$myrow3[user_id]' class='list_friends'>".$myrow3['user_name']." ".$myrow3['user_surname']."</a></h3>");
+                                                                                
+                                                                                if (!empty($myrow3['user_country']) and !empty($myrow3['user_city']))
+                                                                                    {
+                                                                                        echo ("<div class='friends'>$myrow3[user_country], г. $myrow3[user_city]</div></br>");
+                                                                                    }
+                                                                                elseif (!empty($myrow3['user_country']) and empty($myrow3['user_city']))
+                                                                                    {
+                                                                                        echo ("<div class='friends'>$myrow3[user_country]</div><br>");
+                                                                                    }
+                                                                                
+                                                                                if (in_array($myrow3['user_id'],$array_online))
+                                                                                    {
+                                                                                        echo ("<div class='friend_online'>Онлайн</div>");
+                                                                                    }
+                                                                                
+                                                                                echo ("
+                                                                                </td><td width='178' height='10' class='list_friends' align='left'>
+                                                                                
+                                                                                <form action='".define_host()."user/message.html?id=$myrow2[user_id]&action=send' method='post'>
+                                                                                <input type='hidden' name='user_id' value='".$myrow3['user_id']."'/>
+                                                                                <button class='friends_min' type='submit' name='submit' value='send_message'>Написать сообщение</button>
+                                                                                </form>
+                                                                                
+                                                                                <form action='".define_host()."user/friends.html?id=$myrow3[user_id]' method='post'>
+                                                                                <button class='friends_min' type='submit'>Просмотреть друзей</button>
+                                                                                </form>															
+            
+                                                                                </td></tr>
+                                                                                ");
+                                                                                
+                                                                                if ($i == $max_unit and $max_unit - $min_unit > 5 and $max_unit > 8 and $carray_com > 10)
+                                                                                    {
+                                                                                        echo ("<tr><td background='".define_host()."source/imgs/section_line.gif' width='100%' height='3' colspan='3'></td></tr>");
+                                                                                    }
+                                                                        }
+                                                                        
+                                                                    if ($max_unit - $min_unit > 5)
+                                                                        {
+                                                                            echo ("<tr><td width='100%' align='left' colspan='3'>");
+                                                                            //НАЧАЛО Сраницы
+                                                                            pages("friends.html?id=$myrow[user_id]",$section,$com,$per,$p);
+                                                                            per_pages("friends.html?id=$myrow[user_id]",$section,$com,$per,$p);
+                                                                            //КОНЕЦ Сраницы
+                                                                            echo ("</td></tr>");
+                                                                        }
+                                                                    echo ("<tr><td width='100%' align='left' colspan='3'></td></tr>");
+                                                                }
+                                                            else
+                                                                {
+                                                                    echo ("<tr><td width='100%' class='list_friends' align='left' colspan='3'>Общих друзей нет.</td></tr>");
+                                                                }
+            
+                                                    }
+                                                else
+                                                    {
+                                                        echo ("<tr><td width='100%' class='list_friends' align='left' colspan='3'>Общих друзей нет.</td></tr>");
+                                                    }
+                                        }
+                                    else
+                                        {
+                                            echo ("<tr><td width='100%' class='list_friends' align='left' colspan='3'>Общих друзей нет.</td></tr>");
+                                        }
+                                }	
+                                    echo ("
+                                    <tr><td width='100%' colspan='3'></td></tr>
+						</table>
+					</td>
+					<td width='3'>
+		            	<table border=0 cellpadding='0' cellspacing='0' width='3' height='100%'>
+        			        <tr><td background='".define_host()."source/imgs/gradient_right_up_line.gif' height='170' width='3'>
+                            	</td>
+							</tr>
+                			<tr><td width='3'>
+                            	</td>
+							</tr>
+                			<tr><td height='170' width='3'>
+                            	</td>
+							</tr>
+                		</table>
+					</td>
+				</tr>
+        		<tr>
+        			<td background='".define_host()."source/imgs/gradient_left_down_corner.gif' width='3' height='3'>
+                    </td>
+                    <td background='".define_host()."source/imgs/gradient_bottom_line.gif' width='504' height='3'>
+                    </td>
+                    <td width='3' height='3'>
+                    </td>
+				</tr>
+			</table>
+		</td>
+    	");
+?>

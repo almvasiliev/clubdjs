@@ -1,0 +1,266 @@
+<?php
+
+function pages($link,$section,$count,$per,$p)
+{
+	
+	//index.html?id=$myrow2[user_id]&section=all&p=1&per=10
+    
+	if (preg_match("/[?]/",$link))
+    	{
+        	if ($section == 'all')
+            	{
+                	$section_url = '';
+                    $p_url = '&p';
+                    	if ($per == 10)
+                        	{
+                            	$per_url = '';
+                            }
+						else
+                        	{
+                            	$per_url = "&per=$per";
+                            }
+				}
+			else
+            	{
+                	$section_url = "&section=$section";
+                    $p_url = '&p';
+                    	if ($per == 10)
+                        	{
+                            	$per_url = '';
+                            }
+						else
+                        	{
+                            	$per_url = "&per=$per";
+                            }
+                }
+		}
+	else
+    	{
+        	if ($section == 'all')
+            	{
+                	$section_url = '';
+                    $p_url = '?p';
+                        if ($per == 10)
+                            {
+                                $per_url = '';
+                            }
+                        else
+                            {
+                                $per_url = "&per=$per";
+                            }
+				}
+            else
+            	{
+                	$section_url = "?section=$section";
+                    $p_url = '&p';
+                    	if ($per == 10)
+                        	{
+                            	$per_url = '';
+                            }
+						else
+                        	{
+                            	$per_url = "&per=$per";
+                            }
+                }
+		}
+    
+	require_once ('back2url.html');
+    $error_404 = define_host()."404.html";
+	
+	$num_units = $count;//Общее число друзей.
+	$num_per_page = $per;//Определяем по сколько друзей будем выводить на странице.
+	$num_pages = ceil($num_units/$num_per_page);//Определяем общее число страниц, исходя из общего числа друзей.
+    $num_pages = $num_pages + 1*($num_pages==0);
+	global $key;//Используется, как ключ - если в браузере ввести номер страницы превышающий реальное количество страниц, появится сервисное сообщение об ошибке и цикл вывода записей на странице работать не будет.
+	
+	if ($p > $num_pages)
+		{
+			back2url("$error_404",0);
+			$key = 0;
+		}
+	else
+		{
+			if (($num_units < 10 and ($per == 50 or $per == 100)) or ($num_units < 50 and $per == 100))
+				{
+					back2url("$error_404",0);
+					$key = 0;
+				}
+			
+			else
+				{
+			
+			$key = 1;
+			
+
+	global $min_unit;
+	global $max_unit;
+	
+	$min_unit = ($p-1)*$num_per_page;//От
+	$max_unit = $p*$num_per_page-1-($num_pages*$num_per_page-$num_units)*($p==$num_pages);//До
+	
+if ($num_pages > 1 or $num_per_page != 10)//Если страниц больше одной, показываем их, иначе нет.
+	{
+	
+	echo ("<div class='pages'><ul><li class='text'>Страницы: </li>");
+	
+		if ($num_pages - $p >= 2)
+			{
+				$q = 0;
+			}
+		elseif ($num_pages - $p == 1)
+			{
+				$q = 1;
+			}
+		else
+			{
+				$q = 2;
+			}
+	
+		if ($p <= 4 or $num_pages <= 7)
+			{
+				for ($j = 1; $j <= $p; $j++)
+					{
+						if ($j == $p)
+							{
+								echo ("<li class='selected'><a href='$link$section_url$p_url=$p$per_url'>$p</a></li>");
+							}
+						else
+							{
+								echo ("<li><a href='$link$section_url$p_url=$j$per_url'>$j</a></li>");
+							}
+					}
+			}
+		else
+			{
+				echo ("<li><a href='$link$section_url$p_url=1$per_url'>1</a></li><li class='dots'>...</li>");
+			
+				for ($j = $p-2-$q; $j <= $p-$q; $j++)
+					{
+						if ($j == $p)
+							{
+								echo ("<li class='selected'><a href='$link$section_url$p_url=$j$per_url'>$j</a></li>");
+							}
+						else
+							{
+								echo ("<li><a href='$link$section_url$p_url=$j$per_url'>$j</a></li>");
+							}
+					}
+			}
+		if ($num_pages-$p <= 3 or $num_pages <= 7)
+			{
+				for ($k = $j/*$p+1-$q*/; $k <= $num_pages; $k++)
+					{
+						if ($k == $p)
+							{
+								echo ("<li class='selected'><a href='$link$section_url$p_url=$k$per_url'>$k</a></li>");
+							}
+						else
+							{
+								echo ("<li><a href='$link$section_url$p_url=$k$per_url'>$k</a></li>");
+							}
+					}
+			}
+		else
+			{
+				if ($p >= 3)
+					{
+						$s = 0;
+					}
+				elseif ($p == 2)
+					{
+						$s = 1;
+					}
+				else
+					{
+						$s = 2;
+					}
+			
+				for ($n = $p+1; $n <= $p+2+$s; $n++)
+					{
+						echo ("<li><a href='$link$section_url$p_url=$n$per_url'>$n</a></li>");
+					}
+				echo ("<li class='dots'>...</li><li><a href='$link$section_url$p_url=$num_pages$per_url'>$num_pages</a></li>");
+		}
+	echo ("</ul></div>");
+				}
+	}
+		}
+}
+	//pages("index.php?id=$myrow2[user_id]",'',$num_units,$num_per_page,$p);
+
+
+function per_pages($link,$section,$count,$per,$p)
+{
+	$num_units = $count;//Общее число друзей.
+	$num_per_page = $per;//Определяем по сколько друзей будем выводить на странице.
+	$num_pages = ceil($num_units/$num_per_page);//Определяем общее число страниц, исходя из общего числа друзей.
+	
+	if ($p <= $num_pages)
+		{
+			if (($num_units < 10 and ($per == 50 or $per == 100)) or ($num_units < 50 and $per == 100)) {}
+			else
+				{
+                    if (preg_match("/[?]/",$link))
+                        {
+                            if ($section == 'all')
+                                {
+                                    $section_url = '';
+                                    $p_url = '&p';
+									$per_url = "&per";
+                                }
+                            else
+                                {
+                                    $section_url = "&section=$section";
+                                    $p_url = '&p';
+									$per_url = "&per";
+                                }
+                        }
+                    else
+                        {
+                            if ($section == 'all')
+                                {
+                                    $section_url = '';
+                                    $p_url = '?p';
+									$per_url = "&per";
+                                }
+                            else
+                                {
+                                    $section_url = "?section=$section";
+                                    $p_url = '&p';
+									$per_url = "&per";
+                                }
+                        }
+                        
+                    $num_units = $count;//Общее число друзей.
+                
+                    if ($num_units > 50)
+                        {
+                            if ($per == 10)
+                                {
+                                    echo ("<div class='per'><ul><li class='text'>Выводить по:</li><li class='selected'><a href='$link$section_url$p_url=1'>10</a></li><li><a href='$link$section_url$p_url=1$per_url=50'>50</a></li><li><a href='$link$section_url$p_url=1$per_url=100'>100</a></li></ul></div>");
+                                }
+                            elseif ($per == 50)
+                                {
+                                    echo ("<div class='per'><ul><li class='text'>Выводить по:</li><li><a href='$link$section_url$p_url=1'>10</a></li><li class='selected'><a href='$link$section_url$p_url=1$per_url=50'>50</a></li><li><a href='$link$section_url$p_url=1$per_url=100'>100</a></li></ul></div>");
+                                }
+                            else//$per==100
+                                {
+                                    echo ("<div class='per'><ul><li class='text'>Выводить по:</li><li><a href='$link$section_url$p_url=1'>10</a></li><li><a href='$link$section_url$p_url=1$per_url=50'>50</a></li><li class='selected'><a href='$link$section_url$p_url=1$per_url=100'>100</a></li></ul></div>");
+                                }
+                        }
+                    elseif ($num_units > 10 and $num_units <= 50)
+                        {
+                            if ($per == 10)
+                                {
+                                    echo ("<div class='per'><ul><li class='text'>Выводить по:</li><li class='selected'><a href='$link$section_url$p_url=1'>10</a></li><li><a href='$link$section_url$p_url=1$per_url=50'>50</a></li></ul></div>");
+                                }
+                            else//$per == 50
+                                {
+                                    echo ("<div class='per'><ul><li class='text'>Выводить по:</li><li><a href='$link$section_url$p_url=1'>10</a></li><li class='selected'><a href='$link$section_url$p_url=1$per_url=50'>50</a></li></ul></div>");
+                                }
+                        }
+            
+				}
+		}
+}
+?>

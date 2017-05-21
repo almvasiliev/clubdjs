@@ -1,0 +1,59 @@
+<?php
+//РЕКОМЕНДУЕМ ПОСЕТИТЬ
+$result_lc_key_2 = mysql_query("SELECT recommended_place.p_id, page.p_id, page.p_name_priority, page.p_url, city.city_name, page_parent.pp_name_short FROM recommended_place, page, city, page_parent WHERE recommended_place.city_id='$city_id' AND recommended_place.rp_show='1' AND page.city_id='$city_id' AND recommended_place.p_id=page.p_id AND (page.pp_id='1' OR page.pp_id='2' OR page.pp_id='3' OR page.pp_id='4' OR page.pp_id='5' OR page.pp_id='6') AND city.city_id='$city_id' AND page_parent.pp_id=page.pp_id ORDER by recommended_place.rp_sort LIMIT $array_lim_lc[$i]");
+
+$array_id_p_2 = array();
+$array_name_priority_p_2 = array();
+$array_url_p_2 = array();
+$array_name_short_pp_2 = array();
+	while($myrow_lc_key_2 = mysql_fetch_array($result_lc_key_2))
+        		{
+            		$array_id_p_2[] = $myrow_lc_key_2['p_id'];
+                    $array_name_priority_p_2[] = $myrow_lc_key_2['p_name_priority'];
+                    $array_url_p_2[] = $myrow_lc_key_2['p_url'];
+                    $array_name_short_pp_2[] = $myrow_lc_key_2['pp_name_short'];
+                    $city_name = $myrow_lc_key_2['city_name'];
+				}
+	
+    $carray_lc_2 = count($array_id_p_2);
+			
+            if ($carray_lc_2 > '0')
+            	{
+                	echo("
+						<table cellpadding='0' cellspacing='0' width='160' height='52'>
+						<tr>
+						<td width='3' height='27' background='".define_host()."source/imgs/point_corner_up_red.gif'></td>
+						<td width='154' height='27' background='".define_host()."source/imgs/point_up_red.gif' align='center'><img src='".define_host()."source/imgs/recomended_place.gif' width='130' height='27'><!--<p align=center><font class='title_popular_place'>&nbsp;&nbsp;Рекомендуем посетить&nbsp;&nbsp;</font></p>--></td>
+						<td width='3' height='27' background='".define_host()."source/imgs/point_corner_up_red.gif'></td>
+						</tr>
+						<tr>
+						<td width='3' height='22' background='".define_host()."source/imgs/point_red.gif'></td>
+						<td width='154' height='22' valign=top class='text_popular_place' bgcolor='#ffffff'><p align='left'><font class='text_popular_place'>Настоятельно рекомендуем Вам посетить именно эти заведения:</font></p>
+                        ");                   
+                    
+                    for ($j = 0; $j <= $carray_lc_2-1; $j++)
+            			{
+							$string = $array_name_short_pp_2[$j]." ".$array_name_priority_p_2[$j]." (".$city_name.")";
+                            echo("<p align=left><a href='".define_host()."".$array_url_p_2[$j]."/index.html' class='link_popular_place'>".$string."</a></p>");
+						} 
+					echo("
+                    	</td>
+						<td width='3' height='22' background='".define_host()."source/imgs/point_red.gif'></td>
+						</tr>
+						<tr>
+						<td width='3' height='3' background='".define_host()."source/imgs/point_red.gif'></td>
+						<td width='154' height='3' background='".define_host()."source/imgs/point_red.gif'></td>
+						<td width='3' height='3' background='".define_host()."source/imgs/point_red.gif'></td>
+						</tr>
+						</table>
+						
+						<table cellpadding='0' cellspacing='0' width='160' height='15'>
+						<tr>
+						<td width='160' height='15'></td>
+						</tr>
+						</table>
+                        ");
+				}
+
+
+?>

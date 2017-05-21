@@ -1,0 +1,14 @@
+<?php
+
+function array_shuffle($array)
+	{//Перемешивает массив и выдает в случайном порядке элементы с ключами по порядку.
+    	$keys = array_keys($array);
+        shuffle($keys);
+	        foreach($keys as $key)
+            	{
+		            $new[$key] = $array[$key];
+        		}
+        $array = array_values($new);        
+        return $array;
+	}
+?>

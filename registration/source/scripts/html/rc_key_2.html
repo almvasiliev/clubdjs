@@ -1,0 +1,96 @@
+<?php
+//НОВОСТНАЯ ЛЕНТА
+/*$result_rc_key_2 = mysql_query("
+SELECT page.p_id, page.p_name_priority, page.p_url, page.p_date, page_parent.pp_name_short, page_logo.pl_logo_rc2 
+FROM page 
+LEFT JOIN page_parent ON page_parent.pp_id=page.pp_id 
+LEFT JOIN page_logo ON page_logo.p_id=page.p_id 
+WHERE (page.pp_id='11' OR page.pp_id='12' OR page.pp_id='13') AND page.p_show_rc2='1' AND (page.city_id='$city_id' OR page.city_id='0') 
+ORDER by page.p_date DESC 
+LIMIT $array_lim_rc[$s]
+");*/
+
+require_once ("substrings.html");
+
+$result_rc_key_2 = mysql_query("
+SELECT page.p_id, page.p_name_priority, page.p_url, page.p_date, page_parent.pp_name_short, page_logo.pl_logo_rc2, page_content.pc_text  
+FROM page 
+LEFT JOIN page_parent ON page_parent.pp_id=page.pp_id 
+LEFT JOIN page_logo ON page_logo.p_id=page.p_id 
+LEFT JOIN page_content ON page_content.p_id=page.p_id AND (page_content.pt_page='9' OR page_content.pt_page='10' OR page_content.pt_page='72') 
+WHERE (page.pp_id='11' OR page.pp_id='12' OR page.pp_id='13') AND page.p_show_rc2='1' AND (page.city_id='$city_id' OR page.city_id='0') 
+ORDER by page.p_date DESC 
+LIMIT $array_lim_rc[$s]
+");
+
+
+$array_id_p_2 = array();
+$array_name_priority_p_2 = array();
+$array_url_p_2 = array();
+$array_date_p_2 = array();
+$array_name_short_pp_2 = array();
+$array_pl_logo_rc2_2 = array();
+$array_pc_text_2 = array();
+
+	while($myrow_rc_key_2 = mysql_fetch_array($result_rc_key_2))
+        		{
+            		$array_id_p_2[] = $myrow_rc_key_2['p_id'];
+                    $array_name_priority_p_2[] = $myrow_rc_key_2['p_name_priority'];
+                    $array_url_p_2[] = $myrow_rc_key_2['p_url'];
+                    $array_date_p_2[] = $myrow_rc_key_2['p_date'];
+                    $array_name_short_pp_2[] = $myrow_rc_key_2['pp_name_short'];                    
+                    $array_logo_rc2_2[] = $myrow_rc_key_2['pl_logo_rc2'];
+                    $array_pc_text_2[] = $myrow_rc_key_2['pc_text'];
+                    
+				}
+            
+			$carray_rc_2 = count($array_id_p_2);
+            
+            if ($carray_rc_2 > '0')
+            	{
+                	for ($j = 0; $j <= $carray_rc_2-1; $j++)
+            			{
+							echo("
+                            <table cellpadding='0' cellspacing='0' width='240' height='106'>
+                            <tr>
+                            <td width='3' height='3' background='".define_host()."source/imgs/news_left_up_corner.gif'></td>
+                            <td width='234' height='3' background='".define_host()."source/imgs/news_up_line.gif'></td>
+                            <td width='3' height='3' background='".define_host()."source/imgs/news_right_up_corner.gif'></td>
+                            </tr>
+                            <tr>
+                            <td width='3' height='100' background='".define_host()."source/imgs/news_left_up_line.gif' valign='bottom'><img src='".define_host()."source/imgs/news_left_down_line.gif' width='3' height='100'></td>
+                            <td width='234' height='100' ");
+                            	if ($array_name_short_pp_2[$j]=='Новость'){echo("style='background: #fbfbfb url(".define_host()."source/imgs/rc_key_2_n.gif) 10% 0 no-repeat' valign='top' class='text_news'>");}
+                                elseif ($array_name_short_pp_2[$j]=='Анонс'){echo("style='background: #fbfbfb url(".define_host()."source/imgs/rc_key_2_e.gif) 10% 0 no-repeat' valign='top' class='text_news'>");}
+                                elseif ($array_name_short_pp_2[$j]=='Фотоотчет'){echo("style='background: #fbfbfb url(".define_host()."source/imgs/rc_key_2_p.gif) 10% 0 no-repeat' valign='top' class='text_news'>");}
+                                else {echo("bgcolor='#fbfbfb' valign='top' class='text_news'>");}
+                            echo("
+                            <h3><a href='".define_host()."".$array_url_p_2[$j]."/index.html' class='h3_rc_key_2'>".substrings($array_name_priority_p_2[$j],45)."</a></h3>");
+                            
+                            	if (!empty($array_logo_rc2_2[$j]))
+                                	{
+                                    	echo("<p align='center'><div class='news_logo'><a href='".define_host()."".$array_url_p_2[$j]."/index.html'><img src='".define_host()."".$array_url_p_2[$j]."/".$array_logo_rc2_2[$j]."' alt='".$array_name_priority_p_2[$j]."'></a></div></p>");
+                                    }
+                            echo("
+                            <p><div class='news_text'>".substrings($array_pc_text_2[$j],130)."<br>
+                            <a href='".define_host()."".$array_url_p_2[$j]."/index.html' class='link_news'>Читать дальше</a><br><br>");
+                            dates($array_date_p_2[$j],$diftime);echo("</div></p>
+                            </td>
+                            <td width='3' height='100' background='".define_host()."source/imgs/news_right_down_line.gif' valign='top'><img src='".define_host()."source/imgs/news_right_up_line.gif' width='3' height='100'></td>
+                            </tr>
+                            <tr>
+                            <td width='3' height='3' background='".define_host()."source/imgs/news_left_down_corner.gif'></td>
+                            <td width='234' height='3' background='".define_host()."source/imgs/news_down_line.gif'></td>
+                            <td width='3' height='3' background='".define_host()."source/imgs/news_right_down_corner.gif'></td>
+                            </tr>
+                            </table>
+                            
+                            <table cellpadding='0' cellspacing='0' width='240' height='15'>
+                            <tr>
+                            <td width='240' height='15'></td>
+                            </tr>
+                            </table>
+                            ");
+						}
+                }
+?>

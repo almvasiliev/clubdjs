@@ -1,0 +1,62 @@
+<?php
+echo ("
+		<td width='510' valign='top'>
+            <table cellpadding='0' cellspacing='0' width='510' height='65' bgcolor='#ffffff'>
+            	<tr><td width='510' height='65'><div style='float:left'><h1>".$myrow['user_name']." ".$myrow['user_surname']."</h1></div><div class='user_online'>Онлайн</div></td>
+                </tr>
+				<tr><td height='5'>");require_once('menu_2.html');echo("</td>
+            	</tr>
+            </table>
+        
+        	<table border='0' cellpadding='0' cellspacing='0' width='510' height='300' bgcolor='#ffffff'>
+				<tr><td width='3'>
+        				<table border='0' cellpadding='0' cellspacing='0' width='3' height='100%'>
+                    		<tr><td background='".define_host()."source/imgs/gradient_left_up_line.gif' height='170' width='3'></td>
+                        	</tr>
+		            		<tr><td width='3'></td>
+                        	</tr>
+                        	<tr><td background='".define_host()."source/imgs/gradient_left_down_line.gif' height='170' width='3'></td>
+                            </tr>
+            			</table>
+            		</td>
+            		<td width='504' bgcolor='#fcfcfc'>
+            			<table border=0 cellpadding='0' cellspacing='0' height='100%' width='100%' valign='top'>
+							<tr><td height='1' width='100%' class='ternary_menu'>");require_once('menu_3.html');echo("</td>
+                            </tr>
+							<tr><td width='100%' height='10' class='user_text' align='left'><h2 class='user'>Добавить новую заметку</h2><p>После добавления новой заметки она станет доступна в ваших сообщениях, в закладке «Мои заметки».</p>
+                            	</td>
+							</tr>
+                            <tr><td width='100%' class='user_text' align='left'><form action='".define_host()."user/messages.html?id=$myrow2[user_id]&section=notes' method='post'><textarea name='message_text' style='resize: none; overflow-x: hidden; overflow-y: hidden; height: 168px; width: 100%' autocomplete='off'></textarea><input type='hidden' name='recipient_id' value=".$myrow2['user_id']."><button class='send_post' type='submit' name='submit' value='send_message'>Добавить заметку</button></form>
+                            	</td>
+							</tr>
+                            <tr>
+							<td width='504' valign='top'></td>
+							</tr>
+						</table>
+					</td>
+					<td width='3'>
+		            	<table border=0 cellpadding='0' cellspacing='0' width='3' height='100%'>
+        			        <tr><td background='".define_host()."source/imgs/gradient_right_up_line.gif' height='170' width='3'>
+                            	</td>
+							</tr>
+                			<tr><td width='3'>
+                            	</td>
+							</tr>
+                			<tr><td height='170' width='3'>
+                            	</td>
+							</tr>
+                		</table>
+					</td>
+				</tr>
+        		<tr>
+        			<td background='".define_host()."source/imgs/gradient_left_down_corner.gif' width='3' height='3'>
+                    </td>
+                    <td background='".define_host()."source/imgs/gradient_bottom_line.gif' width='504' height='3'>
+                    </td>
+                    <td width='3' height='3'>
+                    </td>
+				</tr>
+			</table>
+		</td>
+    	");
+?>

@@ -1,0 +1,13 @@
+<?php
+if (isset($_COOKIE['one']) and !empty($_COOKIE['one'])) {setcookie("two", $_COOKIE['one'], time()+9999999);}
+else {$error_404 = define_host()."404.html"; setcookie("two", $error_404, time()+9999999);}
+$url = htmlspecialchars($_SERVER['REQUEST_URI']);$url = substr($url,1);
+setcookie("one", $url, time()+9999999); 
+
+function goback($steps,$delay)
+	{//¬ернутьс€ на $steps страниц(у) назад (может принимать значение 1 или 2) через врем€ задержки $delay в секундах.
+		//$back = "javascript:history.go(-".$steps.")";
+        if ($steps == '1') {$back = define_host().$_COOKIE['one'];} else {$back = define_host().$_COOKIE['two'];}
+        exit ("<html><head><meta http-equiv='Refresh' content='".$delay."; URL=".$back."'></head><body></body></html>");
+	}
+?>

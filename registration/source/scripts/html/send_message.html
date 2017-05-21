@@ -1,0 +1,71 @@
+<?php
+if (isset($_POST['submit']))
+    {
+    	if (!preg_match("/[^(\w)|(\x7F-\xFF)|(\s)]/",$_POST['submit']))
+            {
+                $submit = htmlspecialchars($_POST['submit']);
+                $submit = strip_tags($submit);
+                    if ($submit == 'send_message' || $submit == 'Отправить' || $submit == 'Ответить' || $submit == 'Добавить заметку')
+                        {
+                        	if (isset($_POST['recipient_id']))
+                            	{
+                                	if (is_numeric($_POST['recipient_id']))
+                                        {
+                                        	$recipient_id = htmlspecialchars($_POST['recipient_id']);
+                                            $recipient_id = strip_tags($recipient_id);
+                                            	if (!empty($recipient_id) and $recipient_id != '')
+													{
+                                                    	if (isset($_POST['message_text']))
+															{
+																$message_text = htmlspecialchars($_POST['message_text']);
+																$message_text = strip_tags($message_text);
+                                                                    if (!empty($message_text) and $message_text != '' and $message_text != ' ')
+																		{
+                                                                        	if ($recipient_id == $id)
+																				{
+																					$result3 = mysql_query("INSERT INTO messages (message_visited, message_author, message_recipient, message_date, message_text) VALUES ('1', '$id', '$recipient_id', NOW(), '$message_text')");
+																				}
+																			
+																			else
+																				{
+																					$result3 = mysql_query("INSERT INTO messages (message_author, message_recipient, message_date, message_text) VALUES ('$id', '$recipient_id', NOW(), '$message_text')");
+																				}
+																			
+                                                                            $msg_class = 'msg_inform';
+                                                                            $msg_title = "Сообщение отправленно.";
+                                                                            $msg_text = "Ваше сообщение было успешно отправленно получателю.";
+                                                                        }
+																	else
+                                                                    	{
+                                                                        	$msg_class = 'msg_inform';
+                                                                            $msg_title = "Сообщение не отправленно.";
+                                                                            $msg_text = "Вы не указали текст сообщения.";
+                                                                        }
+															}
+														else
+                                                        	{
+                                                            	back2url("$error_404",0);
+                                                            }
+                                                    }
+												else
+                                                	{
+                                                    	back2url("$error_404",0);
+                                                    }
+                                        }
+									else
+                                    	{
+                                        	back2url("$error_404",0);
+                                        }
+                                }
+							else
+                            	{
+                                	back2url("$error_404",0);
+                                }
+                        }
+			}
+		else
+        	{
+            	back2url("$error_404",0);
+            }
+    }
+?>

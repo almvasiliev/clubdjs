@@ -1,0 +1,41 @@
+<?php
+function ad_space_a()
+	{	
+		$result_ad_space_a = mysql_query("SELECT advert.a_id, advert.a_url, advert.a_link, advert.a_title, advert.a_width, advert.a_height, advert.a_bg, advert.a_visible_hgt, advert.a_counter FROM advert WHERE advert.a_place='a' AND advert.a_default='0' AND advert.a_show='1' AND advert.a_counter<advert.a_count_lim ORDER BY RAND()");
+        $myrow_ad_space_a = mysql_fetch_array($result_ad_space_a);
+        if (isset($myrow_ad_space_a['a_id']) and !empty($myrow_ad_space_a['a_id']))
+        	{
+            	echo ("
+                <body onLoad='' onBlur='' onFocus='' onclick='' onmouseover='' onmouseout='' style='background: #".$myrow_ad_space_a['a_bg']." url(".define_host()."".$myrow_ad_space_a['a_url'].") 50% 0 no-repeat'>
+                <table border='0' cellpadding='0' style='border-collapse: collapse' width='100%' height='100%'>
+                <tr><td width='100%' valign=top height='".$myrow_ad_space_a['a_visible_hgt']."' colspan='3'><center><a href='".$myrow_ad_space_a['a_link']."' title='".$myrow_ad_space_a['a_title']."'><img src='".define_host()."source/imgs/1x1.gif' width='100%' height='".$myrow_ad_space_a['a_visible_hgt']."'></a></center></td></tr>
+                ");
+				
+                $a_id = $myrow_ad_space_a['a_id'];
+                $count = $myrow_ad_space_a['a_counter']+1;
+                mysql_query("UPDATE advert SET advert.a_counter=$count WHERE advert.a_id='$a_id'");
+            }
+        else
+        	{
+            	$result_ad_space_a = mysql_query("SELECT advert.a_id, advert.a_url, advert.a_width, advert.a_height, advert.a_bg, advert.a_visible_hgt FROM advert WHERE advert.a_place='a' AND advert.a_default='1' AND advert.a_show='1'");
+                $myrow_ad_space_a = mysql_fetch_array($result_ad_space_a);
+                
+                if (isset($myrow_ad_space_a['a_id']) and !empty($myrow_ad_space_a['a_id']))
+                	{                
+                        echo ("
+                        <body onLoad='' onBlur='' onFocus='' onclick='' onmouseover='' onmouseout='' style='background: #$myrow_ad_space_a[a_bg] url(".define_host()."$myrow_ad_space_a[a_url]) 50% 0 no-repeat'>
+                        <table border='0' cellpadding='0' style='border-collapse: collapse' width='100%' height='100%'>
+                        <tr><td width='100%' valign=top height='$myrow_ad_space_a[a_visible_hgt]' colspan='3'></td></tr>
+                        ");
+					}
+				else
+                	{
+                    	echo ("
+                        <body onLoad='' onBlur='' onFocus='' onclick='' onmouseover='' onmouseout='' style='background: #ffffff 50% 0 no-repeat'>
+                        <table border='0' cellpadding='0' style='border-collapse: collapse' width='100%' height='100%'>
+                        <tr><td width='100%' valign=top height='5' colspan='3'></td></tr>
+                        ");
+                    }
+            }
+	}
+?>

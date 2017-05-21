@@ -1,0 +1,260 @@
+<?php
+        
+        if (isset($_GET['p']))
+            {
+                if (ctype_digit($_GET['p']))//Если символы в строке $_GET['p'] цифровые, то...
+                    {
+                        $p = htmlspecialchars($_GET['p']);
+                        $p = strip_tags($p);
+                    }
+                else
+                    {
+                        back2url("$error_404",0);
+                    }
+            }
+            else
+                {
+                    $p = '1';
+                }
+                
+            if (isset($_GET['per']))
+            {
+                if (ctype_digit($_GET['per']) and ($_GET['per'] == 10 or $_GET['per'] == 50 or $_GET['per'] == 100))//Если символы в строке $_GET['per'] цифровые, то...
+                    {
+                        $per = htmlspecialchars($_GET['per']);
+                        $per = strip_tags($per);
+                    }
+                else
+                    {
+                        back2url("$error_404",0);
+                    }
+            }
+            else
+                {
+                    $per = '10';
+                }
+            
+            require_once ("pages.html");
+            require_once ("substrings.html");
+        
+        //НАЧАЛО Подсчет всех концертных площадок.
+        
+        $result_concert_halls = mysql_query("
+        SELECT page.p_id 
+        FROM page
+        LEFT JOIN other_parents ON other_parents.p_id=page.p_id AND other_parents.pp_id='5'
+        WHERE page.city_id='$city_id' AND (page.pp_id='5' OR (page.p_id=other_parents.p_id AND other_parents.pp_id='5'))
+        ORDER by page.p_fr DESC
+        ");
+		$array_concert_halls = array();
+            while($myrow_concert_halls = mysql_fetch_array($result_concert_halls))
+                {
+                    $array_concert_halls[] = $myrow_concert_halls['p_id'];
+                }
+		$carray_concert_halls = count($array_concert_halls);
+        	if ($carray_concert_halls == 0)
+                {
+                    $crt = '';
+                }
+            else
+                {
+                    $crt = "$carray_concert_halls";
+                }
+		//КОНЕЦ Подсчет всех концертных площадок.
+       
+        echo ("
+		<td width='510' valign='top'>
+            <table cellpadding='0' cellspacing='0' width='510' height='65' bgcolor='#ffffff'>
+            	<tr><td width='510' height='65'><div style='float:left'><h1>Концертные залы $city_name_genitivus</h1></div></td>
+                </tr>
+				<tr><td height='5'>");require_once('menu_2.html');echo("</td>
+            	</tr>
+            </table>
+        
+        	<table border='0' cellpadding='0' cellspacing='0' width='510' height='300' bgcolor='#ffffff'>
+				<tr><td width='3'>
+        				<table border='0' cellpadding='0' cellspacing='0' width='3' height='100%'>
+                    		<tr><td background='".define_host()."source/imgs/gradient_left_up_line.gif' height='170' width='3'></td>
+                        	</tr>
+		            		<tr><td width='3'></td>
+                        	</tr>
+                        	<tr><td background='".define_host()."source/imgs/gradient_left_down_line.gif' height='170' width='3'></td>
+                            </tr>
+            			</table>
+            		</td>
+            		<td width='504' bgcolor='#fcfcfc'>
+            			<table border=0 cellpadding='0' cellspacing='0' height='100%' width='100%' valign='top'>
+							<tr><td height='1' width='100%' class='ternary_menu' colspan='3'>");require_once('menu_3.html');echo("</td>
+                            </tr>                            
+                            <tr><td width='100%' height='10' class='list_places' align='left' colspan='3'><h2 class='list_places'>Список концертных площадок $city_name_genitivus</h2><p>Концертные площадки $city_name_genitivus отсортированы по рейтингу. Самые популярные концертные залы находятся на верхних строчках рейтинга. Многотысячные концертные площадки стали неотъемлемой частью крупных мегаполисов. Выбрать ту или иную площадку в $city_name_dative Вам поможет именно этот раздел сайта. Каждая анкета того или иного клуба включает в себя описание заведения, рецензии посетителей, фотографии интерьера, адреса, телефоны и ссылки на официальные страницы концертных площадок $city_name_genitivus.</p></td></tr>
+                            <tr><td width='100%' height='10' align='left' colspan='3'>
+                            ");
+                            
+                            //НАЧАЛО Сраницы
+                            pages("concert_halls.html",'all',$crt,$per,$p);
+                            per_pages("concert_halls.html",'all',$crt,$per,$p);
+                            //КОНЕЦ Сраницы
+                            echo ("</td></tr>");
+                            
+                            if ($key == 1)
+                                {
+                            
+                                    if ($carray_concert_halls != 0)
+                                        {
+                                            for ($i = $min_unit; $i <= $max_unit; $i++)
+                                                {
+                                                    $concert_hall_id_crt = $array_concert_halls[$i];
+                                                    
+                                                    $result_page = mysql_query("
+                                                    SELECT page.p_id, page.pp_id, page.p_url, page.p_name_priority, page.city_id, page.p_official, page.p_adress, page.p_ar, page.p_nv, page.p_closed, city.city_name, city.country_id, country.country_name, page_content.pc_text, page_h1.ph1_text, page_logo.pl_mid, page_parent.pp_name 
+                                                    FROM page
+                                                    LEFT JOIN city ON city.city_id=page.city_id 
+                                                    LEFT JOIN country ON country.country_id=city.country_id 
+                                                    LEFT JOIN page_content ON page_content.p_id=page.p_id AND page_content.pt_page='45' 
+                                                    LEFT JOIN page_h1 ON page_h1.p_id=page.p_id AND page_h1.pt_page='45' 
+                                                    LEFT JOIN page_logo ON page_logo.p_id=page.p_id 
+                                                    LEFT JOIN page_parent ON page_parent.pp_id=page.pp_id 
+                                                    WHERE page.p_id='$concert_hall_id_crt'
+                                                    ");
+                                                    
+                                                    $myrow_page = mysql_fetch_array($result_page);
+                                                                                                        
+                                                    $result_other_parents = mysql_query("
+                                                    SELECT other_parents.ops_id, other_parents.p_id, other_parents.pp_id, page_parent.pp_name 
+                                                    FROM other_parents 
+                                                    LEFT JOIN page_parent ON page_parent.pp_id=other_parents.pp_id 
+                                                    WHERE other_parents.p_id='$myrow_page[p_id]' ORDER BY other_parents.ops_id");
+                                                    
+                                                    $array_pp_id = array();
+                                                    $array_pp_name = array();
+                                                    	while($myrow_other_parents = mysql_fetch_array($result_other_parents))
+                                                        	{
+                                                            	$array_pp_id[] = $myrow_other_parents['pp_id'];
+                    											$array_pp_name[] = $myrow_other_parents['pp_name'];
+                                                            }
+													$carray_pp_id = count($array_pp_id);
+
+                                                   
+                                                    $result_metro = mysql_query("
+                                                    SELECT page_metro.pm_id, page_metro.p_id, page_metro.m_id, metro.m_id, metro.m_name 
+                                                    FROM page_metro 
+                                                    LEFT JOIN metro ON page_metro.m_id=metro.m_id 
+                                                    WHERE page_metro.p_id='$myrow_page[p_id]' ORDER BY page_metro.pm_id");
+                                                    
+                                                    $array_m_id = array();
+                                                    $array_m_name = array();
+                                                    	while($myrow_metro = mysql_fetch_array($result_metro))
+                                                        	{
+                                                            	$array_m_id[] = $myrow_metro['m_id'];
+                    											$array_m_name[] = $myrow_metro['m_name'];
+                                                            }
+													$carray_m_id = count($array_m_id);
+                                                    	
+                                                    	
+                                                        $move_min = round((5-$myrow_page['p_ar'])/5*51);
+							                            $ar_p_id = round($myrow_page['p_ar'],1);
+                                                        
+                                                        echo ("<tr><td background='".define_host()."source/imgs/section_line.gif' width='100%' height='3' colspan='3'></td></tr>");
+                                                        echo ("
+                                                        <tr>
+                                                        	<td width='118' height='118' class='list_places' align='left' rowspan='2'><div class='logo_user'><a href='".define_host()."$myrow_page[p_url]/index.html'><img src='".define_host()."$myrow_page[pl_mid]' alt='$myrow_page[ph1_text]'></a></div></td>
+                                                        	<td width='300' height='80' class='list_text_black' align='left'><div style='float:left'><h3 class='list_places'><a href='".define_host()."$myrow_page[p_url]/index.html' class='list_places'>".$myrow_page['p_name_priority']."</a></h3></div>");if ($myrow_page['p_closed'] == '1') {echo ("<div class='place_closed'>закрыт</div>");}
+                                                            echo ("                                                            
+                                                            <br clear='all'><font color='#b2b2b2'>$myrow_page[pp_name]");
+                                                            if ($carray_pp_id > '0')
+                                                            	{
+                                                                    for ($y = 0; $y <= $carray_pp_id-1; $y++)
+                                                                        {
+                                                                            if ($array_pp_id[$y] != $myrow_page['pp_id'])
+                                                                            	{
+		                                                                            $array_pp_name[$y] = mb_strtolower($array_pp_name[$y]);
+                                                                                    echo (",&nbsp;$array_pp_name[$y]");
+																				}
+                                                                        }
+																}
+                                                            
+                                                            echo("
+                                                            <br></font>$myrow_page[country_name], $myrow_page[city_name], $myrow_page[p_adress]<br>
+                                                            ");                                                       
+                                                            
+                                                            if ($carray_m_id > '0')
+                                                            	{
+                                                                    for ($s = 0; $s <= $carray_m_id-1; $s++)
+                                                                        {
+                                                                            if ($s == '0')
+                                                                            	{
+                                                                                	echo ("ст.м.&nbsp;«".$array_m_name[$s]."»");
+                                                                                }
+																			else
+                                                                            	{
+                                                                                	echo (",&nbsp;«".$array_m_name[$s]."»");
+                                                                                }
+                                                                        }
+																}
+															echo("
+                                                        	</td>
+															<td width='86' height='80' class='list_rating' align='left'><div class='rating_min'><div class='bg_rating' style='background-position: -".$move_min."px 0;'><p class='stars' title='");if ($ar_p_id == '0'){echo("Без оценки'");}else{echo("Средний рейтинг: ".$ar_p_id."&nbsp;из&nbsp;5'");}echo("></p></div></div>Оценок:&nbsp;$myrow_page[p_nv]
+                                                            </td>                                                       
+														</tr>
+                                                        <tr>
+                                                        	<td width='386' colspan='2' class='list_text_gray'>");
+                                                            if (!empty($myrow_page['pc_text'])) {echo("".substrings($myrow_page['pc_text'],115)."<br>");}
+                                                            echo("
+                                                            <a href='".define_host()."$myrow_page[p_url]/index.html' class='link'>Читать дальше</a></td>
+														</tr>
+                                                        ");
+                                                        
+                                                        if ($i == $max_unit and $max_unit - $min_unit > 5 and $max_unit > 8 and $carray_concert_halls > 10)
+                                                            {
+                                                                echo ("<tr><td background='".define_host()."source/imgs/section_line.gif' width='100%' height='3' colspan='3'></td></tr>");
+                                                            }
+                                                }
+                                            
+                                            if ($max_unit - $min_unit > 5)
+                                                {
+                                                    echo ("<tr><td width='100%' align='left' colspan='3'>");
+                                                    //НАЧАЛО Сраницы
+                                                    pages("concert_halls.html",'all',$crt,$per,$p);
+                                                    per_pages("concert_halls.html",'all',$crt,$per,$p);
+                                                    //КОНЕЦ Сраницы
+                                                    echo ("</td></tr>");
+                                                }
+                                            
+                                            echo ("<tr><td width='100%' align='left' colspan='3'></td></tr>");
+                                        }
+                                    else
+                                        {
+                                            echo ("<tr><td width='100%' class='list_places' align='left' colspan='3'>К сожалению, список концертных площадок $city_name_genitivus пуст. Станьте первым! Добавьте на сайт Вашу любимую концертную площадку и сделайте жизнь других пользователей сайта немного ярче.</td></tr>");
+                                        }
+                                }	
+							echo ("
+							<tr><td width='100%' colspan='3'></td>
+                            </tr>
+						</table>
+					</td>
+					<td width='3'>
+		            	<table border=0 cellpadding='0' cellspacing='0' width='3' height='100%'>
+        			        <tr><td background='".define_host()."source/imgs/gradient_right_up_line.gif' height='170' width='3'>
+                            	</td>
+							</tr>
+                			<tr><td width='3'>
+                            	</td>
+							</tr>
+                			<tr><td height='170' width='3'>
+                            	</td>
+							</tr>
+                		</table>
+					</td>
+				</tr>
+        		<tr>
+        			<td background='".define_host()."source/imgs/gradient_left_down_corner.gif' width='3' height='3'>
+                    </td>
+                    <td background='".define_host()."source/imgs/gradient_bottom_line.gif' width='504' height='3'>
+                    </td>
+                    <td width='3' height='3'>
+                    </td>
+				</tr>
+			</table>
+		</td>
+    	");
+?>

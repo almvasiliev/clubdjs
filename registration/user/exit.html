@@ -1,0 +1,34 @@
+<?php
+session_start();
+if (empty($_SESSION['email']) or empty($_SESSION['password'])) 
+	{
+		require_once ('../source/scripts/html/goback.html');
+        goback(1,0);
+	}
+else
+	{
+        //setcookie("email",'',time()-9999999);
+        //unset($_COOKIE['email']);
+        //setcookie('email');
+        //setcookie('password');
+		//setcookie('id');
+        //SetCookie("email","");
+        //SetCookie("password","");
+        //SetCookie("id","");
+    	unset($_SESSION['password']);
+        unset($_SESSION['email']); 
+        unset($_SESSION['id']);
+                
+        //setcookie("email", 'false', time() - 1);
+        //setcookie("password", 'false', time() - 1);
+        //setcookie("id", 'false', time() - 1);        
+        //unset($_COOKIE['email']);
+        //unset($_COOKIE['password']);
+        //unset($_COOKIE['id']);
+        //setcookie('email', '', 'TIME_IN_THE_PAST');
+        //setcookie('password', '', 'TIME_IN_THE_PAST');
+		//setcookie('id', '', 'TIME_IN_THE_PAST');
+        require_once ('../source/scripts/html/back2url.html');
+        back2url('../login.html',0);
+    }
+?>

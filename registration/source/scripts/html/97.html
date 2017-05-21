@@ -1,0 +1,288 @@
+<?php
+        //НАЧАЛО Подсчет заявок в друзья
+		$string_requests = $myrow['user_requests'];
+			if (empty($string_requests) or $string_requests == '')
+				{
+					$req = '';
+				}
+			else
+				{
+					$array_requests = unserialize($string_requests);
+					$carray_requests = count($array_requests);
+						if ($carray_requests == 0)
+							{
+								$req = '';
+							}
+						else
+							{
+								$req = "+$carray_requests";
+							}
+				}
+		//КОНЕЦ Подсчет заявок в друзья.
+					
+		//НАЧАЛО Подсчет непрочитанных сообщений
+		$result_inbox_novisit = mysql_query("SELECT * FROM messages WHERE message_recipient='$id' AND message_visited='0'",$connect);
+		$array_inbox_novisit = array();
+			while($myrow_inbox_novisit = mysql_fetch_array($result_inbox_novisit))
+				{
+					$array_inbox_novisit[] = $myrow_inbox_novisit['message_id'];
+				}
+			
+		$string_user_messages_deleted = $myrow['user_messages_deleted'];
+			if (!empty($string_user_messages_deleted) or $string_user_messages_deleted!='')
+					{
+						$array_user_messages_deleted = unserialize($string_user_messages_deleted);
+						$array_inbox_novisit = array_diff($array_inbox_novisit, $array_user_messages_deleted);//Новые полученные сообщения завычетом удаленных сообщений.
+					}
+			$array_inbox_novisit = array_values($array_inbox_novisit);					
+			$carray_inbox_novisit = count($array_inbox_novisit);
+				if ($carray_inbox_novisit == 0)
+					{
+						$in_new = '';
+					}
+				else
+					{
+						$in_new = "+$carray_inbox_novisit";
+					}
+		//КОНЕЦ Подсчет непрочитанных сообщений
+
+		$email_old = $myrow['user_email'];
+		$cnt = strcspn($email_old, "@");//, 0, 3);
+		$email_hide = substr_replace($email_old, str_repeat("*", $cnt), 0, $cnt);
+        
+        echo ("
+		<td width='510' valign='top'>
+            <table cellpadding='0' cellspacing='0' width='510' height='65' bgcolor='#ffffff'>
+            	<tr><td width='510' height='65'><div style='float:left'><h1>".$myrow['user_name']." ".$myrow['user_surname']."</h1></div><div class='user_online'>Онлайн</div></td>
+                </tr>
+				<tr><td height='5'>");require_once('menu_2.html');echo("</td>
+            	</tr>
+            </table>
+        
+        	<table border='0' cellpadding='0' cellspacing='0' width='510' height='300' bgcolor='#ffffff'>
+				<tr><td width='3'>
+        				<table border='0' cellpadding='0' cellspacing='0' width='3' height='100%'>
+                    		<tr><td background='".define_host()."source/imgs/gradient_left_up_line.gif' height='170' width='3'></td>
+                        	</tr>
+		            		<tr><td width='3'></td>
+                        	</tr>
+                        	<tr><td background='".define_host()."source/imgs/gradient_left_down_line.gif' height='170' width='3'></td>
+                            </tr>
+            			</table>
+            		</td>
+            		<td width='504' bgcolor='#fcfcfc'>
+            			<table border=0 cellpadding='0' cellspacing='0' height='100%' width='100%' valign='top'>
+							<tr><td height='1' width='100%' class='ternary_menu' colspan='2'>");require_once('menu_3.html');echo("</td>
+                            </tr>");
+                            
+                            if (isset($_POST['submit']))
+                                {
+                                    if (!preg_match("/[^(\w)|(\x7F-\xFF)|(\s)]/",$_POST['submit']))
+                                        {
+                                            $submit = htmlspecialchars($_POST['submit']);
+                                            $submit = strip_tags($submit);
+                                            	
+                                                if ($submit == 'save_email' || $submit == 'Сохранить адрес')
+                                                	{
+                                                    	if (getenv("HTTP_CLIENT_IP") && strcasecmp(getenv("HTTP_CLIENT_IP"),"unknown"))
+                                                            {
+                                                                $ip = getenv("HTTP_CLIENT_IP");
+                                                            }
+                                                        elseif (getenv("HTTP_X_FORWARDED_FOR") && strcasecmp(getenv("HTTP_X_FORWARDED_FOR"), "unknown"))
+                                                            {
+                                                                $ip = getenv("HTTP_X_FORWARDED_FOR");
+                                                            }
+                                                        elseif (getenv("REMOTE_ADDR") && strcasecmp(getenv("REMOTE_ADDR"), "unknown"))
+                                                            {
+                                                                $ip = getenv("REMOTE_ADDR");
+                                                            }
+                                                        elseif (!empty($_SERVER['REMOTE_ADDR']) && strcasecmp($_SERVER['REMOTE_ADDR'], "unknown"))
+                                                            {
+                                                                $ip = $_SERVER['REMOTE_ADDR'];
+                                                            }
+                                                        else
+                                                            {
+                                                                $ip = "unknown";
+                                                            }
+                                            
+                                                        mysql_query ("DELETE FROM authorization_fails WHERE UNIX_TIMESTAMP() - UNIX_TIMESTAMP(date) > 300");
+                                                        $result_ip = mysql_query("SELECT number_fails FROM authorization_fails WHERE ip='$ip'",$connect);
+                                                        $myrow_ip = mysql_fetch_array($result_ip);
+                                                        
+                                                            if ($myrow_ip['number_fails'] > 5)
+                                                                {
+                                                                    $exit = define_host()."user/exit.html";
+                                                                    back2url("$exit",0);
+                                                                }
+                                                        
+                                                        require_once ("send_mime_mail.html");
+                                                            if (isset($_POST['email']))
+                                                                {
+                                                                    if (!preg_match("/[0-9a-z_]+@[0-9a-z_^\.]+\.[a-z]{1,10}/i", $_POST['email']))
+                                                                        {
+                                                                            $msg_class = 'msg_cancel';
+                                                                            $msg_title = "Новый адрес электронной почты не сохранен.";
+                                                                            $msg_text = "Вы указали адрес электронной почты в недопустимом формате. ";
+                                                                        }
+                                                                    else
+                                                                        {
+                                                                            $email = htmlspecialchars($_POST['email']);
+                                                                            $email = strip_tags($email);
+                                                            
+                                                                                if (isset($_POST['password']))
+                                                                                    {
+                                                                                        if (!preg_match("/^[a-zA-Z\_0-9\.-]{5,15}$/",$_POST['password']))
+                                                                                            {
+                                                                                                $select = mysql_query ("SELECT ip FROM authorization_fails WHERE ip='$ip'");
+                                                                                                $tmp = mysql_fetch_row ($select);
+                                                                                                    if ($ip == $tmp[0])
+                                                                                                        {
+                                                                                                            //Проверяем, есть ли пользователь в таблице "authorization_fails"
+                                                                                                            $result52 = mysql_query("SELECT number_fails FROM authorization_fails WHERE ip='$ip'",$connect);
+                                                                                                            $myrow52 = mysql_fetch_array($result52);
+                                                                                                            $number_fails = $myrow52[0] + 1;//Если есть, то приплюсовываем количесво.
+                                                                                                            mysql_query ("UPDATE authorization_fails SET number_fails=$number_fails,date=NOW() WHERE ip='$ip'");
+                                                                                                        }
+                                                                                                    else
+                                                                                                        {
+                                                                                                            //Если за последние 300 секунд ошибок не было, то вставляем новую запись в таблицу "authorization_fails"
+                                                                                                            mysql_query ("INSERT INTO authorization_fails (ip,date,number_fails) VALUES ('$ip',NOW(),'1')");
+                                                                                                        }                                                                                    
+                                                                                                
+                                                                                                $msg_class = 'msg_cancel';
+                                                                                                $msg_title = "Новый адрес электронной почты не сохранен.";
+                                                                                                $msg_text = "Текущий пароль от учетной записи указан неверно. Обратите внимание, число неверных попыток ввода пароля ограниченное количество. При превышении числа попыток, вновь авторизоваться на сайте получится не раньше чем через пять минут.";
+                                                                                            }
+                                                                                        else
+                                                                                            {
+                                                                                                $password = htmlspecialchars($_POST['password']);
+                                                                                                $password = strip_tags($password);
+                                                                                                $password = md5($password);
+                                                                                                $password = strrev($password);
+                                                                                                $password = $password."b3p6f";
+                                                                                                
+                                                                                                $result3 = mysql_query("SELECT user_id FROM users WHERE user_id='$id' AND user_password='$password'",$connect);
+                                                                                                $myrow3 = mysql_fetch_array($result3);
+                                                                                                    if (empty($myrow3['user_id']))
+                                                                                                        {//Если пароли не совпадают, то записываем IP пользователя и дату(время) ошибки.
+                                                                                                            $select = mysql_query ("SELECT ip FROM authorization_fails WHERE ip='$ip'");
+                                                                                                            $tmp = mysql_fetch_row ($select);
+                                                                                                                if ($ip == $tmp[0])
+                                                                                                                    {//Проверяем, есть ли пользователь в таблице "authorization_fails"
+                                                                                                                        $result52 = mysql_query("SELECT number_fails FROM authorization_fails WHERE ip='$ip'",$connect);
+                                                                                                                        $myrow52 = mysql_fetch_array($result52);
+                                                                                                                        $number_fails = $myrow52[0] + 1;//Если есть, то приплюсовываем количесво.
+                                                                                                                        mysql_query ("UPDATE authorization_fails SET number_fails=$number_fails,date=NOW() WHERE ip='$ip'");
+                                                                                                                    }
+                                                                                                                else
+                                                                                                                    {//Если за последние 300 секунд ошибок не было, то вставляем новую запись в таблицу "authorization_fails"
+                                                                                                                        mysql_query ("INSERT INTO authorization_fails (ip,date,number_fails) VALUES ('$ip',NOW(),'1')");
+                                                                                                                    }
+                                                                                                                
+                                                                                                                $msg_class = 'msg_cancel';
+                                                                                                                $msg_title = "Новый адрес электронной почты не сохранен.";
+                                                                                                                $msg_text = "Текущий пароль от учетной записи указан неверно. Повторите попытку. В том случае, если последующие попытки будут безуспешны по причине неверно указанного пароля, доступ к Вашей учетной записи будет заблокирован. Повторно авторизоваться на сайте получится только лишь через пять минут.";
+                                                                                                        }
+                                                                                                    else
+                                                                                                        {
+                                                                                                            //Проверка на существование пользователя с таким же e-mail
+                                                                                                            $result4 = mysql_query("SELECT user_id FROM users WHERE user_email='$email'",$connect);
+                                                                                                            $myrow4 = mysql_fetch_array($result4);
+                                                                                                                if (!empty($myrow4['user_id']))
+                                                                                                                    {
+                                                                                                                        $msg_class = 'msg_cancel';
+                                                                                                                		$msg_title = "Новый адрес электронной почты не сохранен.";
+                                                                                                                		$msg_text = "Указанный Вами адрес электронной почты уже зарегистрован в системе.";
+                                                                                                                    }
+                                                                                                                else
+                                                                                                                    {
+                                                                                                                        $old_email = $myrow['user_email'];
+                                                                                                                        $result5 = mysql_query("UPDATE users SET user_email='$email', user_activation='0', user_date=NOW() WHERE user_email='$old_email'",$connect);//обновляем в базе e-mail пользователя
+                                                                                                                            if ($result5=='TRUE')
+                                                                                                                                {
+                                                                                                                                    $result6 = mysql_query ("SELECT user_id, user_name FROM users WHERE user_email='$email'",$connect);
+                                                                                                                                    $myrow6 = mysql_fetch_array($result6);
+                                                                                                                                    $emrev = strrev($email);
+                                                                                                                                    $activation = md5($myrow6['user_id']).md5($emrev);
+                                                                                                                                    
+                                                                                                                                    $subject = "Подтверждение нового адреса электронной почты на сайте КЛУУБ.РУ.";//Тема сообщения.
+                                                                                                                                    $message = "Здравствуйте, ".$myrow['user_name']."!\n\nВы воспользовались возможностью изменить адрес электронной почты. Для того что бы подтердить новый адрес почтового ящика перейдите по ссылке:\n".define_host()."login.html?email=".$email."&code=".$activation."\nЭто письмо сгенерировано автоматически, поэтому отвечать на него не нужно.\n\nС уважением,\nРедакция Cluub.Ru";//содержание сообщение
+                                                                                                                                    send_mime_mail('КЛУУБ.РУ','admin@cluub.ru',$email,'windows-1251','windows-1251',$subject,$message);
+                                                                                                                                    
+                                                                                                                                    unset($_SESSION['password']);
+                                                                                                                                    unset($_SESSION['email']);
+                                                                                                                                    unset($_SESSION['id']);
+                                                                                                                                    
+                                                                                                                                    $msg_class = 'msg_apply';
+                                                                                                               						$msg_title = "Изменения сохранены.";
+                                                                                                                					$msg_text = "На указанный Вами адрес электронной почты отправлено письмо с ссылкой, для подтверждения нового электронного почтового ящика. Обращаем Ваше внимание, ссылка действительна 24 часа.";
+                                                                                                                                }
+                                                                                                                            else
+                                                                                                                                {
+                                                                                                                                    $msg_class = 'msg_cancel';
+                                                                                                                                	$msg_title = "Новый адрес электронной почты не сохранен.";
+                                                                                                                                	$msg_text = "Изменения не были сохранены по причине ошибки на сервере. Повторите попытку немного позже.";
+                                                                                                                                }
+                                                                                                                    }
+                                                                                                        }
+                                                                                            }
+                                                                                    }
+                                                                        }
+                                                                }
+                                                            else
+                                                                {
+                                                                    $msg_class = 'msg_cancel';
+                                                                    $msg_title = "Изменения не сохранены.";
+                                                                    $msg_text = "Заполните все поля корректно.";
+                                                                }
+														
+                                                        if (isset($msg_class) and isset($msg_title) and isset($msg_text))
+                                                            {
+                                                                echo("
+                                                                <tr><td width='100%' height='1' class='user_text' align='left' colspan='2'><div class='".$msg_class."'><b>$msg_title</b><br>$msg_text</div></td></tr>
+                                                                ");
+															}
+                                                    }
+										}
+								}
+							                            
+                            echo("
+                            <tr><td width='100%' height='10' class='user_text' align='left' colspan='2'><div class='topic'><h2 class='user'>Изменить адрес электронной почты</h2><p>На указанный вами почтовый ящик придет письмо с запросом подтверждения нового адреса электронной почты. После подтверждения нового почтового ящика ваша учетная запись будет привязана к новому адресу электронной почты.</p></div>
+                            <form action='settings.html?id=".$myrow['user_id']."&section=email' method='post'></td></tr>
+                            
+                            <tr><td height='30' width='205' class='user_text' align='right'>Текущий адрес:</td>
+                            <td height='30' width='299' class='user_text' align='left'>".$email_hide."</td></tr>
+                            <tr><td height='30' width='205' class='user_text' align='right'>Пароль от учетной записи:</td>
+                            <td height='30' width='299' class='user' align='left'><input style='width: 210px' name='password' type='password'></td></tr>
+                            <tr><td height='30' width='205' class='user_text' align='right'>Новый адрес:</td>
+                            <td height='30' width='299' class='user' align='left'><input style='width: 210px' name='email' type='text' value='' autocomplete='off'></td></tr>
+                            <tr><td height='30' width='205' class='user' align='right'></td><td height='30' width='299' class='user' align='left'><button class='settings_email' type='submit' name='submit' value='save_email'>Сохранить адрес</button></form></td></tr>
+                            <tr><td width='504' height='290' colspan='2' align='left'></td></tr>
+						</table>
+					</td>
+					<td width='3'>
+		            	<table border=0 cellpadding='0' cellspacing='0' width='3' height='100%'>
+        			        <tr><td background='".define_host()."source/imgs/gradient_right_up_line.gif' height='170' width='3'>
+                            	</td>
+							</tr>
+                			<tr><td width='3'>
+                            	</td>
+							</tr>
+                			<tr><td height='170' width='3'>
+                            	</td>
+							</tr>
+                		</table>
+					</td>
+				</tr>
+        		<tr>
+        			<td background='".define_host()."source/imgs/gradient_left_down_corner.gif' width='3' height='3'>
+                    </td>
+                    <td background='".define_host()."source/imgs/gradient_bottom_line.gif' width='504' height='3'>
+                    </td>
+                    <td width='3' height='3'>
+                    </td>
+				</tr>
+			</table>
+		</td>
+    	");
+?>

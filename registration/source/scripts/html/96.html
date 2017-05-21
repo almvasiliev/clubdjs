@@ -1,0 +1,235 @@
+<?php
+        //НАЧАЛО Подсчет заявок в друзья
+		$string_requests = $myrow['user_requests'];
+			if (empty($string_requests) or $string_requests == '')
+				{
+					$req = '';
+				}
+			else
+				{
+					$array_requests = unserialize($string_requests);
+					$carray_requests = count($array_requests);
+						if ($carray_requests == 0)
+							{
+								$req = '';
+							}
+						else
+							{
+								$req = "+$carray_requests";
+							}
+				}
+		//КОНЕЦ Подсчет заявок в друзья.
+					
+		//НАЧАЛО Подсчет непрочитанных сообщений
+		$result_inbox_novisit = mysql_query("SELECT * FROM messages WHERE message_recipient='$id' AND message_visited='0'",$connect);
+		$array_inbox_novisit = array();
+			while($myrow_inbox_novisit = mysql_fetch_array($result_inbox_novisit))
+				{
+					$array_inbox_novisit[] = $myrow_inbox_novisit['message_id'];
+				}
+			
+		$string_user_messages_deleted = $myrow['user_messages_deleted'];
+			if (!empty($string_user_messages_deleted) or $string_user_messages_deleted!='')
+					{
+						$array_user_messages_deleted = unserialize($string_user_messages_deleted);
+						$array_inbox_novisit = array_diff($array_inbox_novisit, $array_user_messages_deleted);//Новые полученные сообщения завычетом удаленных сообщений.
+					}
+			$array_inbox_novisit = array_values($array_inbox_novisit);					
+			$carray_inbox_novisit = count($array_inbox_novisit);
+				if ($carray_inbox_novisit == 0)
+					{
+						$in_new = '';
+					}
+				else
+					{
+						$in_new = "+$carray_inbox_novisit";
+					}
+		//КОНЕЦ Подсчет непрочитанных сообщений
+
+		echo ("
+		<td width='510' valign='top'>
+            <table cellpadding='0' cellspacing='0' width='510' height='65' bgcolor='#ffffff'>
+            	<tr><td width='510' height='65'><div style='float:left'><h1>".$myrow['user_name']." ".$myrow['user_surname']."</h1></div><div class='user_online'>Онлайн</div></td>
+                </tr>
+				<tr><td height='5'>");require_once('menu_2.html');echo("</td>
+            	</tr>
+            </table>
+        
+        	<table border='0' cellpadding='0' cellspacing='0' width='510' height='300' bgcolor='#ffffff'>
+				<tr><td width='3'>
+        				<table border='0' cellpadding='0' cellspacing='0' width='3' height='100%'>
+                    		<tr><td background='".define_host()."source/imgs/gradient_left_up_line.gif' height='170' width='3'></td>
+                        	</tr>
+		            		<tr><td width='3'></td>
+                        	</tr>
+                        	<tr><td background='".define_host()."source/imgs/gradient_left_down_line.gif' height='170' width='3'></td>
+                            </tr>
+            			</table>
+            		</td>
+            		<td width='504' bgcolor='#fcfcfc'>
+            			<table border=0 cellpadding='0' cellspacing='0' height='100%' width='100%' valign='top'>
+							<tr><td height='1' width='100%' class='ternary_menu' colspan='4'>");require_once('menu_3.html');echo("</td>
+                            </tr>");
+                            
+                            	if (isset($_POST['submit']) and ($_POST['submit'] == 'upload_snapshot' or $_POST['submit'] == 'Загрузить фотографию'))
+									{
+                                    	if (isset($msg_class) and isset($msg_title) and isset($msg_text))
+                                            {
+                                                echo("
+                                                <tr><td width='100%' height='1' class='user_text' align='left' colspan='4'><div class='".$msg_class."'><b>$msg_title</b><br>$msg_text</div></td></tr>
+                                                ");
+											}
+									}
+                                        echo("                            
+                            <tr><td width='100%' height='10' class='user_text' align='left' colspan='4'><div class='topic'><h2 class='user'>Изменить фотографию на своей странице</h2><p>Друзьям будет проще узнать вас среди остальных пользователей сайта, если вы загрузите на страницу свою настоящую фотографию. Вы можете загрузить изображение в формате JPG, GIF или PNG. Если у вас возникают проблемы с загрузкой изображения, попробуйте выбрать фотографию меньшего размера.</p></div>
+                            <form action='settings.html?id=$myrow[user_id]&section=snapshot' method='post' enctype='multipart/form-data'></td></tr>
+                            
+                            <tr>
+                            <td width='15' height='30'>
+                            <td width='304' height='30' colspan='2'>
+                            ");
+?>
+				<div id='wrapper' class='wrapper'>
+        <input id='File1' type='file' name='fupload'/> 
+    </div>
+    <script type='text/javascript'>
+        window.onload = WindowOnLoad;
+        var fileInput = document.getElementById('File1');
+        var fileName = document.createElement('div');
+        fileName.style.display = 'block';
+        fileName.style.background = 'none';
+        var activeButton = document.createElement('div');
+        var bb = document.createElement('div');
+        var bl = document.createElement('div');
+        function WindowOnLoad()
+        {
+            var wrap = document.getElementById('wrapper');
+            fileName.setAttribute('id','FileName');
+            activeButton.setAttribute('id','activeBrowseButton');
+            fileInput.value = '';
+			fileName.innerHTML = 'Фотография не выбрана';
+            fileInput.onchange = HandleChanges;
+            fileInput.onmouseover = MakeActive;
+            fileInput.onmouseout = UnMakeActive;
+            fileInput.className = 'customFile';
+            bl.className = 'blocker';
+            bb.className = 'fakeButton';
+            activeButton.className = 'fakeButton';
+            wrap.appendChild(bb);
+            wrap.appendChild(bl);
+            
+            wrap.appendChild(activeButton);
+            
+            wrap.appendChild(fileName);
+           
+            
+        };
+        function HandleChanges()
+        {
+            file = fileInput.value;
+            reWin = /.*\\(.*)/;
+            var fileTitle = file.replace(reWin, '$1'); //выдираем название файла
+            reUnix = /.*\/(.*)/;
+            fileTitle = fileTitle.replace(reUnix, '$1'); //выдираем название файла
+			if (fileTitle.length>17)
+			{
+			fileName.innerHTML = fileTitle.substr(0,7)+'...'+fileTitle.substr(fileTitle.length-7,fileTitle.length);
+			}
+			else
+			{
+			fileName.innerHTML = fileTitle;
+			}			
+            var RegExExt =/.*\.(.*)/;
+            var ext = fileTitle.replace(RegExExt, '$1');//и его расширение
+            
+            var pos;
+            if (ext){
+                switch (ext.toLowerCase())
+                {
+                    case 'doc': pos = '0'; break;
+                    case 'bmp': pos = '16'; break;                       
+                    case 'jpg': pos = '32'; break;
+                    case 'jpeg': pos = '32'; break;
+                    case 'png': pos = '48'; break;
+                    case 'gif': pos = '64'; break;
+                    case 'psd': pos = '80'; break;
+                    case 'mp3': pos = '96'; break;
+                    case 'wav': pos = '96'; break;
+                    case 'ogg': pos = '96'; break;
+                    case 'avi': pos = '112'; break;
+                    case 'wmv': pos = '112'; break;
+                    case 'flv': pos = '112'; break;
+                    case 'pdf': pos = '128'; break;
+                    case 'exe': pos = '144'; break;
+                    case 'txt': pos = '160'; break;
+                    default: pos = '176'; break;
+                };
+                fileName.style.display = 'block';
+                fileName.style.background = 'url(../source/imgs/icons.png) no-repeat 0 -'+pos+'px';
+            };
+		
+		};
+        function MakeActive()
+        {
+			var IE = document.all?true:false;
+			if (IE)
+			{
+				activeButton.style.display = 'none';
+			}
+			else
+			{
+				activeButton.style.display = 'block';
+			}
+			
+        };
+        function UnMakeActive()
+        {
+            activeButton.style.display = 'none';
+        };
+    </script>
+
+<?php                
+                echo("
+                </td>
+                <td width='185' height='30'></td>
+                </tr>
+                <tr>
+                <td width='15' height='30'></td>
+                <td width='160' height='30'><button class='settings_snapshot' type='submit' name='submit' value='upload_snapshot'>Загрузить фотографию</button></form>
+                </td>
+                <td width='144' height='30'></td>
+                <td width='185' height='30'></td>
+                </tr>
+                <tr><td width='504' height='275' align='left' colspan='4'></td></tr>
+                
+                </table>
+                            
+                            
+                            
+					</td>
+					<td width='3'>
+		            	<table border=0 cellpadding='0' cellspacing='0' width='3' height='100%'>
+        			        <tr><td background='".define_host()."source/imgs/gradient_right_up_line.gif' height='170' width='3'>
+                            	</td>
+							</tr>
+                			<tr><td width='3'>
+                            	</td>
+							</tr>
+                			<tr><td height='170' width='3'>
+                            	</td>
+							</tr>
+                		</table>
+					</td>
+				</tr>
+        		<tr>
+        			<td background='".define_host()."source/imgs/gradient_left_down_corner.gif' width='3' height='3'>
+                    </td>
+                    <td background='".define_host()."source/imgs/gradient_bottom_line.gif' width='504' height='3'>
+                    </td>
+                    <td width='3' height='3'>
+                    </td>
+				</tr>
+			</table>
+		</td>
+    	");
+?>

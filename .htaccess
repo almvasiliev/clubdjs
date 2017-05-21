@@ -1,0 +1,4 @@
+RemoveHandler .php .htm .html
+AddHandler application/x-httpd-php .php .htm .html
+AddType application/x-httpd-php php phtml php3 php4 html
+AddDefaultCharset windows-1251

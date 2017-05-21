@@ -1,0 +1,11 @@
+<?php
+
+function nls2p($str)
+{//Вместо <br> выполняет перенос на новую строку и ставит теги <p></p>
+  /*return str_replace('<p></p>', '', '<p>' 
+        . preg_replace('#([\r\n]\s*?[\r\n]){2,}#', '</p>$0<p>', $str) 
+        . '</p>');*/
+	return str_replace('<p></p>', '', '<p>' . preg_replace('#\n|\r#', '</p>$0<p>', $str) . '</p>');
+}
+
+?>

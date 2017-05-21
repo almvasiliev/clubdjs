@@ -1,0 +1,109 @@
+<?php 
+
+function index_events_dates($date_start,$date_finish,$diftime)
+	{
+        //Веремена для афиш ВСЕГДА указываются по МЕСТНОМУ времени. Время TODAY является серверным, поэтому для каждой афиши определяем город и по городу определяем diftime, после чего определяем время TODAY для конкретного города.
+        //$date_start = '2013-05-27 23:00:00';//Время начала мероприятия из БД, т.е. местоное время начала мероприятия, которое задал пользователь.
+        //$date_finish = '2013-05-28 06:00:00';//Время окончания мероприятия из БД, т.е. местоное время окончания мероприятия, которое задал пользователь.
+    	    
+        $month_array = array('','января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декакбря');
+        $day_array = array('','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31');
+        $hour_array = array('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23');
+        $minute_array = array('00','01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59');
+        $second_array = array('00','01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59');
+        $weekday = array('Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота');
+              
+        $date_start = str_replace(' ', '-', $date_start);
+        $date_start = str_replace(':', '-', $date_start);
+        $date_start = explode("-", $date_start);
+        $date_year_start = intval($date_start[0]);
+        $date_month_start = intval($date_start[1]);
+        $date_day_start = intval($date_start[2]);
+        $date_hour_start = intval($date_start[3]);
+        $date_minute_start = intval($date_start[4]);
+        $date_second_start = intval($date_start[5]);
+        $dateunix_start = mktime($date_hour_start, $date_minute_start, $date_second_start, $date_month_start, $date_day_start, $date_year_start);//Вычисляем метку времени UNIX для пользовательской даты.
+                
+        	if (!isset($date_finish) or empty($date_finish) or $date_finish == '0000-00-00 00:00:00')
+            	{
+                	$dateunix_finish == $dateunix_start + '21600';//По умолчанию длительность мероприятия составляет 6 часов (6*60*60 = 21600 секунд).
+                    $date_finish = date("Y-m-d H:i:s", $dateunix_finish);
+                    $date_finish = str_replace(' ', '-', $date_finish);
+                    $date_finish = str_replace(':', '-', $date_finish);
+                    $date_finish = explode("-", $date_finish);
+                    $date_year_finish = intval($date_finish[0]);
+                    $date_month_finish = intval($date_finish[1]);
+                    $date_day_finish = intval($date_finish[2]);
+                    $date_hour_finish = intval($date_finish[3]);
+                    $date_minute_finish = intval($date_finish[4]);
+                    $date_second_finish = intval($date_finish[5]);
+                }
+        	else
+            	{
+                	$date_finish = str_replace(' ', '-', $date_finish);
+                    $date_finish = str_replace(':', '-', $date_finish);
+                    $date_finish = explode("-", $date_finish);
+                    $date_year_finish = intval($date_finish[0]);
+                    $date_month_finish = intval($date_finish[1]);
+                    $date_day_finish = intval($date_finish[2]);
+                    $date_hour_finish = intval($date_finish[3]);
+                    $date_minute_finish = intval($date_finish[4]);
+                    $date_second_finish = intval($date_finish[5]);
+                    $dateunix_finish = mktime($date_hour_finish, $date_minute_finish, $date_second_finish, $date_month_finish, $date_day_finish, $date_year_finish);//Вычисляем метку времени UNIX для пользовательской даты.
+                }
+		
+        $date_today = date('Y-m-d H:i:s');
+        $date_today = str_replace(' ', '-', $date_today);
+        $date_today = str_replace(':', '-', $date_today);
+        $date_today = explode("-", $date_today);
+        $date_year_today = intval($date_today[0]);
+        $date_month_today = intval($date_today[1]);
+        $date_day_today = intval($date_today[2]);
+        $date_hour_today = intval($date_today[3]);
+        $date_minute_today = intval($date_today[4]);
+        $date_second_today = intval($date_today[5]);
+        $dateunix_today = mktime ($date_hour_today, $date_minute_today, $date_second_today, $date_month_today, $date_day_today, $date_year_today);//Вычисляем метку времени UNIX для серверного времени на стыке сегодня/завтра
+        $dateunix_today = $dateunix_today + $diftime;    
+        $date_today = date("Y-m-d H:i:s", $dateunix_today);
+        $date_today = explode("-", $date_today);
+        $date_year_today = intval($date_today[0]);
+        $date_month_today = intval($date_today[1]);
+        $date_day_today = intval($date_today[2]);    
+                
+        if ($dateunix_today > $dateunix_finish)
+        	{
+            	echo ("<div class='index_event_finished'>Окончено</div>");
+            }
+        elseif ($dateunix_today < $dateunix_finish and $dateunix_today > $dateunix_start)
+        	{
+            	echo ("<div class='index_event_continues'>Сейчас идёт</div>");
+            }
+		else
+        	{
+                $ut = strtotime($date_day_start.'-'.$date_month_start.'-'.$date_year_start);//unix time
+                $wd = date('w',$ut);//week day (0-6)
+                    
+                    if ($date_year_today == $date_year_start and $date_month_today == $date_month_start and $date_day_today == $date_day_start)
+                        {
+                            echo ("<div class='index_event_today'>Сегодня в $hour_array[$date_hour_start]:$minute_array[$date_minute_start]</div>");/*:$second_array[$date_second]_start");*/
+                        }
+                    elseif ($date_year_today == $date_year_start and $date_month_today == $date_month_start and $date_day_today == $date_day_start - 1)
+                        {
+                            echo ("<div class='index_event_tomorrow'>Завтра в $hour_array[$date_hour_start]:$minute_array[$date_minute_start]</div>");/*:$second_array[$date_second_start]");*/
+                        }
+                    elseif ($date_year_today == $date_year_start and $date_month_today == $date_month_start - 1 and $date_day_start == '1')
+                        {
+                            echo ("<div class='index_event_tomorrow'>Завтра в $hour_array[$date_hour_start]:$minute_array[$date_minute_start]</div>");/*:$second_array[$date_second_start]");*/
+                        }
+                    elseif ($date_year_today == $date_year_start - 1 and $date_month_today == '12' and $date_month_start == '1' and $date_day_today == '31' and $date_day_start == '1')
+                        {
+                            echo ("<div class='index_event_tomorrow'>Завтра в $hour_array[$date_hour_start]:$minute_array[$date_minute_start]</div>");/*:$second_array[$date_second_start]");*/
+                        }
+                    else
+                        {
+                            echo ("<div class='index_event_date'>$day_array[$date_day_start] $month_array[$date_month_start] в $hour_array[$date_hour_start]:$minute_array[$date_minute_start]</div>");/*:$second_array[$date_second_start]");*/
+                        }
+            }
+	}
+
+?>

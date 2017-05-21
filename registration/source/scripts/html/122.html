@@ -1,0 +1,86 @@
+<?php
+echo ("
+		<td width='510' valign='top'>
+            <table cellpadding='0' cellspacing='0' width='510' height='65' bgcolor='#ffffff'>
+            	<tr><td width='510' height='65'><div style='float:left'><h1>".$myrow['user_name']." ".$myrow['user_surname']."</h1></div><div class='user_online'>Онлайн</div></td>
+                </tr>
+				<tr><td height='5'>");require_once('menu_2.html');echo("</td>
+            	</tr>
+            </table>
+        
+        	<table border='0' cellpadding='0' cellspacing='0' width='510' height='300' bgcolor='#ffffff'>
+				<tr><td width='3'>
+        				<table border='0' cellpadding='0' cellspacing='0' width='3' height='100%'>
+                    		<tr><td background='".define_host()."source/imgs/gradient_left_up_line.gif' height='170' width='3'></td>
+                        	</tr>
+		            		<tr><td width='3'></td>
+                        	</tr>
+                        	<tr><td background='".define_host()."source/imgs/gradient_left_down_line.gif' height='170' width='3'></td>
+                            </tr>
+            			</table>
+            		</td>
+            		<td width='504' bgcolor='#fcfcfc'>
+            			<table border=0 cellpadding='0' cellspacing='0' height='100%' width='100%' valign='top'>
+							<tr><td height='1' width='100%' class='ternary_menu' colspan='2'>");require_once('menu_3.html');echo("</td>
+                            </tr>
+							<tr><td width='100%' height='10' class='user_text' align='left' colspan='2'><h2 class='user'>Получатель</h2></td>
+							</tr>
+                            <tr><td width='68' height='68' class='user_text' align='left'><div class='logo_user'><a href='".define_host()."user/index.html?id=$myrow3[user_id]'><img src='".define_host()."user/$myrow3[user_snapshot_min]' alt='$myrow3[user_name] $myrow3[user_surname]'></a></div>
+                            	</td>
+                                <td width='436' height='68' class='user_text' align='left'><h3 class='list_friends'><a href='".define_host()."user/index.html?id=$myrow3[user_id]' class='link'>".$myrow3['user_name']." ".$myrow3['user_surname']."</a></h1>");
+								if (in_array($myrow3['user_id'], $array_online))
+                                	{
+                                    	echo ("<div class='friend_online'>Онлайн</div><br>");
+									}
+                                else
+                                	{
+                                    	if ($myrow3['user_sex'] == 1)
+                                        	{
+                                            	echo ("<div class='friend_online'>Заходила: ");dates("$myrow3[user_visit_date]",$diftime);echo("</div><br>");
+											}
+										elseif ($myrow3['user_sex'] == 2)
+                                        	{
+                                            	echo ("<div class='friend_online'>Заходил: ");dates("$myrow3[user_visit_date]",$diftime);echo("</div><br>");
+											}
+										else
+                                        	{
+                                            	echo ("<div class='friend_online'>Последняя активность: ");dates("$myrow3[user_visit_date]",$diftime);echo("</div><br>");
+											}
+									}
+								echo("
+                                </td>
+							</tr>
+                            <tr><td width='100%' colspan='2' class='user_text' align='left'><form action='".define_host()."user/messages.html?id=$myrow2[user_id]&section=outbox' method='post'><textarea name='message_text' style='resize: none; overflow-x: hidden; overflow-y: hidden; height: 128px; width: 100%' autocomplete='off'></textarea><input type='hidden' name='recipient_id' value=".$myrow3['user_id']."><button class='send_post' type='submit' name='submit' value='send_message'>Отправить</button></form>
+                            	</td>
+							</tr>
+                            <tr>
+							<td width='504' valign='top' colspan='2'></td>
+							</tr>
+						</table>
+					</td>
+					<td width='3'>
+		            	<table border=0 cellpadding='0' cellspacing='0' width='3' height='100%'>
+        			        <tr><td background='".define_host()."source/imgs/gradient_right_up_line.gif' height='170' width='3'>
+                            	</td>
+							</tr>
+                			<tr><td width='3'>
+                            	</td>
+							</tr>
+                			<tr><td height='170' width='3'>
+                            	</td>
+							</tr>
+                		</table>
+					</td>
+				</tr>
+        		<tr>
+        			<td background='".define_host()."source/imgs/gradient_left_down_corner.gif' width='3' height='3'>
+                    </td>
+                    <td background='".define_host()."source/imgs/gradient_bottom_line.gif' width='504' height='3'>
+                    </td>
+                    <td width='3' height='3'>
+                    </td>
+				</tr>
+			</table>
+		</td>
+    	");
+?>

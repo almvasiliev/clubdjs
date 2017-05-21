@@ -1,0 +1,404 @@
+<?php
+require_once ('../source/scripts/html/user_session.html');
+if (isset($_GET['action']))
+	{
+		if (preg_match("/^[a-z]{1,}$/",$_GET['action']) and ($_GET['action'] == 'show' or $_GET['action'] == 'send'))
+			{
+				$action = htmlspecialchars($_GET['action']);
+				$action = strip_tags($action);
+			}
+		else
+			{
+				back2url("$error_404",0);
+			}
+	}
+else
+	{
+		back2url("$error_404",0);
+	}
+
+if ($myrow2['user_id'] == $id)
+	{
+        if ($action == 'show')
+        	{
+                require_once ("../source/scripts/html/nls2p.html");
+                
+                if (isset($_GET['message']))
+                    {
+                        if (is_numeric($_GET['message']))
+                            {
+                                $message_id = htmlspecialchars($_GET['message']);
+                                $message_id = strip_tags($message_id);
+                                    if (!empty($message_id) and $message_id != '')
+                                        {
+                                            //НАЧАЛО Подсчет заявок в друзья
+                                            $string_requests = $myrow['user_requests'];
+                                            if (empty($string_requests) or $string_requests == '')
+                                                {
+                                                    $req = '';
+                                                }
+                                            else
+                                                {
+                                                    $array_requests = unserialize($string_requests);
+                                                    $carray_requests = count($array_requests);
+                                                        if ($carray_requests == 0)
+                                                            {
+                                                                $req = '';
+                                                            }
+                                                        else
+                                                            {
+                                                                $req = "+$carray_requests";
+                                                            }
+                                                }
+                                            //КОНЕЦ Подсчет заявок в друзья.
+                                            
+                                            //НАЧАЛО Выбираем все удаленные сообщения.
+                                            $result3 = mysql_query("SELECT * FROM messages WHERE message_id='$message_id' and (message_recipient='$myrow2[user_id]' or message_author='$myrow2[user_id]')");
+                                            $myrow3 = mysql_fetch_array($result3);
+                                            $string_user_messages_deleted = $myrow['user_messages_deleted'];
+                                                if (!empty($string_user_messages_deleted) and $string_user_messages_deleted != '')
+                                                    {
+                                                        $array_user_messages_deleted = unserialize($string_user_messages_deleted);
+                                                        $key = 1;
+                                                    }
+                                                else
+                                                    {
+                                                        $key = 0;
+                                                    }
+                                            //КОНЕЦ Выбираем все удаленные сообщения.
+                                            
+                                            //НАЧАЛО Определяем для текущего сообщения, что оно прочитано.
+                                            mysql_query ("UPDATE messages SET message_visited=1 WHERE message_id='$message_id' and message_recipient='$id'");
+                                            //КОНЕЦ Определяем для текущего сообщения, что оно прочитано.
+                                            
+                                            //НАЧАЛО Подсчет непрочитанных сообщений.
+                                            $result_inbox_novisit = mysql_query("SELECT * FROM messages WHERE message_recipient='$id' AND message_visited='0'");
+                                            $array_inbox_novisit = array();
+                                                while($myrow_inbox_novisit = mysql_fetch_array($result_inbox_novisit))
+                                                    {
+                                                        $array_inbox_novisit[] = $myrow_inbox_novisit['message_id'];
+                                                    }
+                                            $string_user_messages_deleted = $myrow['user_messages_deleted'];
+                                                if (!empty($string_user_messages_deleted) and $string_user_messages_deleted != '')
+                                                    {
+                                                        $array_user_messages_deleted = unserialize($string_user_messages_deleted);
+                                                        $array_inbox_novisit = array_diff($array_inbox_novisit, $array_user_messages_deleted);//Новые полученные сообщения завычетом удаленных сообщений.
+                                                    }
+                                            $array_inbox_novisit = array_values($array_inbox_novisit);					
+                                            $carray_inbox_novisit = count($array_inbox_novisit);
+                                                if ($carray_inbox_novisit == 0)
+                                                            {
+                                                                $in_new = '';
+                                                            }
+                                                        else
+                                                            {
+                                                                $in_new = "+$carray_inbox_novisit";
+                                                            }
+                                            //КОНЕЦ Подсчет непрочитанных сообщений.
+                                            
+                                            //НАЧАЛО Подсчет заметок.
+                                            $result_notes = mysql_query("SELECT * FROM messages WHERE message_recipient='$id' AND message_author='$id' ORDER BY message_id DESC");
+                                            $array_notes = array();
+                                                while($myrow_notes = mysql_fetch_array($result_notes))
+                                                    {
+                                                        $array_notes[] = $myrow_notes['message_id'];
+                                                    }
+                                            $string_user_messages_deleted = $myrow['user_messages_deleted'];
+                                                if (!empty($string_user_messages_deleted) and $string_user_messages_deleted != '')
+                                                    {
+                                                        $array_user_messages_deleted = unserialize($string_user_messages_deleted);
+                                                        $array_notes = array_diff($array_notes, $array_user_messages_deleted);//Мои заметки завычетом удаленных сообщений.
+                                                    }
+                                            $array_notes = array_values($array_notes);					
+                                            $carray_notes = count($array_notes);
+                                                if ($carray_notes == 0)
+                                                            {
+                                                                $not = '';
+                                                            }
+                                                        else
+                                                            {
+                                                                $not = "$carray_notes";
+                                                            }
+                                            //КОНЕЦ Подсчет заметок.
+                                            
+                                            if (!empty($myrow3['message_id']) and (($key == 1 and !in_array($myrow3['message_id'],$array_user_messages_deleted)) or ($key == 0)))
+                                                {
+                                                    if ($myrow3['message_recipient'] == $myrow2['user_id'] and $myrow3['message_author'] == $myrow2['user_id'])
+                                                        {//МОЯ ЗАМЕТКА
+                                                            $page='119';
+                                                        }
+                                                    elseif ($myrow3['message_author'] == $myrow2['user_id'] and $myrow3['message_recipient'] != $myrow2['user_id'])
+                                                        {//ОТПРАВЛЕННОЕ СООБЩЕНИЕ
+                                                            $result4 = mysql_query("SELECT * FROM users WHERE user_id='$myrow3[message_recipient]'");
+															$myrow4 = mysql_fetch_array($result4);
+                                                            $page='120';
+                                                        }
+                                                    elseif ($myrow3['message_recipient'] == $myrow2['user_id'] and $myrow3['message_author'] != $myrow2['user_id'])
+                                                        {//ПОЛУЧЕННОЕ СООБЩЕНИЕ
+                                                            $result4 = mysql_query("SELECT * FROM users WHERE user_id='$myrow3[message_author]'");
+                                                            $myrow4 = mysql_fetch_array($result4);
+                                                            $page='121';
+                                                        }
+                                                    else
+                                                        {
+                                                            back2url("$error_404",0);
+                                                        }
+                                                }
+                                            else
+                                                {
+                                                    back2url("$error_404",0);
+                                                }
+                                            
+                                        }
+                                    else
+                                        {
+                                            back2url("$error_404",0);
+                                        }
+                            }
+                        else
+                            {
+                                back2url("$error_404",0);
+                            }
+                    }
+                else
+                    {
+                        back2url("$error_404",0);
+                    }
+			}
+        elseif ($action == 'send')
+        	{
+            	if (isset($_POST['submit']))
+                    {
+                        $submit = htmlspecialchars($_POST['submit']);
+                        $submit = strip_tags($submit);							
+							if ($submit == 'send_message' || $submit == 'Отправить сообщение')//ОТПРАВИТЬ СООБЩЕНИЕ
+                            	{									
+                                	if (isset($_POST['user_id']))
+                                    	{
+                                        	if (is_numeric($_POST['user_id']))
+                                            	{
+                                                	$user_id = htmlspecialchars($_POST['user_id']);
+                                                	$user_id = strip_tags($user_id);
+                                                    	if (!empty($user_id) and $user_id != '')
+                                                        	{
+                                                            	//НАЧАЛО Подсчет заявок в друзья.
+                                                                $string_requests = $myrow['user_requests'];
+                                                                if (empty($string_requests) or $string_requests == '')
+                                                                    {
+                                                                        $req = '';
+                                                                    }
+                                                                else
+                                                                    {
+                                                                        $array_requests = unserialize($string_requests);
+                                                                        $carray_requests = count($array_requests);
+                                                                            if ($carray_requests == 0)
+                                                                                {
+                                                                                    $req = '';
+                                                                                }
+                                                                            else
+                                                                                {
+                                                                                    $req = "+$carray_requests";
+                                                                                }
+                                                                    }
+                                                                //КОНЕЦ Подсчет заявок в друзья.
+                                                                
+                                                                //НАЧАЛО Подсчет непрочитанных сообщений.
+                                                                $result_inbox_novisit = mysql_query("SELECT * FROM messages WHERE message_recipient='$id' AND message_visited='0'");
+                                                                $array_inbox_novisit = array();
+                                                                    while($myrow_inbox_novisit = mysql_fetch_array($result_inbox_novisit))
+                                                                        {
+                                                                            $array_inbox_novisit[] = $myrow_inbox_novisit['message_id'];
+                                                                        }
+                                                                $string_user_messages_deleted = $myrow['user_messages_deleted'];
+                                                                    if (!empty($string_user_messages_deleted) or $string_user_messages_deleted!='')
+                                                                        {
+                                                                            $array_user_messages_deleted = unserialize($string_user_messages_deleted);
+                                                                            $array_inbox_novisit = array_diff($array_inbox_novisit, $array_user_messages_deleted);//Новые полученные сообщения завычетом удаленных сообщений.
+                                                                        }
+                                                                $array_inbox_novisit = array_values($array_inbox_novisit);					
+                                                                $carray_inbox_novisit = count($array_inbox_novisit);
+                                                                    if ($carray_inbox_novisit == 0)
+                                                                                {
+                                                                                    $in_new = '';
+                                                                                }
+                                                                            else
+                                                                                {
+                                                                                    $in_new = "+$carray_inbox_novisit";
+                                                                                }
+                                                                //КОНЕЦ Подсчет непрочитанных сообщений.
+                                                                
+                                                                //НАЧАЛО Подсчет заметок.
+                                                                $result_notes = mysql_query("SELECT * FROM messages WHERE message_recipient='$id' AND message_author='$id' ORDER BY message_id DESC");
+                                                                $array_notes = array();
+                                                                    while($myrow_notes = mysql_fetch_array($result_notes))
+                                                                        {
+                                                                            $array_notes[] = $myrow_notes['message_id'];
+                                                                        }
+                                                                $string_user_messages_deleted = $myrow['user_messages_deleted'];
+                                                                    if (!empty($string_user_messages_deleted) or $string_user_messages_deleted!='')
+                                                                        {
+                                                                            $array_user_messages_deleted = unserialize($string_user_messages_deleted);
+                                                                            $array_notes = array_diff($array_notes, $array_user_messages_deleted);//Мои заметки завычетом удаленных сообщений.
+                                                                        }
+                                                                $array_notes = array_values($array_notes);					
+                                                                $carray_notes = count($array_notes);
+                                                                    if ($carray_notes == 0)
+                                                                                {
+                                                                                    $not = '';
+                                                                                }
+                                                                            else
+                                                                                {
+                                                                                    $not = "$carray_notes";
+                                                                                }
+                                                                //КОНЕЦ Подсчет заметок.
+                                                                
+                                                                $result3 = mysql_query("SELECT user_id, user_name, user_surname, user_snapshot_min, user_sex, user_visit_date FROM users WHERE user_id='$user_id'");
+																$myrow3 = mysql_fetch_array($result3);
+                                                                	if (!empty($myrow3['user_id']) and $myrow3['user_id'] != '')
+                                                                    	{
+                                                                        	$page='122';
+                                                                        }
+																	else
+                                                                    	{
+                                                                        	back2url("$error_404",0);
+                                                                        }
+                                                                
+                                                            }
+														else
+                                                            {
+                                                                back2url("$error_404",0);
+                                                            }
+												}
+											else
+ 												{
+                                                	back2url("$error_404",0);
+                                                }
+										}
+									else
+                                    	{
+                                        	back2url("$error_404",0);
+                                        }
+								}
+							elseif ($submit == 'leave note' || $submit == 'Добавить заметку')
+                            	{
+                                	if (isset($_POST['user_id']))
+                                    	{
+                                        	if (is_numeric($_POST['user_id']))
+                                            	{
+                                                	$user_id = htmlspecialchars($_POST['user_id']);
+                                                	$user_id = strip_tags($user_id);
+                                                    	if (!empty($user_id) and $user_id != '' and $user_id == $id)
+                                                        	{
+                                                            	//НАЧАЛО Подсчет заявок в друзья.
+                                                                $string_requests = $myrow['user_requests'];
+                                                                if (empty($string_requests) or $string_requests == '')
+                                                                    {
+                                                                        $req = '';
+                                                                    }
+                                                                else
+                                                                    {
+                                                                        $array_requests = unserialize($string_requests);
+                                                                        $carray_requests = count($array_requests);
+                                                                            if ($carray_requests == 0)
+                                                                                {
+                                                                                    $req = '';
+                                                                                }
+                                                                            else
+                                                                                {
+                                                                                    $req = "+$carray_requests";
+                                                                                }
+                                                                    }
+                                                                //КОНЕЦ Подсчет заявок в друзья.
+                                                                
+                                                                //НАЧАЛО Подсчет непрочитанных сообщений.
+                                                                $result_inbox_novisit = mysql_query("SELECT * FROM messages WHERE message_recipient='$id' AND message_visited='0'");
+                                                                $array_inbox_novisit = array();
+                                                                    while($myrow_inbox_novisit = mysql_fetch_array($result_inbox_novisit))
+                                                                        {
+                                                                            $array_inbox_novisit[] = $myrow_inbox_novisit['message_id'];
+                                                                        }
+                                                                $string_user_messages_deleted = $myrow['user_messages_deleted'];
+                                                                    if (!empty($string_user_messages_deleted) or $string_user_messages_deleted!='')
+                                                                        {
+                                                                            $array_user_messages_deleted = unserialize($string_user_messages_deleted);
+                                                                            $array_inbox_novisit = array_diff($array_inbox_novisit, $array_user_messages_deleted);//Новые полученные сообщения завычетом удаленных сообщений.
+                                                                        }
+                                                                $array_inbox_novisit = array_values($array_inbox_novisit);					
+                                                                $carray_inbox_novisit = count($array_inbox_novisit);
+                                                                    if ($carray_inbox_novisit == 0)
+                                                                                {
+                                                                                    $in_new = '';
+                                                                                }
+                                                                            else
+                                                                                {
+                                                                                    $in_new = "+$carray_inbox_novisit";
+                                                                                }
+                                                                //КОНЕЦ Подсчет непрочитанных сообщений.
+                                                                
+                                                                //НАЧАЛО Подсчет заметок.
+                                                                $result_notes = mysql_query("SELECT * FROM messages WHERE message_recipient='$id' AND message_author='$id' ORDER BY message_id DESC");
+                                                                $array_notes = array();
+                                                                    while($myrow_notes = mysql_fetch_array($result_notes))
+                                                                        {
+                                                                            $array_notes[] = $myrow_notes['message_id'];
+                                                                        }
+                                                                $string_user_messages_deleted = $myrow['user_messages_deleted'];
+                                                                    if (!empty($string_user_messages_deleted) or $string_user_messages_deleted!='')
+                                                                        {
+                                                                            $array_user_messages_deleted = unserialize($string_user_messages_deleted);
+                                                                            $array_notes = array_diff($array_notes, $array_user_messages_deleted);//Мои заметки завычетом удаленных сообщений.
+                                                                        }
+                                                                $array_notes = array_values($array_notes);					
+                                                                $carray_notes = count($array_notes);
+                                                                    if ($carray_notes == 0)
+                                                                                {
+                                                                                    $not = '';
+                                                                                }
+                                                                            else
+                                                                                {
+                                                                                    $not = "$carray_notes";
+                                                                                }
+                                                                //КОНЕЦ Подсчет заметок.
+                                                                
+                                                               $page='123'; 
+                                                            }
+												}
+											else
+                                            	{
+                                                	back2url("$error_404",0);
+                                                }
+										}
+									else
+                                    	{
+                                        	back2url("$error_404",0);
+                                        }
+                                }
+							else
+                            	{
+                                	back2url("$error_404",0);
+                                }
+					}
+				else
+                	{
+                    	back2url("$error_404",0);
+                    }
+			}
+        else
+        	{
+            	back2url("$error_404",0);
+			}
+	}
+else
+	{
+    	if ($authorized_user == '0')
+        	{
+            	$login = define_host()."login.html";
+                back2url("$login",0);
+            }
+        else
+        	{
+            	back2url("$error_404",0);
+			}
+	}
+require_once ('../source/scripts/html/page.html');
+?>

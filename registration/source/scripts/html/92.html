@@ -1,0 +1,309 @@
+<?php
+        
+        if (isset($_GET['p']))
+            {
+                if (ctype_digit($_GET['p']))//Если символы в строке $_GET['p'] цифровые, то...
+                    {
+                        $p = htmlspecialchars($_GET['p']);
+                        $p = strip_tags($p);
+                    }
+                else
+                    {
+                        back2url("$error_404",0);
+                    }
+            }
+            else
+                {
+                    $p = '1';
+                }
+                
+            if (isset($_GET['per']))
+            {
+                if (ctype_digit($_GET['per']) and ($_GET['per'] == 10 or $_GET['per'] == 50 or $_GET['per'] == 100))//Если символы в строке $_GET['per'] цифровые, то...
+                    {
+                        $per = htmlspecialchars($_GET['per']);
+                        $per = strip_tags($per);
+                    }
+                else
+                    {
+                        back2url("$error_404",0);
+                    }
+            }
+            else
+                {
+                    $per = '10';
+                }
+            
+            require_once ("pages.html");
+            require_once ("substrings.html");
+        
+        //НАЧАЛО Подсчет заявок в друзья
+		$string_requests = $myrow['user_requests'];
+			if (empty($string_requests) or $string_requests == '')
+				{
+					$req = '';
+				}
+			else
+				{
+					$array_requests = unserialize($string_requests);
+					$carray_requests = count($array_requests);
+						if ($carray_requests == 0)
+							{
+								$req = '';
+							}
+						else
+							{
+								$req = "+$carray_requests";
+							}
+				}
+		//КОНЕЦ Подсчет заявок в друзья.
+					
+		//НАЧАЛО Подсчет непрочитанных сообщений
+		$result_inbox_novisit = mysql_query("SELECT * FROM messages WHERE message_recipient='$id' AND message_visited='0'",$connect);
+		$array_inbox_novisit = array();
+			while($myrow_inbox_novisit = mysql_fetch_array($result_inbox_novisit))
+				{
+					$array_inbox_novisit[] = $myrow_inbox_novisit['message_id'];
+				}
+			
+		$string_user_messages_deleted = $myrow['user_messages_deleted'];
+			if (!empty($string_user_messages_deleted) or $string_user_messages_deleted!='')
+					{
+						$array_user_messages_deleted = unserialize($string_user_messages_deleted);
+						$array_inbox_novisit = array_diff($array_inbox_novisit, $array_user_messages_deleted);//Новые полученные сообщения завычетом удаленных сообщений.
+					}
+			$array_inbox_novisit = array_values($array_inbox_novisit);					
+			$carray_inbox_novisit = count($array_inbox_novisit);
+				if ($carray_inbox_novisit == 0)
+					{
+						$in_new = '';
+					}
+				else
+					{
+						$in_new = "+$carray_inbox_novisit";
+					}
+		//КОНЕЦ Подсчет непрочитанных сообщений
+					
+		//НАЧАЛО Подсчет заметок
+		$result_notes = mysql_query("SELECT * FROM messages WHERE message_recipient='$id' AND message_author='$id' ORDER BY message_id DESC",$connect);
+		$array_notes = array();
+			while($myrow_notes = mysql_fetch_array($result_notes))
+				{
+					$array_notes[] = $myrow_notes['message_id'];
+				}
+			$string_user_messages_deleted = $myrow['user_messages_deleted'];
+				if (!empty($string_user_messages_deleted) or $string_user_messages_deleted!='')
+					{
+						$array_user_messages_deleted = unserialize($string_user_messages_deleted);
+						$array_notes = array_diff($array_notes, $array_user_messages_deleted);//Мои заметки завычетом удаленных сообщений.
+					}
+		
+        	$array_notes = array_values($array_notes);					
+			$carray_notes = count($array_notes);
+				if ($carray_notes == 0)
+					{
+						$not = '';
+					}
+				else
+					{
+						$not = "$carray_notes";
+					}
+		//КОНЕЦ Подсчет заметок
+					
+		//НАЧАЛО Подсчет полученных сообщений за исключением заметок
+		$result_inbox = mysql_query("SELECT * FROM messages WHERE message_recipient='$id' ORDER BY message_id DESC",$connect);
+		$array_inbox = array();
+			while($myrow_inbox = mysql_fetch_array($result_inbox))
+				{
+					$array_inbox[] = $myrow_inbox['message_id'];
+				}
+			
+            $result_outbox = mysql_query("SELECT * FROM messages WHERE message_author='$id' ORDER BY message_id DESC",$connect);
+			$array_outbox = array();
+				while($myrow_outbox = mysql_fetch_array($result_outbox))
+					{
+						$array_outbox[] = $myrow_outbox['message_id'];
+					}
+			
+            	$array_inbox = array_diff($array_inbox, $array_outbox);//Полученные сообщения завычетом заметок (заметка - сообщение самому себе, т.е. в графе author и recipient будет один и тот же id пользователя).
+				$string_user_messages_deleted = $myrow['user_messages_deleted'];
+					if (!empty($string_user_messages_deleted) or $string_user_messages_deleted!='')
+						{
+							$array_user_messages_deleted = unserialize($string_user_messages_deleted);
+							$array_inbox = array_diff($array_inbox, $array_user_messages_deleted);//Полученные сообщения завычетом удаленный сообщений.
+						}
+				
+                	$array_inbox = array_values($array_inbox);
+					$carray_inbox = count($array_inbox);
+						if ($carray_inbox == 0)
+							{
+								$in = '';
+							}
+						else
+							{
+								$in = "$carray_inbox";
+							}
+		//КОНЕЦ Подсчет полученных сообщений за исключением заметок
+        
+       echo ("
+		<td width='510' valign='top'>
+            <table cellpadding='0' cellspacing='0' width='510' height='65' bgcolor='#ffffff'>
+            	<tr><td width='510' height='65'><div style='float:left'><h1>".$myrow['user_name']." ".$myrow['user_surname']."</h1></div><div class='user_online'>Онлайн</div></td>
+                </tr>
+				<tr><td height='5'>");require_once('menu_2.html');echo("</td>
+            	</tr>
+            </table>
+        
+        	<table border='0' cellpadding='0' cellspacing='0' width='510' height='300' bgcolor='#ffffff'>
+				<tr><td width='3'>
+        				<table border='0' cellpadding='0' cellspacing='0' width='3' height='100%'>
+                    		<tr><td background='".define_host()."source/imgs/gradient_left_up_line.gif' height='170' width='3'></td>
+                        	</tr>
+		            		<tr><td width='3'></td>
+                        	</tr>
+                        	<tr><td background='".define_host()."source/imgs/gradient_left_down_line.gif' height='170' width='3'></td>
+                            </tr>
+            			</table>
+            		</td>
+            		<td width='504' bgcolor='#fcfcfc'>
+            			<table border=0 cellpadding='0' cellspacing='0' height='100%' width='100%' valign='top'>
+							<tr><td height='1' width='100%' class='ternary_menu' colspan='3'>");require_once('menu_3.html');echo("</td>
+                            </tr>");
+                            
+                            if (isset($_POST['submit']))
+                                {
+                                    if (!preg_match("/[^(\w)|(\x7F-\xFF)|(\s)]/",$_POST['submit']))
+                                        {
+                                            $submit = htmlspecialchars($_POST['submit']);
+                                            $submit = strip_tags($submit);
+                                            	
+                                                if ($submit == 'delete_message' || $submit == 'Удалить сообщение' || $submit == 'spam_message' || $submit == 'Пожаловаться на спам' || $submit == 'Удалить заметку')
+                                                	{
+                                                    	if (isset($msg_class) and isset($msg_title) and isset($msg_text))
+                                                            {
+                                                                echo("
+                                                                <tr><td width='100%' height='1' class='user_text' align='left' colspan='3'><div class='".$msg_class."'><b>$msg_title</b><br>$msg_text</div></td></tr>
+                                                                ");
+															}
+													}
+										}
+								}
+							
+                            echo("                            
+                            <tr><td width='100%' height='10' class='user_text' align='left' colspan='3'><h2 class='user'>Полученные личные сообщения</h2><p>Список полученных вами личных сообщений. Все непрочитанные сообщения выделены цветом.</p></td></tr>
+                            <tr><td width='100%' height='10' align='left' colspan='3'>
+                            ");
+                            
+                            //НАЧАЛО Сраницы
+                            pages("messages.html?id=$myrow[user_id]",$section,$in,$per,$p);
+                            per_pages("messages.html?id=$myrow[user_id]",$section,$in,$per,$p);
+                            //КОНЕЦ Сраницы
+                            echo ("</td></tr>");
+                            
+                            if ($key == 1)
+                                {
+                                    if ($carray_inbox!=0)
+                                        {
+                                            for ($i = $min_unit; $i <= $max_unit; $i++)
+                                                {
+                                                    $message_id_inbox = $array_inbox[$i];
+                                                    $result3 = mysql_query("SELECT * FROM messages WHERE message_id='$message_id_inbox'",$connect);
+                                                    $myrow3 = mysql_fetch_array($result3);
+                                                        
+                                                        if ($myrow3['message_visited'] == 0)
+                                                            {
+                                                                $class1 = 'user_text_not_visited';
+                                                                $class2 = 'user_messages_not_visited';
+                                                                $class3 = 'delete_message_not_visited';
+                                                            }
+                                                        else
+                                                            {
+                                                                $class1 = 'user_text';
+                                                                $class2 = 'user_messages';
+                                                                $class3 = 'delete_message';
+                                                            }
+                                                        
+                                                        echo ("<tr><td background='".define_host()."source/imgs/section_line_full.gif' width='100%' height='3' colspan='3'></td></tr>");
+                                                        
+                                                                
+                                                        $result4 = mysql_query("SELECT user_id, user_name, user_surname, user_snapshot_min FROM users WHERE user_id='$myrow3[message_author]'",$connect);
+                                                        $myrow4 = mysql_fetch_array($result4);
+                                                        
+                                                        echo ("<tr><td width='68' height='10' class=".$class1." align='left'><div class='logo_user'><a href='".define_host()."user/index.html?id=$myrow4[user_id]'><img src='$myrow4[user_snapshot_min]' alt='$myrow4[user_name] $myrow4[user_surname]'></a></div></td><td width='208' height='10' class=".$class1." align='left'><h3 class='list_friends'><a href='".define_host()."user/index.html?id=$myrow4[user_id]' class='link'>".$myrow4['user_name']." ".$myrow4['user_surname']."</a></h3>");
+                                                                                                            
+                                                            if (in_array($myrow4['user_id'],$array_online))
+                                                                {
+                                                                    echo ("<div class='friend_online'>Онлайн</div><br>");
+                                                                }
+                                                                
+                                                            echo ("<div class='friends'>");
+                                                            dates("$myrow3[message_date]",$diftime);
+                                                            echo ("</div>");
+                                                            //echo ("<div class='friends'>$myrow3[message_date]</div>");
+                                                            
+                                                            echo ("<div class='friends'><form action='".define_host()."user/messages.html?id=$myrow[user_id]&section=inbox' method='post' enctype='multipart/form-data'><input type='hidden' name='message_id' value=".$message_id_inbox."><input type='hidden' name='page' value='messages'><button class=".$class3." type='submit' name='submit' value='delete_message'>Удалить сообщение</button></form></div>");
+                                                            
+                                                            echo ("
+                                                            </td><td width='228' height='10' class=".$class2." align='left'>
+                                                            <a href='".define_host()."user/message.html?id=$myrow[user_id]&action=show&message=$message_id_inbox' class='messages'>".substrings($myrow3['message_text'],80)."</a><br>
+                                                            <a href='".define_host()."user/message.html?id=$myrow[user_id]&action=show&message=$message_id_inbox' class='link'>Читать дальше</a>
+                                                            </td></tr>
+                                                            ");
+                                                            
+                                                            if ($i == $max_unit and $max_unit - $min_unit > 5 and $max_unit > 8 and $carray_inbox > 10)
+                                                            {
+                                                                echo ("<tr><td background='".define_host()."source/imgs/section_line_full.gif' width='100%' height='3' colspan='3'></td></tr>");
+                                                            }
+                                                }
+                                                    
+                                                    if ($max_unit - $min_unit > 5)
+                                                        {
+                                                            echo ("<tr><td width='100%' align='left' colspan='3'>");
+                                                            //НАЧАЛО Сраницы
+                                                            pages("messages.html?id=$myrow[user_id]",$section,$in,$per,$p);
+                                                            per_pages("messages.html?id=$myrow[user_id]",$section,$in,$per,$p);
+                                                            //КОНЕЦ Сраницы
+                                                            echo ("</td></tr>");
+                                                        }
+                                                    echo ("<tr><td width='100%' align='left' colspan='3'></td></tr>");
+                                        }
+                                    else
+                                        {
+                                            echo ("<tr><td width='100%' class='user_text' align='left' colspan='3'>Список принятых личных сообщений пуст.</td></tr>");
+                                        }
+                                }
+                            else
+                                {
+                                    echo ("<tr><td width='100%' class='user_text' align='left' colspan='3'>Список принятых личных сообщений пуст.</td></tr>");
+                                }
+                                
+                                echo ("
+                                <tr><td width='100%' colspan='3'></td></tr>
+						</table>
+					</td>
+					<td width='3'>
+		            	<table border=0 cellpadding='0' cellspacing='0' width='3' height='100%'>
+        			        <tr><td background='".define_host()."source/imgs/gradient_right_up_line.gif' height='170' width='3'>
+                            	</td>
+							</tr>
+                			<tr><td width='3'>
+                            	</td>
+							</tr>
+                			<tr><td height='170' width='3'>
+                            	</td>
+							</tr>
+                		</table>
+					</td>
+				</tr>
+        		<tr>
+        			<td background='".define_host()."source/imgs/gradient_left_down_corner.gif' width='3' height='3'>
+                    </td>
+                    <td background='".define_host()."source/imgs/gradient_bottom_line.gif' width='504' height='3'>
+                    </td>
+                    <td width='3' height='3'>
+                    </td>
+				</tr>
+			</table>
+		</td>
+    	");
+?>

@@ -1,0 +1,24 @@
+<?php
+require_once ('source/scripts/html/page_session.html');
+if (isset($_GET['section']))
+	{
+		if (preg_match("/^[a-z]{1,}$/",$_GET['section']) and ($_GET['section'] == 'all' or $_GET['section'] == 'other'))
+			{
+				$section = htmlspecialchars($_GET['section']);
+				$section = strip_tags($section);
+			}
+		else
+			{
+				back2url("$error_404",0);
+			}
+	}
+else
+	{
+		$section = 'all';
+	}
+
+if (empty($section) or $section == 'all') {$page='5';}
+elseif ($section == 'other') {$page='65';}
+else {back2url("$error_404",0);}
+require_once ('source/scripts/html/page.html');
+?>

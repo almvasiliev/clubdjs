@@ -1,0 +1,217 @@
+<?php
+function ad_space_e($page)
+	{	
+		$result_ad_space_e = mysql_query("SELECT advert.a_id, advert.a_url, advert.a_link, advert.a_title, advert.a_width, advert.a_height, advert.a_bg, advert.a_counter FROM advert WHERE advert.a_place='e' AND advert.a_default='0' AND advert.a_show='1' AND advert.a_counter<advert.a_count_lim ORDER BY RAND()");
+        $myrow_ad_space_e = mysql_fetch_array($result_ad_space_e);
+        if (isset($myrow_ad_space_e['a_id']) and !empty($myrow_ad_space_e['a_id']))
+        	{
+            	$file_extension = preg_replace("/.*?\./", '', $myrow_ad_space_e['a_url']);
+                                                
+                $width_e = $myrow_ad_space_e['a_width'];
+                $height_e = $myrow_ad_space_e['a_height'];
+                //$width_e должен быть не более 240px.
+                $w6=252;$w2=5;$w4=$w2;$w3=$width_e;$w1=round(($w6-$w2-$w3-$w4)/2);$w5=$w6-$w1-$w2-$w3-$w4;
+                $h1=1;$h2=5;$h3=$height_e;$h4=11;$h5=15;$h6=$h1+$h2+$h3+$h4+$h5;
+                    
+                echo ("
+                <table cellpadding='0' cellspacing='0' width='".$w6."' height='".$h6."' bgcolor='#".$myrow_ad_space_e['a_bg']."'>
+                
+                <tr height='".$h1."'>
+                <td width='".$w6."' height='".$h1."' colspan='5'></td>
+                </tr>
+                
+                <tr height='".$h2."'>
+                <td width='".$w1."' height='".$h2."'></td>
+                <td width='".$w2."' height='".$h2."' background='".define_host()."source/imgs/e1.gif'></td>
+                <td width='".$w3."' height='".$h2."' background='".define_host()."source/imgs/e2.gif'></td>
+                <td width='".$w4."' height='".$h2."' background='".define_host()."source/imgs/e3.gif'></td>
+                <td width='".$w5."' height='".$h2."'></td>
+                </tr>
+                
+                <tr height='".$h3."'>
+                <td width='".$w1."' height='".$h3."'></td>
+                <td width='".$w2."' height='".$h3."' background='".define_host()."source/imgs/e4.gif'></td>
+                <td width='".$w3."' height='".$h3."'><noindex>");
+                
+                if ($file_extension == 'swf')
+                	{
+                    	echo ("
+                        <object type='application/x-shockwave-flash' data='".define_host()."".$myrow_ad_space_e['a_url']."' width='".$width_e."' height='".$height_e."'>
+                        <param name='movie' value='".define_host()."".$myrow_ad_space_e['a_url']."' />
+                        </object>
+                        ");
+                    }
+				else
+                	{
+                    	echo ("<a href='".define_host()."".$myrow_ad_space_e['a_link']."' title='".$myrow_ad_space_e['a_title']."'><img src='".define_host()."".$myrow_ad_space_e['a_url']."'></a>");
+                    }
+
+                echo("</noindex></td>
+                <td width='".$w4."' height='".$h3."' background='".define_host()."source/imgs/e5.gif'></td>
+                <td width='".$w5."' height='".$h3."'></td>
+                </tr>
+                
+                <tr height='".$h4."'>
+                <td width='".$w1."' height='".$h4."'></td>
+                <td width='".$w2."' height='".$h4."' background='".define_host()."source/imgs/e6.gif'></td>
+                <td width='".$w3."' height='".$h4."' background='".define_host()."source/imgs/e7.gif' align='right'><a href='".define_host()."advert.html'><img src='".define_host()."source/imgs/advt_e.gif'></a></td>
+                <td width='".$w4."' height='".$h4."' background='".define_host()."source/imgs/e8.gif'></td>
+                <td width='".$w5."' height='".$h4."'></td>
+                </tr>
+                                
+                <tr height='".$h5."'>
+                <td width='".$w6."' height='".$h5."' colspan='5'></td>
+                </tr>
+                </table>
+                ");
+                
+                $a_id = $myrow_ad_space_e['a_id'];
+                $count = $myrow_ad_space_e['a_counter']+1;
+                mysql_query("UPDATE advert SET advert.a_counter=$count WHERE advert.a_id='$a_id'");
+            }
+		else
+        	{
+                $result_ad_space_e = mysql_query("SELECT advert.a_id, advert.a_url, advert.a_link, advert.a_title, advert.a_width, advert.a_height, advert.a_bg FROM advert WHERE advert.a_place='e' AND advert.a_default='1' AND advert.a_show='1'");
+                $myrow_ad_space_e = mysql_fetch_array($result_ad_space_e);
+                
+                if (isset($myrow_ad_space_e['a_id']) and !empty($myrow_ad_space_e['a_id']))
+                	{
+                    	$pos = strrpos($myrow_ad_space_e['a_url'],'.');//»щем положение точки с конца строки
+                        $file_extension = substr($myrow_ad_space_e['a_url'],$pos+1);//ќпередел€ем расширение файла с рекламой (gif,jpg,jpeg,png,gif,bmp,swf)
+                                                        
+                        $width_e = $myrow_ad_space_e['a_width'];
+                        $height_e = $myrow_ad_space_e['a_height'];
+                        
+                        $w6=252;$w2=5;$w4=$w2;$w3=$width_e;$w1=round(($w6-$w2-$w3-$w4)/2);$w5=$w6-$w1-$w2-$w3-$w4;
+                        $h1=1;$h2=5;$h3=$height_e;$h4=11;$h5=15;$h6=$h1+$h2+$h3+$h4+$h5;
+                            
+                        echo ("
+                        <table cellpadding='0' cellspacing='0' width='".$w6."' height='".$h6."' bgcolor='#".$myrow_ad_space_e['a_bg']."'>
+                        
+                        <tr height='".$h1."'>
+                        <td width='".$w6."' height='".$h1."' colspan='5'></td>
+                        </tr>
+                        
+                        <tr height='".$h2."'>
+                        <td width='".$w1."' height='".$h2."'></td>
+                        <td width='".$w2."' height='".$h2."' background='".define_host()."source/imgs/e1.gif'></td>
+                        <td width='".$w3."' height='".$h2."' background='".define_host()."source/imgs/e2.gif'></td>
+                        <td width='".$w4."' height='".$h2."' background='".define_host()."source/imgs/e3.gif'></td>
+                        <td width='".$w5."' height='".$h2."'></td>
+                        </tr>
+                        
+                        <tr height='".$h3."'>
+                        <td width='".$w1."' height='".$h3."'></td>
+                        <td width='".$w2."' height='".$h3."' background='".define_host()."source/imgs/e4.gif'></td>
+                        <td width='".$w3."' height='".$h3."'><noindex>");
+                        
+                        if ($file_extension == 'swf')
+                            {
+                                echo ("
+                                <object type='application/x-shockwave-flash' data='".define_host()."".$myrow_ad_space_e['a_url']."' width='".$width_e."' height='".$height_e."'>
+                                <param name='movie' value='".define_host()."".$myrow_ad_space_e['a_url']."' />
+                                </object>
+                                ");
+                            }
+                        else
+                            {
+                                echo ("<a href='".define_host()."".$myrow_ad_space_e['a_link']."' title='".$myrow_ad_space_e['a_title']."'><img src='".define_host()."".$myrow_ad_space_e['a_url']."'></a>");
+                            }
+        
+                        echo("</noindex></td>
+                        <td width='".$w4."' height='".$h3."' background='".define_host()."source/imgs/e5.gif'></td>
+                        <td width='".$w5."' height='".$h3."'></td>
+                        </tr>
+                        
+                        <tr height='".$h4."'>
+                        <td width='".$w1."' height='".$h4."'></td>
+                        <td width='".$w2."' height='".$h4."' background='".define_host()."source/imgs/e6.gif'></td>
+                        <td width='".$w3."' height='".$h4."' background='".define_host()."source/imgs/e7.gif' align='right'><a href='".define_host()."advert.html'><img src='".define_host()."source/imgs/advt_e.gif'></a></td>
+                        <td width='".$w4."' height='".$h4."' background='".define_host()."source/imgs/e8.gif'></td>
+                        <td width='".$w5."' height='".$h4."'></td>
+                        </tr>
+                                        
+                        <tr height='".$h5."'>
+                        <td width='".$w6."' height='".$h5."' colspan='5'></td>
+                        </tr>
+                        </table>
+                        ");
+                    }
+				else
+                	{
+                    	$result_rc = mysql_query("SELECT * FROM right_column WHERE pt_page='$page' AND rc_context='1'");
+                        $myrow_rc = mysql_fetch_array($result_rc);
+                            if	(isset($myrow_rc['rc_id']) and !empty($myrow_rc['rc_id']))
+                                {
+                                    $width_e = 240;
+                                    $height_e = 400;
+                                    $w6=252;$w2=5;$w4=$w2;$w3=$width_e;$w1=round(($w6-$w2-$w3-$w4)/2);$w5=$w6-$w1-$w2-$w3-$w4;
+                        			$h1=1;$h2=5;$h3=$height_e;$h4=11;$h5=15;$h6=$h1+$h2+$h3+$h4+$h5;
+                                        
+                                    echo ("
+                                    <table cellpadding='0' cellspacing='0' width='".$w6."' height='".$h6."' bgcolor='#".$myrow_ad_space_e['a_bg']."'>
+                                    
+                                    <tr height='".$h1."'>
+                                    <td width='".$w6."' height='".$h1."' colspan='5'></td>
+                                    </tr>
+                                    
+                                    <tr height='".$h2."'>
+                                    <td width='".$w1."' height='".$h2."'></td>
+                                    <td width='".$w2."' height='".$h2."' background='".define_host()."source/imgs/e1.gif'></td>
+                                    <td width='".$w3."' height='".$h2."' background='".define_host()."source/imgs/e2.gif'></td>
+                                    <td width='".$w4."' height='".$h2."' background='".define_host()."source/imgs/e3.gif'></td>
+                                    <td width='".$w5."' height='".$h2."'></td>
+                                    </tr>
+                                    
+                                    <tr height='".$h3."'>
+                                    <td width='".$w1."' height='".$h3."'></td>
+                                    <td width='".$w2."' height='".$h3."' background='".define_host()."source/imgs/e4.gif'></td>
+                                    <td width='".$w3."' height='".$h3."'><noindex>
+                                    <!-- яндекс.ƒирект -->
+                                    <script type='text/javascript'>
+                                    //<![CDATA[
+                                    yandex_partner_id = 63125;
+                                    yandex_site_bg_color = 'FFFFFF';
+                                    yandex_site_charset = 'windows-1251';
+                                    yandex_ad_format = 'direct';
+                                    yandex_font_size = 0.9;
+                                    yandex_font_family = 'tahoma';
+                                    yandex_direct_type = 'vertical';
+                                    yandex_direct_limit = 3;
+                                    yandex_direct_title_font_size = 1;
+                                    yandex_direct_title_color = '248ED7';
+                                    yandex_direct_url_color = 'CCCCCC';
+                                    yandex_direct_all_color = '08588E';
+                                    yandex_direct_text_color = '000000';
+                                    yandex_direct_hover_color = '08588E';
+                                    yandex_direct_favicon = false;
+                                    document.write('<sc'+'ript type='text/javascript' src='http://an.yandex.ru/system/context.js'></sc'+'ript>');
+                                    //]]>
+                                    </script>
+                                    </noindex></td>
+                                    <td width='".$w4."' height='".$h3."' background='".define_host()."source/imgs/e5.gif'></td>
+                                    <td width='".$w5."' height='".$h3."'></td>
+                                    </tr>
+                                    
+                                    <tr height='".$h4."'>
+                                    <td width='".$w1."' height='".$h4."'></td>
+                                    <td width='".$w2."' height='".$h4."' background='".define_host()."source/imgs/e6.gif'></td>
+                                    <td width='".$w3."' height='".$h4."' background='".define_host()."source/imgs/e7.gif' align='right'><a href='".define_host()."advert.html'><img src='".define_host()."source/imgs/advt_e.gif'></a></td>
+                                    <td width='".$w4."' height='".$h4."' background='".define_host()."source/imgs/e8.gif'></td>
+                                    <td width='".$w5."' height='".$h4."'></td>
+                                    </tr>
+                                                    
+                                    <tr height='".$h5."'>
+                                    <td width='".$w6."' height='".$h5."' colspan='5'></td>
+                                    </tr>
+                                    </table>
+                                    ");
+                                }
+						else
+                        	{
+                            	//ѕусто.
+                            }
+					}
+            }
+	}
+?>

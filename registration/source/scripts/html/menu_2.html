@@ -1,0 +1,64 @@
+<?php
+		if (!isset($req) or empty($req)){$req = '';}
+        if (!isset($in_new) or empty($in_new)){$in_new = '';}
+        
+        $result_pt = mysql_query("SELECT m2_id FROM page_type WHERE pt_page='$page'");
+        $myrow_pt = mysql_fetch_array($result_pt);
+        $m2_id = $myrow_pt['m2_id'];
+        
+        if (isset($page_id) and !empty($page_id) and $page_id!=0)
+        	{
+        		$result_p = mysql_query("SELECT p_id, p_url FROM page WHERE p_id='$page_id'");
+            	$myrow_p = mysql_fetch_array($result_p);
+            	$name_url = $myrow_p['p_url'];
+			}
+		else
+        	{
+            	$name_url = '';
+            }
+        
+        $result_m2_type = mysql_query("SELECT m2_type FROM menu_2 WHERE m2_id='$m2_id'");
+        $myrow_m2_type = mysql_fetch_array($result_m2_type);
+        $m2_type = $myrow_m2_type['m2_type'];
+        
+        $result_m2 = mysql_query("SELECT m2_id, m2_name, m2_url, m2_counter FROM menu_2 WHERE m2_type='$m2_type' ORDER BY m2_sort");
+        
+        $array_id_m2 = array();
+        $array_name_m2 = array();
+        $array_url_m2 = array();
+        $array_counter_m2 = array();
+        	while($myrow_m2 = mysql_fetch_array($result_m2))
+        		{
+            		$array_id_m2[] = $myrow_m2['m2_id'];
+                    $array_name_m2[] = $myrow_m2['m2_name'];
+		            $array_url_m2[] = $myrow_m2['m2_url'];
+                    $array_counter_m2[] = $myrow_m2['m2_counter'];
+				}
+			
+            echo ("<div class='secondary_menu'><ul>");
+            
+            $carray = count($array_name_m2);
+            	for ($i = 0; $i <= $carray-1; $i++)
+            		{
+						$array_name_m2[$i] = $array_name_m2[$i].$array_counter_m2[$i];
+						$array_name_m2[$i] = str_replace('19',"<font size='-1'><sup>&nbsp;$req</sup></font>", "$array_name_m2[$i]");
+                        $array_name_m2[$i] = str_replace('20',"<font size='-1'><sup>&nbsp;$in_new</sup></font>", "$array_name_m2[$i]");
+                        
+                        $array_name_m2[$i] = str_replace('none',"<font size='-1'><sup>&nbsp;</sup></font>", "$array_name_m2[$i]");
+                        $array_url_m2[$i] = str_replace('$name',$name_url, "$array_url_m2[$i]");
+                        $array_url_m2[$i] = str_replace('$city',$city_url, "$array_url_m2[$i]");
+                        $array_url_m2[$i] = str_replace('$id',$id, "$array_url_m2[$i]");
+                        $array_url_m2[$i] = define_host().$array_url_m2[$i];
+                        
+                        if ($i == '0')
+                        	{
+                            	echo("<li");if ($m2_id == $array_id_m2[$i]){echo (" class='selected_left'");}else{echo(" class='left'");}echo("><a href='$array_url_m2[$i]'>$array_name_m2[$i]</a></li>");
+                            }
+						else
+                        	{
+                            	echo("<li");if ($m2_id == $array_id_m2[$i]){echo (" class='selected'");}echo("><a href='$array_url_m2[$i]'>$array_name_m2[$i]</a></li>");
+                            }
+                    }
+			
+            echo ("</ul></div>");
+?>

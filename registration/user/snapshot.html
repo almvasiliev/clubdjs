@@ -1,0 +1,375 @@
+<?php
+$page = 81;
+require_once ('../source/scripts/html/user_session.html');
+require_once ('../source/scripts/html/dd.html');
+if (isset($_GET['section']))
+	{
+    	if (preg_match("/^[a-z]{1,}$/",$_GET['section']) and ($_GET['section'] == 'save' or $_GET['section'] == 'delete'))
+			{
+				$section = htmlspecialchars($_GET['section']);
+				$section = strip_tags($section);
+                	
+                    if ($section == 'save')
+                    	{
+                        	if (isset($_POST['submit']))
+                                {
+                                    if (!preg_match("/[^(\w)|(\x7F-\xFF)|(\s)]/",$_POST['submit']))
+                                        {
+                                            $submit = htmlspecialchars($_POST['submit']);
+                                            $submit = strip_tags($submit);
+                                                if ($submit == 'save_snapshot' || $submit == '—охранить фотографию')
+                                                    {
+                                                    	
+                                                        $path_to_90_directory = htmlspecialchars($_POST['path_to_90_directory']);
+                                                        $path_to_90_directory = strip_tags($path_to_90_directory);
+                                                        
+                                                        $target = htmlspecialchars($_POST['target']);
+                                                        $target = strip_tags($target);
+                                                        
+                                                        $date = htmlspecialchars($_POST['date']);
+                                                        $date = strip_tags($date);
+                                                        
+                                                        $w_src = htmlspecialchars($_POST['w_src']);
+                                                        $w_src = strip_tags($w_src);
+                                                        
+                                                        $h_src = htmlspecialchars($_POST['h_src']);
+                                                        $h_src = strip_tags($h_src);
+                                                        
+                                                        $wp = htmlspecialchars($_POST['wp']);
+                                                        $wp = strip_tags($wp);
+                                                        
+                                                        $hp = htmlspecialchars($_POST['hp']);
+                                                        $hp = strip_tags($hp);
+                                                        
+                                                        $x = htmlspecialchars($_POST['x']);
+                                                        $x = strip_tags($x);
+                                                        
+                                                        $y = htmlspecialchars($_POST['y']);
+                                                        $y = strip_tags($y);
+                                                        
+                                                        $w = htmlspecialchars($_POST['w']);
+                                                        $w = strip_tags($w);
+                                                        
+                                                        $h = htmlspecialchars($_POST['h']);
+                                                        $h = strip_tags($h);
+                                                        
+                                                        if (preg_match('/[.](JPG)|(jpg)|(jpeg)|(JPEG)$/', $target))
+                                                            {
+                                                                $im = imagecreatefromjpeg($target);
+                                                                $dest = imagecreatetruecolor($wp,$hp);
+                                                                imagecopyresampled($dest, $im, 0, 0, 0, 0, $wp, $hp, $w_src, $h_src);
+                                                                imagejpeg($dest, $target, 100);
+                                                                $im_max = imagecreatefromjpeg($target);
+                                                                $dest_max = imagecreatetruecolor($w,$h);
+                                                                imagecopy($dest_max, $im_max, 0, 0, $x, $y, $wp, $hp);				
+                                                                $deldir = "snapshots/$id";
+                                                                if (file_exists($deldir)) {dd($deldir);}
+                                                                $structure = "snapshots/$id/";
+                                                                mkdir($structure);
+                                                                $max = "1";
+                                                                $link_max = "$structure$date$max.jpg";
+                                                                imagejpeg($dest_max, $link_max, 100);
+                                                                
+                                                                $dest_mid = imagecreatetruecolor(100,100);//создаем пустую квадратную картинку 100х100px
+                                                                $im_mid = imagecreatefromjpeg($link_max);//создаем изображение
+                                                                imagecopyresampled($dest_mid, $im_mid, 0, 0, 0, 0, 100, 100, $w, $h);
+                                                                $mid = "2";
+                                                                $link_mid = "$structure$date$mid.jpg";
+                                                                imagejpeg($dest_mid, $link_mid, 100);
+                                                                
+                                                                $dest_min = imagecreatetruecolor(50,50);//создаем пустую квадратную картинку 50х50px
+                                                                $im_min = imagecreatefromjpeg($link_mid);//создаем изображение
+                                                                imagecopyresampled($dest_min, $im_min, 0, 0, 0, 0, 50, 50, 100, 100);
+                                                                $min = "3";
+                                                                $link_min = "$structure$date$min.jpg";
+                                                                imagejpeg($dest_min, $link_min, 100);
+															}
+                                                        
+                                                        if (preg_match('/[.](GIF)|(gif)$/', $target))
+                                                        	{
+                                                            	$im = imagecreatefromgif($target);
+																$dest = imagecreatetruecolor($wp,$hp);
+                                                                imagecopyresampled($dest, $im, 0, 0, 0, 0, $wp, $hp, $w_src, $h_src);
+                                                                imagegif($dest, $target, 100);
+                                                                $im_max = imagecreatefromgif($target);
+                                                                $dest_max = imagecreatetruecolor($w,$h);
+                                                                imagecopy($dest_max, $im_max, 0, 0, $x, $y, $wp, $hp);				
+                                                                $deldir = "snapshots/$id";
+                                                                if (file_exists($deldir)) {dd($deldir);}
+                                                                $structure = "snapshots/$id/";
+                                                                mkdir($structure);
+                                                                $max = "1";
+                                                                $link_max = "$structure$date$max.gif";
+                                                                imagegif($dest_max, $link_max, 100);
+                                                                
+                                                                $dest_mid = imagecreatetruecolor(100,100);//создаем пустую квадратную картинку 100х100px
+                                                                $im_mid = imagecreatefromgif($link_max);//создаем изображение
+                                                                imagecopyresampled($dest_mid, $im_mid, 0, 0, 0, 0, 100, 100, $w, $h);
+                                                                $mid = "2";
+                                                                $link_mid = "$structure$date$mid.gif";
+                                                                imagegif($dest_mid, $link_mid, 100);
+                                                                
+                                                                $dest_min = imagecreatetruecolor(50,50);//создаем пустую квадратную картинку 50х50px
+                                                                $im_min = imagecreatefromgif($link_mid);//создаем изображение
+                                                                imagecopyresampled($dest_min, $im_min, 0, 0, 0, 0, 50, 50, 100, 100);
+                                                                $min = "3";
+                                                                $link_min = "$structure$date$min.gif";
+                                                                imagegif($dest_min, $link_min, 100);
+                                                            }
+														
+                                                        if (preg_match('/[.](PNG)|(png)$/', $target))
+                                                        	{
+                                                            	$im = imagecreatefrompng($target);
+                                                                $dest = imagecreatetruecolor($wp,$hp);
+                                                                imagealphablending($dest, false);
+                                                                imagesavealpha($dest, true);
+                                                                $transparent = imagecolorallocatealpha($dest, 255, 255, 255, 127);
+                                                                imagefilledrectangle($dest, 0, 0, $w_src, $h_src, $transparent);
+                                                                imagecopyresampled($dest, $im, 0, 0, 0, 0, $wp, $hp, $w_src, $h_src);
+                                                                imagepng($dest, $target);
+                                                                
+                                                                                                                                
+                                                                $im_max = imagecreatefrompng($target);
+                                                                $dest_max = imagecreatetruecolor($w,$h);
+                                                                
+                                                                imagealphablending($dest_max, false);
+                                                                imagesavealpha($dest_max, true);
+                                                                $transparent = imagecolorallocatealpha($dest_max, 255, 255, 255, 127);
+                                                                imagefilledrectangle($dest_max, 0, 0, $wp, $hp, $transparent);
+                                                                
+                                                                imagecopy($dest_max, $im_max, 0, 0, $x, $y, $wp, $hp);				
+                                                                $deldir = "snapshots/$id";
+                                                                if (file_exists($deldir)) {dd($deldir);}
+                                                                $structure = "snapshots/$id/";
+                                                                mkdir($structure);
+                                                                $max = "1";
+                                                                $link_max = "$structure$date$max.png";
+                                                                imagepng($dest_max, $link_max);
+                                                                
+                                                                
+                                                                
+                                                                $dest_mid = imagecreatetruecolor(100,100);//создаем пустую квадратную картинку 100х100px
+                                                                $im_mid = imagecreatefrompng($link_max);//создаем изображение
+                                                                
+                                                                imagealphablending($dest_mid, false);
+                                                                imagesavealpha($dest_mid, true);
+                                                                $transparent = imagecolorallocatealpha($dest_mid, 255, 255, 255, 127);
+                                                                imagefilledrectangle($dest_mid, 0, 0, $w, $h, $transparent);
+                                                                
+                                                                imagecopyresampled($dest_mid, $im_mid, 0, 0, 0, 0, 100, 100, $w, $h);
+                                                                $mid = "2";
+                                                                $link_mid = "$structure$date$mid.png";
+                                                                imagepng($dest_mid, $link_mid);
+                                                                
+                                                                
+                                                                
+                                                                $dest_min = imagecreatetruecolor(50,50);//создаем пустую квадратную картинку 50х50px
+                                                                $im_min = imagecreatefrompng($link_mid);//создаем изображение
+                                                                
+                                                                imagealphablending($dest_min, false);
+                                                                imagesavealpha($dest_min, true);
+                                                                $transparent = imagecolorallocatealpha($dest_min, 255, 255, 255, 127);
+                                                                imagefilledrectangle($dest_min, 0, 0, 100, 100, $transparent);
+                                                                
+                                                                imagecopyresampled($dest_min, $im_min, 0, 0, 0, 0, 50, 50, 100, 100);
+                                                                $min = "3";
+                                                                $link_min = "$structure$date$min.png";
+                                                                imagepng($dest_min, $link_min);
+                                                            }
+                                                        
+                                                        imagedestroy($im);
+                                                        imagedestroy($im_max);
+                                                        imagedestroy($im_mid);
+                                                        imagedestroy($im_min);
+                                                        unlink($target);
+                                                        
+                                                        $result_update_snapshot = mysql_query("UPDATE users SET user_snapshot_max = '$link_max', user_snapshot_mid = '$link_mid', user_snapshot_min = '$link_min', user_snapshot_timing='', user_snapshot_timing_date='0000-00-00 00:00:00' WHERE user_id='$id'");
+                                                        
+                                                        $home = define_host()."user/index.html?id=".$myrow['user_id'];
+                                                        back2url("$home",0);
+                                                    }
+												elseif ($submit == 'leave_snapshot' || $submit == '¬ернутьс€ назад')
+                                                	{
+                                                    	$settings = define_host()."user/settings.html?id=".$myrow['user_id']."&section=snapshot";
+                                                        back2url("$settings",0);
+                                                    }
+												else
+                                                	{
+                                                    	back2url("$error_404",0);
+                                                    }
+										}
+									else
+                                    	{
+                                        	back2url("$error_404",0);
+                                        }
+								}
+							else
+                            	{
+                                	back2url("$error_404",0);
+                                }
+                        }
+					elseif ($section == 'delete')
+                    	{
+                        	if (isset($_POST['submit']))
+                                {
+                                    if (!preg_match("/[^(\w)|(\x7F-\xFF)|(\s)]/",$_POST['submit']))
+                                        {
+                                            $submit = htmlspecialchars($_POST['submit']);
+                                            $submit = strip_tags($submit);
+                                                if ($submit == 'delete_snapshot' || $submit == '”далить фотографию')
+                                                    {
+                                                    	$deldir = "snapshots/$id";
+                                                        if (file_exists($deldir)) {dd($deldir);}
+                                                        $link_max = "snapshots/0/max.gif";
+                                                        $link_mid = "snapshots/0/mid.gif";
+                                                        $link_min = "snapshots/0/min.gif";
+                                                        $result_update_snapshot = mysql_query("UPDATE users SET user_snapshot_max = '$link_max', user_snapshot_mid = '$link_mid', user_snapshot_min = '$link_min', user_snapshot_timing='', user_snapshot_timing_date='0000-00-00 00:00:00' WHERE user_id='$id'");
+                                                        $home = define_host()."user/index.html?id=".$myrow['user_id'];
+                                                        back2url("$home",0);
+                                                    }
+												else
+                                                	{
+                                                    	back2url("$error_404",0);
+                                                    }
+										}
+									else
+                                    	{
+                                        	back2url("$error_404",0);
+                                        }
+								}
+							else
+                            	{
+                                	back2url("$error_404",0);
+                                }
+                        }
+					else
+                    	{
+                        	back2url("$error_404",0);
+						}
+			}
+		else
+			{
+				back2url('".define_host()."404.html',0);
+			}
+    }
+else
+	{
+		if (isset($_POST['path_to_90_directory']) and isset($_POST['target']) and isset($_POST['width_src']) and isset($_POST['height_src']))
+            {
+                $path_to_90_directory = $_POST['path_to_90_directory'];
+                $target = $_POST['target'];
+                $date = $_POST['date'];                
+                $width_src = $_POST['width_src'];
+                $height_src = $_POST['height_src'];
+            
+        
+                require_once ('../source/scripts/html/page_header.html');
+                require_once ('../source/scripts/html/top_row.html');
+                
+                $msg_class = 'msg_inform';
+                $msg_title = "‘отографи€ на ¬ашей странице.";
+                $msg_text = "¬ыбранна€ область на фотографии будет отображатьс€ на ¬ашей странице. ≈сли фотографи€ слишком больших размеров, пот€ните за ползунок в нижнем правом углу исходной фотографии, это позволит масштабировать исходное изображение.";
+                
+                echo("
+                <tr>
+                <td background='".define_host()."source/imgs/left_up_corner_line.gif' width='3' height='3'>
+                </td>
+                <td background='".define_host()."source/imgs/top_line.gif' width='954' height='3'>
+                </td>
+                <td background='".define_host()."source/imgs/right_up_corner_line.gif' width='3' height='3'>
+                </td>
+                </tr>
+                <tr><td width='3'>
+                    <table border='0' cellpadding='0' cellspacing='0' width='3' height='100%'>
+                    <tr><td background='".define_host()."source/imgs/gradient_left_up_line.gif' height='170' width='3'></td>
+                    </tr>
+                    <tr><td width='3'></td>
+                    </tr>
+                    <tr><td background='".define_host()."source/imgs/gradient_left_down_line.gif' height='170' width='3'></td>
+                    </tr>
+                    </table>
+                </td>
+                <td width='954' bgcolor='#fcfcfc'>
+                    <table border='0' cellpadding='0' cellspacing='0' width='100%' height='100%'>
+                    <tr><td width='100%' height='1' class='user_text' align='left'><div class='".$msg_class."'><b>$msg_title</b><br>$msg_text</div></td></tr>
+                    <tr><td width='100%' height='1' class='user_text' valign='top'>
+                    		<table border='0' cellpadding='0' cellspacing='0' width='100%' height='1'>
+                                <tr><td width='50%' height='1' class='user_text' align='right'>
+                                		<form id='formId' action='snapshot.html?id=$myrow[user_id]&section=save' method='post'>
+                                		<button class='snapshot_leave' type='submit' name='submit' value='leave_snapshot'>¬ернутьс€ назад</button>
+                                	</td>
+									<td width='50%' height='1' class='user_text' align='left'>                                
+                                		<button class='snapshot_save' type='submit' name='submit' value='save_snapshot'>—охранить фотографию</button>
+									</td>
+								</tr>
+							</table>
+                        </td>
+                    </tr>
+                    <tr><td width='100%' height='1' class='user_text' align='center'>
+                    		<table border='0' cellpadding='0' cellspacing='0' width='100%' height='1'>
+                            	<tr><td width='49%' height='1' align='left'></td>
+                                	<td width='2%' height='1' class='user_text' align='left'>
+                    ");
+                    
+                    chmod ($target, 0644);
+                    echo ("
+                    <div class='snapshot_user'><img id='photo1' src='".$target."' width='".$width_src."' height='".$height_src."'/></div>
+                    <input type='hidden' name='path_to_90_directory' value='".$path_to_90_directory."' />
+                    <input type='hidden' name='target' value='".$target."' />
+                    <input type='hidden' name='date' value='".$date."' />
+                    <input type='hidden' name='w_src' value='".$width_src."' />
+                    <input type='hidden' name='h_src' value='".$height_src."' />
+                    <input type='hidden' name='wp' value='0' />
+                    <input type='hidden' name='hp' value='0' />
+                    <input type='hidden' name='x' value='0' />
+                    <input type='hidden' name='y' value='0' />
+                    <input type='hidden' name='w' value='0' />
+                    <input type='hidden' name='h' value='0' />
+                    </form>
+                    ");
+                    
+                    echo("
+                    				</td>
+                                    <td width='49%' height='1' align='right'></td>
+								</tr>
+							</table>
+						</td>
+                    </tr>
+                    <tr>
+						<td width='954' valign='top'></td>
+					</tr>
+                    </table>
+                </td>
+                <td width='3'>
+                    <table border=0 cellpadding='0' cellspacing='0' width='3' height='100%'>
+                    <tr><td background='".define_host()."source/imgs/gradient_right_up_line.gif' height='170' width='3'>
+                    </td>
+                    </tr>
+                    <tr><td width='3'>
+                    </td>
+                    </tr>
+                    <tr><td height='170' width='3'>
+                    </td>
+                    </tr>
+                    </table>
+                </td>
+                </tr>
+                <tr>
+                <td background='".define_host()."source/imgs/gradient_left_down_corner.gif' width='3' height='3'>
+                </td>
+                <td style='background: #fff url(".define_host()."source/imgs/gradient_bottom_line.gif) no-repeat' width='954' height='3'>
+                </td>
+                <td width='3' height='3'>
+                </td>
+                </tr>
+                ");
+                require_once ('../source/scripts/html/bottom_row.html');
+                require_once ('../source/scripts/html/page_footer.html');
+            }
+        else
+            {
+                back2url("$error_404",0);
+            }
+
+    }
+?>

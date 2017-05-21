@@ -1,0 +1,38 @@
+<?php
+		echo("
+        <tr><td width='9' height='100'></td>
+        	<td width='160' height='100' valign='top'>
+        ");
+        
+        if (isset($page_id) and !empty($page_id))
+        	{
+                //Если PAGE_PARENT.PP_TYPE=1 т.е. соответствует заведению, то $city_id для всего LEFT_COLUMN берем соответствующий городу того заведения, на котором находимся в данный момент, иначе значение $city_id принимается из COOKIES.
+                $result_city = mysql_query("SELECT page.p_id, page.city_id, page.pp_id, page_parent.pp_type FROM page, page_parent WHERE page.p_id='$page_id' AND page.pp_id=page_parent.pp_id");
+                $myrow_city = mysql_fetch_array($result_city);
+                if ($myrow_city['pp_type']=='1' and isset($myrow_city['city_id']) and !empty($myrow_city['city_id']))
+                    {
+                        $city_id = $myrow_city['city_id'];
+                    }
+        	}
+		
+        $result_lc = mysql_query("SELECT * FROM left_column WHERE pt_page='$page' AND lc_show='1' ORDER by lc_sort");
+        $array_key_lc = array();
+        $array_lim_lc = array();
+			while($myrow_lc = mysql_fetch_array($result_lc))
+        		{
+            		$array_key_lc[] = $myrow_lc['lc_key'];
+                    $array_lim_lc[] = $myrow_lc['lc_lim'];
+				}
+			
+			$carray_lc = count($array_key_lc);
+			
+			for ($i = 0; $i <= $carray_lc-1; $i++)
+            		{
+                        require_once ("lc_key_".$array_key_lc[$i].".html");
+					}
+		
+        echo("
+        	</td>
+			<td width='10' height='100'></td>
+        ");
+?>

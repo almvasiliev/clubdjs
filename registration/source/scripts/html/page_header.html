@@ -1,0 +1,114 @@
+<?php
+
+		require_once ('menu_city.html');
+		require_once ('menu_user.html');
+		require_once ('menu_headline.html');
+        require_once ('menu_search.html');
+		require_once ('menu_main.html');
+        require_once ('ad_space_a.html');
+		
+        	if (isset($page_id) and !empty($page_id) and $page_id != '')
+				{
+                	$result_page_header = mysql_query("
+                    SELECT page_title.pt_text, page_description.pd_text, page_keywords.pk_text  
+                    FROM page_title 
+                    LEFT JOIN page_description ON page_description.p_id='$page_id' AND page_description.pt_page='$page' 
+                    LEFT JOIN page_keywords ON page_keywords.p_id='$page_id' AND page_keywords.pt_page='$page' 
+                    WHERE page_title.p_id='$page_id' AND page_title.pt_page='$page' 
+                    ");
+                    
+                    $myrow_page_header = mysql_fetch_array($result_page_header);
+                    if (isset($myrow_page_header['pt_text']) and !empty($myrow_page_header['pt_text'])){$title = $myrow_page_header['pt_text'];}else{$title = '';}
+                    if (isset($myrow_page_header['pd_text']) and !empty($myrow_page_header['pd_text'])){$description = $myrow_page_header['pd_text'];}else{$description = '';}
+                    if (isset($myrow_page_header['pk_text']) and !empty($myrow_page_header['pk_text'])){$keywords = $myrow_page_header['pk_text'];}else{$keywords = '';}     
+                }
+			else
+            	{
+                	$result_page_header = mysql_query("
+                    SELECT page_type.pt_title, page_type.pt_description, page_type.pt_keywords  
+                    FROM page_type 
+                    WHERE page_type.pt_page='$page' 
+                    ");
+                    
+                    $myrow_page_header = mysql_fetch_array($result_page_header);
+                    if (isset($myrow_page_header['pt_title']) and !empty($myrow_page_header['pt_title'])){$title = $myrow_page_header['pt_title'];}else{$title = '';}
+                    if (isset($myrow_page_header['pt_description']) and !empty($myrow_page_header['pt_description'])){$description = $myrow_page_header['pt_description'];}else{$description = '';}
+                    if (isset($myrow_page_header['pt_keywords']) and !empty($myrow_page_header['pt_keywords'])){$keywords = $myrow_page_header['pt_keywords'];}else{$keywords = '';}
+                    
+                    if (isset($myrow['user_name']) and !empty($myrow['user_name'])){$user_name = $myrow['user_name'];}else{$user_name = '';}
+        			if (isset($myrow['user_surname']) and !empty($myrow['user_surname'])){$user_surname = $myrow['user_surname'];}else{$user_surname = '';}
+                    if (!isset($city_name_genitivus) or empty($city_name_genitivus)){$city_name_genitivus = '';}
+                                        
+                    $title = str_replace('$name',$user_name, "$title");
+                    $title = str_replace('$surname',$user_surname, "$title");
+                    $title = str_replace('$city_genitivus',$city_name_genitivus, "$title");
+                    $title = str_replace('$city_dative',$city_name_dative, "$title");
+                    $title = str_replace('$city',$city_name, "$title");
+                    
+                    $description = str_replace('$name',$user_name, "$description");
+                    $description = str_replace('$surname',$user_surname, "$description");
+                    $description = str_replace('$city_genitivus',$city_name_genitivus, "$description");
+                    $description = str_replace('$city_dative',$city_name_dative, "$description");
+                    $description = str_replace('$city',$city_name, "$description");
+                    
+                    $keywords = str_replace('$name',$user_name, "$keywords");
+                    $keywords = str_replace('$surname',$user_surname, "$keywords");
+                    $keywords = str_replace('$city_genitivus',$city_name_genitivus, "$keywords");
+                    $keywords = str_replace('$city_dative',$city_name_dative, "$keywords");
+                    $keywords = str_replace('$city',$city_name, "$keywords");
+                }
+        
+         
+        
+        echo("
+        <html>
+        <head>
+        <meta http-equiv='Content-Language' content='ru'>
+        <meta http-equiv='Content-Type' content='text/html; charset=windows-1251'>
+        <title>".$title."</title>
+        <link rel='shortcut icon' href='".define_host()."source/imgs/favicon.ico' type='image/x-icon'>
+        <link href='".define_host()."source/scripts/css/style.css' type='text/css' rel='stylesheet'>
+        <meta name='description' content='".$description."'>
+        <meta name='keywords' content='".$keywords."'>
+        ");
+            if ($page == '95')
+                {
+                    require_once ('user_personal_settings_scripts.html');
+                }
+			if ($page == '81')
+            	{
+                	require_once ('user_snapshot_scripts.html');
+                }
+        echo("
+        </head>
+        ");
+		
+        ad_space_a();        
+        
+        echo ("
+		<tr><td align='right' valign=top width='49%'></td>
+        	<td align='center' valign=top width='960' bgcolor='#ffffff'>
+				<div align='center'>
+                	<table cellpadding='0' cellspacing='0' width='960' height='122' bgcolor='#ffffff'>
+                    	<tr><td width='5' height='5'></td>
+							<td width='950' height='5' colspan='3'></td>
+							<td width='5' height='5'></td>
+						</tr>
+						<tr><td width='5' height='112' rowspan='3'></td>
+							<td width='249' height='30' background='".define_host()."source/imgs/1.gif' valign='middle'>");menu_city($city_name);echo("</td>
+							<td width='701' height='30' colspan='2' background='".define_host()."source/imgs/2.gif'>");menu_user($authorized_user,$myrow2);echo("</td>
+							<td width='5' height='112' rowspan='3'></td>
+						</tr>
+						<tr><td width='249' height='82' rowspan='2' background='".define_host()."source/imgs/3.gif'><p align='center'><a href='".define_host()."'><img src='".define_host()."source/imgs/logo.gif' class='logotype'></a></p></td>
+							<td width='389' height='32' background='".define_host()."source/imgs/4.gif'>");menu_headline();echo("</td>
+							<td width='312' height='32' background='".define_host()."source/imgs/5.gif' valign='middle'>");menu_search();echo("</td>
+						</tr>
+						<tr><td width='701' height='50' colspan='2' valign=top background='".define_host()."source/imgs/6.gif'>");menu_main($city_url,$page);echo("</td>
+						</tr>
+						<tr><td width='5' height='5'></td>
+							<td width='950' height='5' colspan='3'></td>
+							<td width='5' height='5'></td>
+						</tr>
+					</table>
+			");
+?>

@@ -1,0 +1,161 @@
+<?php
+require_once ('../source/scripts/html/user_session.html');
+if (isset($_GET['section']))
+	{
+		if (preg_match("/^[a-z]{1,}$/",$_GET['section']) and ($_GET['section'] == 'personal' or $_GET['section'] == 'snapshot' or $_GET['section'] == 'email' or $_GET['section'] == 'password'))
+			{
+				$section = htmlspecialchars($_GET['section']);
+				$section = strip_tags($section);
+			}
+		else
+			{
+				back2url('".define_host()."404.html',0);
+			}
+	}
+else
+	{
+		$section = 'personal';
+	}
+
+if ($myrow2['user_id'] == $id)
+	{
+        if (empty($section) or $section == 'personal'){$page='95';}
+        elseif ($section == 'snapshot')
+        	{
+            	$page='96';
+                
+                	if (!empty($myrow['user_snapshot_timing'])){ unlink($myrow['user_snapshot_timing']);}
+        			$result5 = mysql_query("UPDATE users SET user_snapshot_timing='', user_snapshot_timing_date='0000-00-00 00:00:00' WHERE user_email='$email'",$connect);
+                
+					if (isset($_POST['submit']))
+						{
+                        	if (!preg_match("/[^(\w)|(\x7F-\xFF)|(\s)]/",$_POST['submit']))
+                                {
+                                    $submit = htmlspecialchars($_POST['submit']);
+                                    $submit = strip_tags($submit);
+                                        if ($submit == 'upload_snapshot' || $submit == 'Загрузить фотографию')
+                                            {
+                                            	
+                                                if (preg_match('/[.](JPG)|(jpg)|(jpeg)|(JPEG)|(gif)|(GIF)|(png)|(PNG)$/',$_FILES['fupload']['name']))
+                                                    {
+                                                        $date = time();
+                                                        $path_to_90_directory = 'snapshots/';
+                                                        $filename = $id.$_FILES['fupload']['name'];
+                                                        $source = $_FILES['fupload']['tmp_name'];
+                                                        $target = $path_to_90_directory.$filename;
+                                                        move_uploaded_file($source, $target);
+                                                        
+                                                        if (preg_match('/[.](GIF)|(gif)$/', $filename))
+                                                            {
+                                                                $im = imagecreatefromgif($path_to_90_directory.$filename);
+                                                                $target2 = $path_to_90_directory.$id.$date.'.gif';
+                                                            }
+                                                            
+                                                        if (preg_match('/[.](PNG)|(png)$/', $filename))
+                                                            {
+                                                                $im = imagecreatefrompng($path_to_90_directory.$filename);
+                                                                $target2 = $path_to_90_directory.$id.$date.'.png';
+                                                            }
+                                                        
+                                                        if (preg_match('/[.](JPG)|(jpg)|(jpeg)|(JPEG)$/', $filename))
+                                                            {
+                                                                $im = imagecreatefromjpeg($path_to_90_directory.$filename);
+                                                                $target2 = $path_to_90_directory.$id.$date.'.jpg';
+                                                            }
+                                                        rename($target,$target2);
+														$target = $target2;
+                                                        $width_src = imagesx($im);
+            											$height_src = imagesy($im);
+                                                        $aspect_ratio_src = $width_src / $height_src;
+                                                            
+                                                            if ($width_src < 200 or $width_src > 7000 or $height_src < 200 or $height_src > 7000 or $aspect_ratio_src < 0.33 or $aspect_ratio_src > 3)
+                                                                {
+                                                                    unlink ($target);
+                                                                    $msg_class = 'msg_cancel';
+                                                                    $msg_title = "К сожалению, произошла ошибка.";
+                                                                    $msg_text = "Фотография должна иметь размер не меньше 200 точек и не больше 7 000 точек по каждой из сторон. Кроме того, нельзя использовать фотографии, у которых одна из сторон в разы превышает другую.";
+                                                                }
+                                                            else
+                                                                {
+                                                                	$result_snapshot = mysql_query("UPDATE users SET user_snapshot_timing='$target', user_snapshot_timing_date=NOW() WHERE user_id='$id'",$connect);
+																	$width_new = 908;//918
+                                                                    
+																		if ($width_src > $width_new)
+                                                                        	{
+                                                                            	$height_new = $height_src * $width_new / $width_src;
+                                                                                $height_new = floor($height_new);
+                                                                                
+                                                                                    if (preg_match('/[.](JPG)|(jpg)|(jpeg)|(JPEG)$/', $target))
+                                                                                        {
+                                                                                            $dest_new = imagecreatetruecolor($width_new,$height_new);
+                                                                                            imagecopyresampled($dest_new, $im, 0, 0, 0, 0, $width_new, $height_new, $width_src, $height_src);
+                                                                                            imagejpeg($dest_new, $target, 100);
+                                                                                            ImageDestroy($dest_new);
+                                                                                        }
+																					
+                                                                                    if (preg_match('/[.](GIF)|(gif)$/', $target))
+                                                                                        {
+                                                                                            $dest_new = imagecreatetruecolor($width_new,$height_new);
+                                                                                            imagecopyresampled($dest_new, $im, 0, 0, 0, 0, $width_new, $height_new, $width_src, $height_src);
+                                                                                            imagegif($dest_new, $target, 100);
+                                                                                            ImageDestroy($dest_new);
+                                                                                        }
+																					
+                                                                                    if (preg_match('/[.](PNG)|(png)$/', $target))
+                                                                                        {
+                                                                                            $dest_new = imagecreatetruecolor($width_new,$height_new);
+                                                                                            imagealphablending($dest_new, false);
+                                                                                            imagesavealpha($dest_new, true);
+                                                                                            $transparent = imagecolorallocatealpha($dest_new, 255, 255, 255, 127);
+                                                                                            imagefilledrectangle($dest_new, 0, 0, $width_src, $height_src, $transparent);
+                                                                                            imagecopyresampled($dest_new, $im, 0, 0, 0, 0, $width_new, $height_new, $width_src, $height_src);
+                                                                                            imagepng($dest_new, $target);
+                                                                                            ImageDestroy($dest_new); 
+                                                                                        }
+																				
+                                                                                $width_src = $width_new;
+                                                                                $height_src = $height_new;
+																			}
+                                                                                echo("
+                                                                                <html><head></head><body>
+                                                                                <form name='snapshot' id='snapshot' action='snapshot.html?id=$myrow[user_id]' method='post' enctype='multipart/form-data'>
+                                                                                <input type='hidden' name='path_to_90_directory' value='".$path_to_90_directory."'/>
+                                                                                <input type='hidden' name='target' value='".$target."'/>
+                                                                                <input type='hidden' name='date' value='".$date."'/>
+                                                                                <input type='hidden' name='width_src' value='".$width_src."'/>
+                        														<input type='hidden' name='height_src' value='".$height_src."'/>
+                                                                                </form>
+                                                                                <!--<script>document.getElementById('form').submit();</script>-->
+                                                                                <script language='JavaScript' type='text/javascript'>document.snapshot.submit();</script>
+                                                                                </body>
+                                                                                </html>
+                                                                                ");
+                                                                    
+                                                                    
+                                                                    
+                                                                    $msg_class = 'msg_apply';
+                                                                    $msg_title = "YES.";
+                                                                    $msg_text = "Картинка.";
+                                                                }
+                                                    }
+                                                else
+                                                    {
+                                                        $msg_class = 'msg_cancel';
+                                                        $msg_title = "К сожалению, произошла ошибка.";
+                                                        $msg_text = "Изображение должно быть в формате JPG, GIF или PNG. Проблемы с загрузкой изображения могут быть так же связаны с большим размером фотографии. Попробуйте выбрать фотографию меньшего размера.";
+                                                    }
+                                                
+                                            }
+								}
+						}
+            }
+        elseif ($section == 'email'){$page='97';}
+        elseif ($section == 'password'){$page='98';}
+        else {back2url("$error_404",0);}
+	}
+else
+	{
+    	back2url("$error_404",0);
+	}
+require_once ('../source/scripts/html/page.html');
+?>
