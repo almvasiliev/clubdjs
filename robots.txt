@@ -1,2 +1,8 @@
-User-agent: *<br>
+User-agent: *
+
 Disallow: /registration/
+Disallow: /registration2/
+
+Allow: *.css
+Allow: *.js
+
